@@ -19,6 +19,63 @@ import {
 } from './utils'
 
 /**
+ * Date parts extracted in a specific timezone
+ */
+interface DateParts {
+  year: number
+  month: number
+  day: number
+  weekday: number
+  hour: number
+  minute: number
+  second: number
+}
+
+/**
+ * Get date parts in a specific timezone using Intl.DateTimeFormat
+ * This is the key function that ensures we get the correct time components
+ * for the target timezone, not the server's local timezone.
+ */
+function getDatePartsInTimezone(date: Date, timezone?: Timezone): DateParts {
+  const tz = timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
+
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  })
+
+  const parts = formatter.formatToParts(date)
+  const getPart = (type: string): number | string => {
+    const part = parts.find((p) => p.type === type)
+    return part ? part.value : ''
+  }
+
+  // Map weekday string to number (0-6, Sunday = 0)
+  const weekdayMap: Record<string, number> = {
+    'Sun': 0, 'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5, 'Sat': 6
+  }
+  const weekdayStr = getPart('weekday') as string
+  const weekday = weekdayMap[weekdayStr] ?? 0
+
+  return {
+    year: parseInt(getPart('year') as string, 10),
+    month: parseInt(getPart('month') as string, 10) - 1, // 0-indexed like Date.getMonth()
+    day: parseInt(getPart('day') as string, 10),
+    weekday,
+    hour: parseInt(getPart('hour') as string, 10),
+    minute: parseInt(getPart('minute') as string, 10),
+    second: parseInt(getPart('second') as string, 10),
+  }
+}
+
+/**
  * Token definitions for format strings
  */
 interface TokenHandlers {
@@ -27,41 +84,84 @@ interface TokenHandlers {
 
 const tokenHandlers: TokenHandlers = {
   // Year
-  year: (date) => date.getFullYear().toString(),
-  yearShort: (date) => date.getFullYear().toString().slice(-2),
+  year: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    return parts.year.toString()
+  },
+  yearShort: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    return parts.year.toString().slice(-2)
+  },
 
   // Month
-  month: (date) => padZero(date.getMonth() + 1),
-  monthShort: (date) => MONTHS_SHORT[date.getMonth()],
-  monthFull: (date) => MONTHS_FULL[date.getMonth()],
+  month: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    return padZero(parts.month + 1)
+  },
+  monthShort: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    return MONTHS_SHORT[parts.month]
+  },
+  monthFull: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    return MONTHS_FULL[parts.month]
+  },
 
   // Day
-  day: (date) => padZero(date.getDate()),
-  dayOrdinal: (date) => formatOrdinal(date.getDate()),
-  weekday: (date) => WEEKDAYS_FULL[date.getDay()],
-  weekdayShort: (date) => WEEKDAYS_SHORT[date.getDay()],
+  day: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    return padZero(parts.day)
+  },
+  dayOrdinal: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    return formatOrdinal(parts.day)
+  },
+  weekday: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    return WEEKDAYS_FULL[parts.weekday]
+  },
+  weekdayShort: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    return WEEKDAYS_SHORT[parts.weekday]
+  },
 
   // Time (respects hour12 config)
-  hour: (date, config) => {
-    const hour = date.getHours()
+  hour: (date, config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
     if (config.formats.hour12) {
-      const hour12 = hour % 12 || 12
+      const hour12 = parts.hour % 12 || 12
       return hour12.toString()
     }
-    return padZero(hour)
+    return padZero(parts.hour)
   },
-  hour24: (date) => padZero(date.getHours()),
-  hour12: (date) => {
-    const hour = date.getHours() % 12 || 12
-    return hour.toString()
+  hour24: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    return padZero(parts.hour)
   },
-  minute: (date) => padZero(date.getMinutes()),
-  second: (date) => padZero(date.getSeconds()),
+  hour12: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    const hour12 = parts.hour % 12 || 12
+    return hour12.toString()
+  },
+  minute: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    return padZero(parts.minute)
+  },
+  second: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    return padZero(parts.second)
+  },
   millisecond: (date) => padZero(date.getMilliseconds(), 3),
 
   // AM/PM
-  ampm: (date) => (date.getHours() < 12 ? 'am' : 'pm'),
-  AMPM: (date) => (date.getHours() < 12 ? 'AM' : 'PM'),
+  ampm: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    return parts.hour < 12 ? 'am' : 'pm'
+  },
+  AMPM: (date, _config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    return parts.hour < 12 ? 'AM' : 'PM'
+  },
 
   // Timezone
   timezone: (date, _config, timezone) => {
@@ -81,17 +181,17 @@ const tokenHandlers: TokenHandlers = {
   },
 
   // Special: time preset
-  time: (date, config) => {
-    const hour = date.getHours()
-    const minute = padZero(date.getMinutes())
+  time: (date, config, timezone) => {
+    const parts = getDatePartsInTimezone(date, timezone)
+    const minute = padZero(parts.minute)
 
     if (config.formats.hour12) {
-      const hour12 = hour % 12 || 12
-      const ampm = hour < 12 ? 'AM' : 'PM'
+      const hour12 = parts.hour % 12 || 12
+      const ampm = parts.hour < 12 ? 'AM' : 'PM'
       return `${hour12}:${minute} ${ampm}`
     }
 
-    return `${padZero(hour)}:${minute}`
+    return `${padZero(parts.hour)}:${minute}`
   },
 }
 
