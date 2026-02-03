@@ -1,5 +1,5 @@
 {
-  "name": "@whenny/react",
+  "name": "whenny-react",
   "version": "1.0.0",
   "description": "React hooks and components for Whenny, with shadcn/ui calendar integration",
   "keywords": [
@@ -36,7 +36,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "sideEffects": false,
   "scripts": {
@@ -47,7 +48,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "whenny": "*"
+    "whenny": "^1.0.0"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
