@@ -296,6 +296,9 @@ import { useRelativeTime } from 'whenny-react'`}</code>
               <a href="https://github.com/ZVN-DEV/whenny" className="text-slate-500 hover:text-slate-700 text-sm">
                 GitHub
               </a>
+              <Link href="/docs" className="text-slate-500 hover:text-slate-700 text-sm">
+                Docs
+              </Link>
               <Link href="/demo" className="text-slate-500 hover:text-slate-700 text-sm">
                 Demo
               </Link>
