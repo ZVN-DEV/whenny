@@ -78,30 +78,52 @@ function CodeBlock({
   )
 }
 
-// Simple syntax highlighting
-function highlightCode(code: string, language: string): string {
+// Simple syntax highlighting using token-based approach to avoid regex conflicts
+function highlightCode(code: string, _language: string): string {
+  // First, escape HTML
   let result = code
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
 
-  // Comments
-  result = result.replace(/(\/\/.*$)/gm, '<span class="text-slate-500">$1</span>')
+  // Use unique placeholders that won't conflict with code content
+  const tokens: string[] = []
+  const placeholder = (content: string) => {
+    const idx = tokens.length
+    tokens.push(content)
+    return `\x00${idx}\x00`
+  }
+
+  // Comments first (highest priority)
+  result = result.replace(/(\/\/.*$)/gm, (match) =>
+    placeholder(`<span style="color:#64748b">${match}</span>`)
+  )
 
   // Strings
-  result = result.replace(/(['"`])((?:\\.|(?!\1)[^\\])*?)\1/g, '<span class="text-emerald-400">$1$2$1</span>')
+  result = result.replace(/(&quot;|'|`)((?:\\.|(?!\1)[^\\])*?)\1/g, (match) =>
+    placeholder(`<span style="color:#34d399">${match}</span>`)
+  )
 
   // Keywords
   const keywords = ['import', 'export', 'from', 'const', 'let', 'var', 'function', 'return', 'if', 'else', 'async', 'await', 'new', 'class', 'extends']
   keywords.forEach(kw => {
-    result = result.replace(new RegExp(`\\b(${kw})\\b`, 'g'), '<span class="text-purple-400">$1</span>')
+    result = result.replace(new RegExp(`\\b(${kw})\\b`, 'g'), (match) =>
+      placeholder(`<span style="color:#c084fc">${match}</span>`)
+    )
   })
 
-  // Functions
-  result = result.replace(/\b([a-zA-Z_]\w*)\s*\(/g, '<span class="text-blue-400">$1</span>(')
+  // Function calls
+  result = result.replace(/\b([a-zA-Z_]\w*)\s*\(/g, (match, name) =>
+    placeholder(`<span style="color:#60a5fa">${name}</span>`) + '('
+  )
 
-  // Numbers
-  result = result.replace(/\b(\d+)\b/g, '<span class="text-amber-400">$1</span>')
+  // Numbers (but not inside placeholders)
+  result = result.replace(/\b(\d+)\b/g, (match) =>
+    placeholder(`<span style="color:#fbbf24">${match}</span>`)
+  )
+
+  // Replace placeholders with actual HTML
+  result = result.replace(/\x00(\d+)\x00/g, (_, idx) => tokens[parseInt(idx)])
 
   return result
 }
