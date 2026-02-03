@@ -5,7 +5,7 @@
  * Configuration can be loaded from a whenny.config.ts file or passed directly.
  */
 
-import type { WhennyConfig, WhennyUserConfig, DeepPartial } from '../types'
+import type { WhennyConfig, WhennyUserConfig } from '../types'
 import { defaultConfig } from './defaults'
 
 // Global configuration instance
@@ -14,10 +14,43 @@ let globalConfig: WhennyConfig = defaultConfig
 /**
  * Deep merge utility for configuration objects
  */
-function deepMerge<T extends Record<string, unknown>>(
-  target: T,
-  source: DeepPartial<T>
-): T {
+function deepMerge(
+  target: WhennyConfig,
+  source: WhennyUserConfig
+): WhennyConfig {
+  const result = { ...target } as unknown as Record<string, unknown>
+
+  for (const key in source) {
+    const sourceValue = (source as unknown as Record<string, unknown>)[key]
+    const targetValue = (target as unknown as Record<string, unknown>)[key]
+
+    if (
+      sourceValue !== null &&
+      typeof sourceValue === 'object' &&
+      !Array.isArray(sourceValue) &&
+      targetValue !== null &&
+      typeof targetValue === 'object' &&
+      !Array.isArray(targetValue)
+    ) {
+      result[key] = deepMergeObject(
+        targetValue as Record<string, unknown>,
+        sourceValue as Record<string, unknown>
+      )
+    } else if (sourceValue !== undefined) {
+      result[key] = sourceValue
+    }
+  }
+
+  return result as unknown as WhennyConfig
+}
+
+/**
+ * Deep merge for nested objects
+ */
+function deepMergeObject(
+  target: Record<string, unknown>,
+  source: Record<string, unknown>
+): Record<string, unknown> {
   const result = { ...target }
 
   for (const key in source) {
@@ -32,12 +65,12 @@ function deepMerge<T extends Record<string, unknown>>(
       typeof targetValue === 'object' &&
       !Array.isArray(targetValue)
     ) {
-      result[key] = deepMerge(
+      result[key] = deepMergeObject(
         targetValue as Record<string, unknown>,
-        sourceValue as DeepPartial<Record<string, unknown>>
-      ) as T[Extract<keyof T, string>]
+        sourceValue as Record<string, unknown>
+      )
     } else if (sourceValue !== undefined) {
-      result[key] = sourceValue as T[Extract<keyof T, string>]
+      result[key] = sourceValue
     }
   }
 

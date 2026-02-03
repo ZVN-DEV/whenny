@@ -13,17 +13,13 @@ import {
   isToday,
   isYesterday,
   isTomorrow,
-  isThisWeek,
   isThisYear,
   isFuture,
   isBrowser,
-  getLocalTimezone,
   SECONDS_IN_MINUTE,
   SECONDS_IN_HOUR,
-  SECONDS_IN_DAY,
   SECONDS_IN_WEEK,
   SECONDS_IN_MONTH,
-  SECONDS_IN_YEAR,
 } from '../core/utils'
 import { format, formatInTimezone } from '../core/formatter'
 import { relative } from '../relative'
@@ -44,7 +40,7 @@ function findBucket(
   date: Date,
   reference: Date,
   buckets: SmartBucket[],
-  timezone?: Timezone
+  _timezone?: Timezone
 ): SmartBucket | undefined {
   const diffSeconds = Math.abs(differenceInSeconds(date, reference))
 

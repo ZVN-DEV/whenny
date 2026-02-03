@@ -29,10 +29,7 @@
 import type {
   DateInput,
   Timezone,
-  WhennyConfig,
-  WhennyUserConfig,
   Whenny as WhennyInterface,
-  WhennyDuration,
   TransferPayload,
 } from './types'
 
@@ -136,7 +133,7 @@ export { configure, getConfig, resetConfig, createConfig, defineConfig }
 export { defaultConfig } from './config/defaults'
 
 // Relative time
-export { relative, fromNow, from as relativeFrom }
+export { relative, fromNow, relativeFrom }
 
 // Smart formatting
 export { smart, smartFor, smartFrom }
@@ -158,6 +155,18 @@ export {
   convertTo,
   isTodayIn,
   nowIn,
+  // Timezone aliases
+  fromAlias,
+  isAlias,
+  aliases,
+  isValidTimezone,
+  // Date ranges
+  createRange,
+  isInRange,
+  rangesOverlap,
+  rangeIntersection,
+  getDatesBetween,
+  type DateRange,
 } from './timezone'
 
 // Transfer
@@ -206,7 +215,26 @@ export {
   padZero,
   formatOrdinal,
   getOrdinalSuffix,
+  addTime,
+  subtractTime,
 } from './core/utils'
+
+// Errors
+export {
+  WhennyError,
+  type WhennyErrorCode,
+  type WhennyErrorContext,
+  type Result,
+  ok,
+  err,
+  trySafe,
+  assertValidDate,
+  assertInputLength,
+  assertValidTimeUnit,
+  assertValidTransferPayload,
+  MAX_INPUT_LENGTH,
+  MAX_PARSE_DEPTH,
+} from './errors'
 
 // Default export
 export default whenny

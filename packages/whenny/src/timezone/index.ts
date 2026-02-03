@@ -122,7 +122,6 @@ export function convertTo(date: DateInput, timezone: Timezone): Date {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-    fractionalSecondDigits: 3,
     hour12: false,
   })
 
@@ -226,6 +225,212 @@ export function inZone(timezone: Timezone, dateString?: string): Date {
   return new Date(localParsed.getTime() + offsetDiff)
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// TIMEZONE ALIASES
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Common timezone aliases mapped to IANA timezone names.
+ * Supports abbreviations like "EST", "PST", etc.
+ */
+const TIMEZONE_ALIASES: Record<string, Timezone> = {
+  // US Timezones
+  EST: 'America/New_York',
+  EDT: 'America/New_York',
+  CST: 'America/Chicago',
+  CDT: 'America/Chicago',
+  MST: 'America/Denver',
+  MDT: 'America/Denver',
+  PST: 'America/Los_Angeles',
+  PDT: 'America/Los_Angeles',
+  AKST: 'America/Anchorage',
+  AKDT: 'America/Anchorage',
+  HST: 'Pacific/Honolulu',
+
+  // European Timezones
+  GMT: 'Europe/London',
+  BST: 'Europe/London',
+  WET: 'Europe/Lisbon',
+  WEST: 'Europe/Lisbon',
+  CET: 'Europe/Paris',
+  CEST: 'Europe/Paris',
+  EET: 'Europe/Helsinki',
+  EEST: 'Europe/Helsinki',
+  MSK: 'Europe/Moscow',
+
+  // Asian Timezones
+  IST: 'Asia/Kolkata',
+  PKT: 'Asia/Karachi',
+  JST: 'Asia/Tokyo',
+  KST: 'Asia/Seoul',
+  CST_CHINA: 'Asia/Shanghai',
+  HKT: 'Asia/Hong_Kong',
+  SGT: 'Asia/Singapore',
+  ICT: 'Asia/Bangkok',
+  WIB: 'Asia/Jakarta',
+
+  // Australian Timezones
+  AEST: 'Australia/Sydney',
+  AEDT: 'Australia/Sydney',
+  ACST: 'Australia/Adelaide',
+  ACDT: 'Australia/Adelaide',
+  AWST: 'Australia/Perth',
+
+  // Other
+  NZST: 'Pacific/Auckland',
+  NZDT: 'Pacific/Auckland',
+  UTC: 'UTC',
+  Z: 'UTC',
+}
+
+/**
+ * Resolve a timezone alias to an IANA timezone name.
+ * Returns the original string if not found (might be an IANA name already).
+ *
+ * @example
+ * ```typescript
+ * fromAlias('EST')         // 'America/New_York'
+ * fromAlias('PST')         // 'America/Los_Angeles'
+ * fromAlias('UTC')         // 'UTC'
+ * fromAlias('America/New_York')  // 'America/New_York' (unchanged)
+ * ```
+ */
+export function fromAlias(alias: string): Timezone {
+  const upper = alias.toUpperCase()
+  return TIMEZONE_ALIASES[upper] ?? alias
+}
+
+/**
+ * Check if a string is a known timezone alias.
+ */
+export function isAlias(alias: string): boolean {
+  return alias.toUpperCase() in TIMEZONE_ALIASES
+}
+
+/**
+ * Get all known timezone aliases.
+ */
+export function aliases(): Record<string, Timezone> {
+  return { ...TIMEZONE_ALIASES }
+}
+
+/**
+ * Validate if a string is a valid timezone (IANA name or alias).
+ * Returns true if the timezone can be used for date operations.
+ */
+export function isValidTimezone(tz: string): boolean {
+  const resolved = fromAlias(tz)
+  try {
+    Intl.DateTimeFormat('en-US', { timeZone: resolved })
+    return true
+  } catch {
+    return false
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DATE RANGES
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface DateRange {
+  start: Date
+  end: Date
+}
+
+/**
+ * Create a date range.
+ *
+ * @example
+ * ```typescript
+ * const range = createRange('2024-01-01', '2024-01-31')
+ * ```
+ */
+export function createRange(start: DateInput, end: DateInput): DateRange {
+  return {
+    start: parseDate(start),
+    end: parseDate(end),
+  }
+}
+
+/**
+ * Check if a date is within a range (inclusive).
+ *
+ * @example
+ * ```typescript
+ * const range = createRange('2024-01-01', '2024-01-31')
+ * isInRange('2024-01-15', range)  // true
+ * isInRange('2024-02-01', range)  // false
+ * ```
+ */
+export function isInRange(date: DateInput, range: DateRange): boolean {
+  const d = parseDate(date)
+  return d >= range.start && d <= range.end
+}
+
+/**
+ * Check if two date ranges overlap.
+ *
+ * @example
+ * ```typescript
+ * const rangeA = createRange('2024-01-01', '2024-01-15')
+ * const rangeB = createRange('2024-01-10', '2024-01-20')
+ * rangesOverlap(rangeA, rangeB)  // true
+ * ```
+ */
+export function rangesOverlap(rangeA: DateRange, rangeB: DateRange): boolean {
+  return rangeA.start <= rangeB.end && rangeA.end >= rangeB.start
+}
+
+/**
+ * Get the intersection of two date ranges.
+ * Returns null if ranges don't overlap.
+ *
+ * @example
+ * ```typescript
+ * const rangeA = createRange('2024-01-01', '2024-01-15')
+ * const rangeB = createRange('2024-01-10', '2024-01-20')
+ * rangeIntersection(rangeA, rangeB)  // { start: Jan 10, end: Jan 15 }
+ * ```
+ */
+export function rangeIntersection(rangeA: DateRange, rangeB: DateRange): DateRange | null {
+  if (!rangesOverlap(rangeA, rangeB)) {
+    return null
+  }
+
+  return {
+    start: new Date(Math.max(rangeA.start.getTime(), rangeB.start.getTime())),
+    end: new Date(Math.min(rangeA.end.getTime(), rangeB.end.getTime())),
+  }
+}
+
+/**
+ * Get all dates between two dates (inclusive).
+ *
+ * @example
+ * ```typescript
+ * const dates = getDatesBetween('2024-01-01', '2024-01-05')
+ * // [Jan 1, Jan 2, Jan 3, Jan 4, Jan 5]
+ * ```
+ */
+export function getDatesBetween(start: DateInput, end: DateInput): Date[] {
+  const startDate = startOfDay(parseDate(start))
+  const endDate = startOfDay(parseDate(end))
+  const dates: Date[] = []
+
+  // Limit to prevent memory issues
+  const MAX_DATES = 366 * 2 // ~2 years
+  let current = new Date(startDate)
+  let count = 0
+
+  while (current <= endDate && count < MAX_DATES) {
+    dates.push(new Date(current))
+    current.setDate(current.getDate() + 1)
+    count++
+  }
+
+  return dates
+}
+
 /**
  * Timezone utilities namespace
  */
@@ -241,4 +446,15 @@ export const tz = {
   isTodayIn,
   nowIn,
   inZone,
+  // Aliases
+  fromAlias,
+  isAlias,
+  aliases,
+  isValidTimezone,
+  // Ranges
+  createRange,
+  isInRange,
+  rangesOverlap,
+  rangeIntersection,
+  getDatesBetween,
 }

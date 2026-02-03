@@ -5,7 +5,7 @@
  * finding day boundaries, business day calculations, etc.
  */
 
-import type { WhennyConfig, DateInput, TimeUnit, DayOfWeek, Timezone } from '../types'
+import type { WhennyConfig, DateInput, TimeUnit, DayOfWeek } from '../types'
 import { getConfig } from '../config'
 import {
   parseDate,

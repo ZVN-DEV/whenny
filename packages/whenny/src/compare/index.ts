@@ -117,7 +117,7 @@ export function compare(
 export function distance(
   dateA: DateInput,
   dateB: DateInput,
-  config: WhennyConfig = getConfig()
+  _config: WhennyConfig = getConfig()
 ): WhennyDistance {
   const a = parseDate(dateA)
   const b = parseDate(dateB)

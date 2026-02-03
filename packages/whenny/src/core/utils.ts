@@ -6,6 +6,10 @@
  */
 
 import type { DateInput, TimeUnit, Timezone } from '../types'
+import {
+  WhennyError,
+  assertInputLength,
+} from '../errors'
 
 // ============================================================================
 // CONSTANTS
@@ -47,41 +51,200 @@ export const WEEKDAYS_FULL = [
 // ============================================================================
 
 /**
- * Parse any date input into a Date object
+ * Parse any date input into a Date object.
+ *
+ * Supports:
+ * - Date objects (returns a clone)
+ * - Unix timestamps (milliseconds)
+ * - ISO 8601 strings: "2024-01-15", "2024-01-15T10:30:00Z"
+ * - Space-separated: "2024-01-15 10:30:00"
+ * - Slash-separated: "2024/01/15", "01/15/2024"
+ * - European format: "15.01.2024"
+ * - Whenny instances (via toDate())
+ *
+ * @example
+ * ```typescript
+ * parseDate(new Date())           // Clone
+ * parseDate(1705276800000)        // Unix timestamp
+ * parseDate('2024-01-15')         // ISO date
+ * parseDate('2024-01-15T10:30Z')  // ISO datetime
+ * parseDate('2024/01/15')         // Slash format
+ * parseDate('15.01.2024')         // European format
+ * ```
  */
 export function parseDate(input: DateInput): Date {
+  // Handle Date objects - return a clone
   if (input instanceof Date) {
+    if (isNaN(input.getTime())) {
+      throw new WhennyError('INVALID_DATE', 'Received an Invalid Date object', {
+        input: 'Invalid Date',
+        operation: 'parseDate',
+      })
+    }
     return new Date(input.getTime())
   }
 
+  // Handle Unix timestamps
   if (typeof input === 'number') {
-    return new Date(input)
+    if (!Number.isFinite(input)) {
+      throw new WhennyError('INVALID_TIMESTAMP', 'Timestamp must be a finite number', {
+        input,
+        operation: 'parseDate',
+      })
+    }
+    const date = new Date(input)
+    if (isNaN(date.getTime())) {
+      throw new WhennyError('INVALID_TIMESTAMP', 'Timestamp resulted in Invalid Date', {
+        input,
+        operation: 'parseDate',
+      })
+    }
+    return date
   }
 
+  // Handle string inputs
   if (typeof input === 'string') {
-    // Try parsing as ISO string first
-    const parsed = new Date(input)
-    if (!isNaN(parsed.getTime())) {
+    // Validate length for security
+    assertInputLength(input, 'Date string')
+
+    const trimmed = input.trim()
+    if (trimmed === '') {
+      throw new WhennyError('INVALID_DATE_STRING', 'Date string cannot be empty', {
+        input: '(empty string)',
+        operation: 'parseDate',
+      })
+    }
+
+    // Try multiple parsing strategies
+    const parsed = tryParseString(trimmed)
+    if (parsed) {
       return parsed
     }
 
-    // Try common formats
-    // Handle formats like "2024-01-15 10:30"
-    const withT = input.replace(' ', 'T')
-    const parsedWithT = new Date(withT)
-    if (!isNaN(parsedWithT.getTime())) {
-      return parsedWithT
-    }
-
-    throw new Error(`Invalid date string: ${input}`)
+    throw new WhennyError(
+      'INVALID_DATE_STRING',
+      `Unable to parse date string: "${truncate(trimmed, 50)}"`,
+      {
+        input: trimmed,
+        operation: 'parseDate',
+        supported: [
+          'ISO 8601 (2024-01-15, 2024-01-15T10:30:00Z)',
+          'Slash format (2024/01/15, 01/15/2024)',
+          'European (15.01.2024)',
+          'Unix timestamp (1705276800000)',
+        ],
+      }
+    )
   }
 
-  // Handle Whenny instances
+  // Handle Whenny instances (duck typing)
   if (input && typeof input === 'object' && 'toDate' in input) {
-    return (input as { toDate(): Date }).toDate()
+    const date = (input as { toDate(): Date }).toDate()
+    if (isNaN(date.getTime())) {
+      throw new WhennyError('INVALID_DATE', 'Object.toDate() returned Invalid Date', {
+        input: 'Whenny-like object',
+        operation: 'parseDate',
+      })
+    }
+    return date
   }
 
-  throw new Error(`Invalid date input: ${input}`)
+  throw new WhennyError('INVALID_DATE', 'Unsupported date input type', {
+    input,
+    received: typeof input,
+    expected: 'Date | number | string',
+    operation: 'parseDate',
+  })
+}
+
+/**
+ * Try multiple parsing strategies for string dates.
+ */
+function tryParseString(input: string): Date | null {
+  // Strategy 1: Native Date parsing (ISO 8601, etc.)
+  const native = new Date(input)
+  if (!isNaN(native.getTime())) {
+    return native
+  }
+
+  // Strategy 2: Replace space with T for datetime strings
+  // "2024-01-15 10:30:00" -> "2024-01-15T10:30:00"
+  if (input.includes(' ') && !input.includes('T')) {
+    const withT = input.replace(' ', 'T')
+    const parsed = new Date(withT)
+    if (!isNaN(parsed.getTime())) {
+      return parsed
+    }
+  }
+
+  // Strategy 3: Slash-separated dates
+  // "2024/01/15" or "01/15/2024"
+  const slashMatch = input.match(/^(\d{1,4})[/](\d{1,2})[/](\d{1,4})$/)
+  if (slashMatch) {
+    const [, a, b, c] = slashMatch.map(Number)
+    // Determine format by checking which part could be the year
+    let year: number, month: number, day: number
+    if (a > 31) {
+      // YYYY/MM/DD
+      year = a
+      month = b
+      day = c
+    } else if (c > 31) {
+      // MM/DD/YYYY or DD/MM/YYYY - assume US format (MM/DD/YYYY)
+      month = a
+      day = b
+      year = c
+    } else {
+      // Ambiguous, assume YYYY/MM/DD or MM/DD/YY
+      if (a > 12) {
+        // Must be DD/MM/YYYY
+        day = a
+        month = b
+        year = c < 100 ? 2000 + c : c
+      } else {
+        // Assume MM/DD/YYYY (US format)
+        month = a
+        day = b
+        year = c < 100 ? 2000 + c : c
+      }
+    }
+    const date = new Date(year, month - 1, day)
+    if (!isNaN(date.getTime())) {
+      return date
+    }
+  }
+
+  // Strategy 4: European format with dots (DD.MM.YYYY)
+  const dotMatch = input.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/)
+  if (dotMatch) {
+    const [, day, month, year] = dotMatch.map(Number)
+    const fullYear = year < 100 ? 2000 + year : year
+    const date = new Date(fullYear, month - 1, day)
+    if (!isNaN(date.getTime())) {
+      return date
+    }
+  }
+
+  // Strategy 5: Try with timezone suffix
+  // "2024-01-15 10:30:00 EST" - strip timezone and parse
+  const tzMatch = input.match(/^(.+?)\s+([A-Z]{2,4})$/i)
+  if (tzMatch) {
+    const dateWithoutTz = tzMatch[1]
+    const recursive = tryParseString(dateWithoutTz)
+    if (recursive) {
+      return recursive
+    }
+  }
+
+  return null
+}
+
+/**
+ * Truncate a string for display in error messages.
+ */
+function truncate(str: string, maxLength: number): string {
+  if (str.length <= maxLength) return str
+  return str.slice(0, maxLength - 3) + '...'
 }
 
 /**
@@ -103,7 +266,14 @@ export function normalizeUnit(unit: TimeUnit): string {
 }
 
 /**
- * Add time to a date
+ * Add time to a date.
+ *
+ * @example
+ * ```typescript
+ * addTime(date, 5, 'day')    // 5 days later
+ * addTime(date, -2, 'hour')  // 2 hours earlier
+ * addTime(date, 1, 'month')  // 1 month later (handles month-end)
+ * ```
  */
 export function addTime(date: Date, amount: number, unit: TimeUnit): Date {
   const result = new Date(date.getTime())
@@ -129,13 +299,65 @@ export function addTime(date: Date, amount: number, unit: TimeUnit): Date {
       result.setDate(result.getDate() + amount * 7)
       break
     case 'month':
-      result.setMonth(result.getMonth() + amount)
-      break
+      // Handle month-end edge cases properly
+      // e.g., Jan 31 + 1 month = Feb 28/29, not Mar 2/3
+      return addMonthsSafe(result, amount)
     case 'year':
-      result.setFullYear(result.getFullYear() + amount)
-      break
+      // Handle leap year edge cases
+      // e.g., Feb 29 + 1 year = Feb 28
+      return addYearsSafe(result, amount)
     default:
-      throw new Error(`Invalid time unit: ${unit}`)
+      throw new WhennyError('INVALID_TIME_UNIT', `Invalid time unit: "${unit}"`, {
+        input: unit,
+        operation: 'addTime',
+        supported: ['millisecond', 'second', 'minute', 'hour', 'day', 'week', 'month', 'year'],
+      })
+  }
+
+  return result
+}
+
+/**
+ * Add months while handling month-end edge cases.
+ * Jan 31 + 1 month = Feb 28/29 (last day of Feb), not Mar 2/3.
+ */
+function addMonthsSafe(date: Date, months: number): Date {
+  const result = new Date(date.getTime())
+  const targetMonth = result.getMonth() + months
+  const dayOfMonth = result.getDate()
+
+  // Set to first of month to avoid overflow issues
+  result.setDate(1)
+  result.setMonth(targetMonth)
+
+  // Get the last day of the target month
+  const lastDayOfTargetMonth = new Date(
+    result.getFullYear(),
+    result.getMonth() + 1,
+    0
+  ).getDate()
+
+  // Use the smaller of original day or last day of target month
+  result.setDate(Math.min(dayOfMonth, lastDayOfTargetMonth))
+
+  return result
+}
+
+/**
+ * Add years while handling leap year edge cases.
+ * Feb 29 + 1 year = Feb 28.
+ */
+function addYearsSafe(date: Date, years: number): Date {
+  const result = new Date(date.getTime())
+  const month = result.getMonth()
+
+  result.setFullYear(result.getFullYear() + years)
+
+  // If we were on the last day of Feb in a leap year and moved to a non-leap year,
+  // the date might have overflowed to March
+  if (result.getMonth() !== month) {
+    // Went from Feb 29 to Mar 1 - set to Feb 28
+    result.setDate(0) // Sets to last day of previous month (Feb 28)
   }
 
   return result
