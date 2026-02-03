@@ -1,27 +1,32 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo } from 'react'
 import Link from 'next/link'
 import { whenny, relative, smart, duration, calendar, compare } from 'whenny'
 import { useRelativeTime, useCountdown } from 'whenny-react'
 
 export default function DemoPage() {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  // Memoize example dates to prevent flickering on re-renders
+  const dates = useMemo(() => {
+    const now = new Date()
+    return {
+      now,
+      fiveMinutesAgo: new Date(now.getTime() - 5 * 60 * 1000),
+      oneHourAgo: new Date(now.getTime() - 60 * 60 * 1000),
+      yesterday: new Date(now.getTime() - 24 * 60 * 60 * 1000),
+      lastWeek: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
+      nextWeek: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
+      nextMonth: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
+      nextYear: new Date(now.getFullYear() + 1, 0, 1),
+    }
+  }, [])
 
-  // Example dates
-  const now = new Date()
-  const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000)
-  const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
-  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-  const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-  const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
-  const nextMonth = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-  const nextYear = new Date(now.getFullYear() + 1, 0, 1)
+  const { now, fiveMinutesAgo, oneHourAgo, yesterday, lastWeek, nextWeek, nextMonth, nextYear } = dates
 
   // Auto-updating relative time
   const autoUpdatingTime = useRelativeTime(fiveMinutesAgo)
 
-  // Countdown to next week
+  // Countdown to next year
   const countdown = useCountdown(nextYear)
 
   return (
@@ -346,7 +351,7 @@ npx whenny add relative smart calendar`}</code>
             <Link href="/" className="text-blue-600 hover:underline">
               Home
             </Link>
-            <a href="https://github.com/whenny/whenny" className="text-blue-600 hover:underline">
+            <a href="https://github.com/ZVN-DEV/whenny" className="text-blue-600 hover:underline">
               GitHub
             </a>
           </div>
