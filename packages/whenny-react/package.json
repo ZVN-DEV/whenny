@@ -36,7 +36,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "sideEffects": false,
   "scripts": {
@@ -47,7 +48,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "whenny": "*"
+    "whenny": "^1.0.0"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
