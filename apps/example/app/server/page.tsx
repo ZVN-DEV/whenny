@@ -1,4 +1,4 @@
-import { whenny, transfer, calendar } from 'whenny'
+import { whenny, createTransfer, calendar } from 'whenny'
 import Link from 'next/link'
 
 // This page demonstrates server-side rendering with Whenny
@@ -37,7 +37,7 @@ async function getServerData() {
   // Convert dates to transfer format (preserves timezone context)
   return events.map(event => ({
     ...event,
-    dateTransfer: transfer.toJSON(event.date, event.timezone),
+    dateTransfer: createTransfer(event.date, { timezone: event.timezone }),
     formatted: {
       smart: whenny(event.date).smart(),
       relative: whenny(event.date).relative(),
