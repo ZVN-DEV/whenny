@@ -1,0 +1,108 @@
+{
+  "name": "whenny",
+  "version": "1.0.0",
+  "description": "A modern date library for the AI era. Own your code. Configure your voice. Never think about timezones again.",
+  "keywords": [
+    "date",
+    "time",
+    "datetime",
+    "timezone",
+    "format",
+    "relative",
+    "moment",
+    "dayjs",
+    "date-fns",
+    "shadcn",
+    "react-day-picker",
+    "calendar"
+  ],
+  "author": "Whenny Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whenny/whenny.git",
+    "directory": "packages/whenny"
+  },
+  "homepage": "https://whenny.dev",
+  "bugs": {
+    "url": "https://github.com/whenny/whenny/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./config": {
+      "import": {
+        "types": "./dist/config/index.d.ts",
+        "default": "./dist/config/index.js"
+      },
+      "require": {
+        "types": "./dist/config/index.d.cts",
+        "default": "./dist/config/index.cjs"
+      }
+    },
+    "./themes": {
+      "import": {
+        "types": "./dist/themes/index.d.ts",
+        "default": "./dist/themes/index.js"
+      },
+      "require": {
+        "types": "./dist/themes/index.d.cts",
+        "default": "./dist/themes/index.cjs"
+      }
+    },
+    "./natural": {
+      "import": {
+        "types": "./dist/natural/index.d.ts",
+        "default": "./dist/natural/index.js"
+      },
+      "require": {
+        "types": "./dist/natural/index.d.cts",
+        "default": "./dist/natural/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist coverage"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "eslint": "^8.56.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.2.0",
+    "@vitest/coverage-v8": "^1.2.0"
+  },
+  "peerDependencies": {
+    "react-day-picker": ">=8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react-day-picker": {
+      "optional": true
+    }
+  }
+}

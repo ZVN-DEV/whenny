@@ -1,0 +1,68 @@
+{
+  "name": "@whenny/react",
+  "version": "1.0.0",
+  "description": "React hooks and components for Whenny, with shadcn/ui calendar integration",
+  "keywords": [
+    "whenny",
+    "react",
+    "hooks",
+    "date",
+    "calendar",
+    "shadcn",
+    "react-day-picker"
+  ],
+  "author": "Whenny Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whenny/whenny.git",
+    "directory": "packages/whenny-react"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "whenny": "*"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-day-picker": ">=8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react-day-picker": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "react": "^18.2.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.2.0"
+  }
+}
