@@ -68,23 +68,23 @@ export const formal: WhennyConfig = {
   },
   smart: {
     buckets: [
-      { within: 'minute', show: 'a moment ago' },
+      { within: 'minute', show: '[a moment ago]' },
       { within: 'hour', show: 'relative' },
-      { within: 'today', show: 'today at {time}' },
-      { within: 'yesterday', show: 'yesterday at {time}' },
-      { within: 'week', show: '{weekday} at {time}' },
-      { within: 'year', show: '{monthFull} {dayOrdinal}' },
-      { older: true, show: '{monthFull} {dayOrdinal}, {year}' },
+      { within: 'today', show: '[today at] h:mm A' },
+      { within: 'yesterday', show: '[yesterday at] h:mm A' },
+      { within: 'week', show: 'dddd [at] h:mm A' },
+      { within: 'year', show: 'MMMM Do' },
+      { older: true, show: 'MMMM Do, YYYY' },
     ],
   },
   formats: {
     ...defaultConfig.formats,
     presets: {
-      short: '{monthShort} {dayOrdinal}',
-      long: '{monthFull} {dayOrdinal}, {year}',
-      iso: '{year}-{month}-{day}T{hour24}:{minute}:{second}Z',
-      time: '{hour}:{minute} {AMPM}',
-      datetime: '{monthFull} {dayOrdinal} at {hour}:{minute} {AMPM}',
+      short: 'MMM Do',
+      long: 'MMMM Do, YYYY',
+      iso: 'YYYY-MM-DD[T]HH:mm:ss[Z]',
+      time: 'h:mm A',
+      datetime: 'MMMM Do [at] h:mm A',
     },
   },
 }
@@ -123,13 +123,13 @@ export const slack: WhennyConfig = {
   },
   smart: {
     buckets: [
-      { within: 'minute', show: 'just now' },
+      { within: 'minute', show: '[just now]' },
       { within: 'hour', show: 'relative' },
-      { within: 'today', show: '{time}' },
-      { within: 'yesterday', show: 'Yesterday at {time}' },
-      { within: 'week', show: '{weekday}' },
-      { within: 'year', show: '{monthShort} {dayOrdinal} at {time}' },
-      { older: true, show: '{monthShort} {dayOrdinal}, {year}' },
+      { within: 'today', show: 'h:mm A' },
+      { within: 'yesterday', show: '[Yesterday at] h:mm A' },
+      { within: 'week', show: 'dddd' },
+      { within: 'year', show: 'MMM Do [at] h:mm A' },
+      { older: true, show: 'MMM Do, YYYY' },
     ],
   },
 }
@@ -168,12 +168,12 @@ export const twitter: WhennyConfig = {
   },
   smart: {
     buckets: [
-      { within: 'minute', show: 'now' },
+      { within: 'minute', show: '[now]' },
       { within: 'hour', show: 'relative' },
       { within: 'today', show: 'relative' },
       { within: 'week', show: 'relative' },
-      { within: 'year', show: '{monthShort} {day}' },
-      { older: true, show: '{monthShort} {day}, {year}' },
+      { within: 'year', show: 'MMM D' },
+      { older: true, show: 'MMM D, YYYY' },
     ],
   },
 }
@@ -212,12 +212,12 @@ export const minimal: WhennyConfig = {
   },
   smart: {
     buckets: [
-      { within: 'minute', show: 'now' },
+      { within: 'minute', show: '[now]' },
       { within: 'hour', show: 'relative' },
       { within: 'today', show: 'relative' },
       { within: 'week', show: 'relative' },
-      { within: 'year', show: '{monthShort} {day}' },
-      { older: true, show: '{monthShort} {day}, {yearShort}' },
+      { within: 'year', show: 'MMM D' },
+      { older: true, show: 'MMM D, YY' },
     ],
   },
 }
@@ -255,18 +255,16 @@ export const technical: WhennyConfig = {
     inYears: (n) => `+${n}y`,
   },
   smart: {
-    buckets: [
-      { older: true, show: '{year}-{month}-{day}T{hour24}:{minute}:{second}Z' },
-    ],
+    buckets: [{ older: true, show: 'YYYY-MM-DD[T]HH:mm:ss[Z]' }],
   },
   formats: {
     ...defaultConfig.formats,
     presets: {
-      short: '{year}-{month}-{day}',
-      long: '{year}-{month}-{day}T{hour24}:{minute}:{second}Z',
-      iso: '{year}-{month}-{day}T{hour24}:{minute}:{second}Z',
-      time: '{hour24}:{minute}:{second}',
-      datetime: '{year}-{month}-{day} {hour24}:{minute}:{second}',
+      short: 'YYYY-MM-DD',
+      long: 'YYYY-MM-DD[T]HH:mm:ss[Z]',
+      iso: 'YYYY-MM-DD[T]HH:mm:ss[Z]',
+      time: 'HH:mm:ss',
+      datetime: 'YYYY-MM-DD HH:mm:ss',
     },
     hour12: false,
   },
@@ -295,11 +293,11 @@ export const discord: WhennyConfig = {
   },
   smart: {
     buckets: [
-      { within: 'minute', show: 'just now' },
+      { within: 'minute', show: '[just now]' },
       { within: 'hour', show: 'relative' },
-      { within: 'today', show: 'Today at {time}' },
-      { within: 'yesterday', show: 'Yesterday at {time}' },
-      { older: true, show: '{month}/{day}/{year} {time}' },
+      { within: 'today', show: '[Today at] h:mm A' },
+      { within: 'yesterday', show: '[Yesterday at] h:mm A' },
+      { older: true, show: 'MM/DD/YYYY h:mm A' },
     ],
   },
 }
@@ -320,21 +318,21 @@ export const github: WhennyConfig = {
     ...defaultConfig.relative,
     justNow: 'now',
     secondsAgo: () => 'now',
-    minutesAgo: (n) => n === 1 ? '1 minute ago' : `${n} minutes ago`,
-    hoursAgo: (n) => n === 1 ? '1 hour ago' : `${n} hours ago`,
+    minutesAgo: (n) => (n === 1 ? '1 minute ago' : `${n} minutes ago`),
+    hoursAgo: (n) => (n === 1 ? '1 hour ago' : `${n} hours ago`),
     yesterday: 'yesterday',
-    daysAgo: (n) => n === 1 ? 'yesterday' : `${n} days ago`,
+    daysAgo: (n) => (n === 1 ? 'yesterday' : `${n} days ago`),
     weeksAgo: (n) => `${n} week${n === 1 ? '' : 's'} ago`,
     monthsAgo: (n) => `${n} month${n === 1 ? '' : 's'} ago`,
     yearsAgo: (n) => `${n} year${n === 1 ? '' : 's'} ago`,
   },
   smart: {
     buckets: [
-      { within: 'minute', show: 'now' },
+      { within: 'minute', show: '[now]' },
       { within: 'hour', show: 'relative' },
       { within: 'today', show: 'relative' },
       { within: 'month', show: 'relative' },
-      { older: true, show: 'on {monthShort} {day}, {year}' },
+      { older: true, show: '[on] MMM D, YYYY' },
     ],
   },
 }
