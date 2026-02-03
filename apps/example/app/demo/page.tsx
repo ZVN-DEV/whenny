@@ -194,9 +194,9 @@ export default function DemoPage() {
                 result={`${compare(yesterday, now).hours()} hours`}
               />
               <DemoCard
-                label="Weeks between"
-                code="compare(lastWeek, nextWeek).weeks()"
-                result={`${compare(lastWeek, nextWeek).weeks()} weeks`}
+                label="Days between"
+                code="compare(lastWeek, nextWeek).days()"
+                result={`${compare(lastWeek, nextWeek).days()} days`}
               />
             </div>
           </Section>
