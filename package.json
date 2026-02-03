@@ -17,7 +17,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo run build --filter=whenny --filter=create-whenny --filter=@whenny/react && changeset publish"
+    "release": "turbo run build --filter=whenny --filter=create-whenny --filter=whenny-react && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.0",

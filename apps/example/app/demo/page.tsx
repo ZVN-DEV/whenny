@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { whenny, relative, smart, duration, calendar, compare } from 'whenny'
-import { useRelativeTime, useCountdown } from '@whenny/react'
+import { useRelativeTime, useCountdown } from 'whenny-react'
 
 export default function DemoPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
@@ -322,7 +322,7 @@ export default function DemoPage() {
                   Traditional installation as a dependency.
                 </p>
                 <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg text-sm overflow-x-auto">
-                  <code>npm install whenny @whenny/react</code>
+                  <code>npm install whenny whenny-react</code>
                 </pre>
               </div>
               <div className="bg-white rounded-xl border-2 border-blue-200 p-6">

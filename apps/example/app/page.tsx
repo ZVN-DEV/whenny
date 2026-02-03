@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { whenny, duration } from 'whenny'
-import { useRelativeTime, useCountdown } from '@whenny/react'
+import { useRelativeTime, useCountdown } from 'whenny-react'
 
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false)
@@ -158,7 +158,7 @@ export default defineConfig({
             <CodeExample
               title="React Hooks"
               description="Auto-updating times with zero boilerplate"
-              code={`import { useRelativeTime, useCountdown } from '@whenny/react'
+              code={`import { useRelativeTime, useCountdown } from 'whenny-react'
 
 function Comment({ createdAt }) {
   // Updates automatically every minute
@@ -205,7 +205,7 @@ const { date, originZone } = transfer.fromJSON(data.createdAt)
                 Traditional installation. Works great.
               </p>
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg text-sm overflow-x-auto">
-                <code>npm install whenny @whenny/react</code>
+                <code>npm install whenny whenny-react</code>
               </pre>
             </div>
             <div className="bg-white rounded-xl border-2 border-blue-200 p-6 relative">

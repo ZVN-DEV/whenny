@@ -1,5 +1,5 @@
 {
-  "name": "@whenny/react",
+  "name": "whenny-react",
   "version": "1.0.0",
   "description": "React hooks and components for Whenny, with shadcn/ui calendar integration",
   "keywords": [
