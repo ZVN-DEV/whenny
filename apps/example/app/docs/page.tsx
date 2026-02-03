@@ -1,9 +1,96 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 type Section = 'installation' | 'quickstart' | 'core' | 'formatting' | 'relative' | 'smart' | 'compare' | 'duration' | 'timezone' | 'calendar' | 'natural' | 'react' | 'config' | 'cli'
+
+// Fade-in animation wrapper
+function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(true), delay)
+    return () => clearTimeout(timer)
+  }, [delay])
+
+  return (
+    <div className={`transition-all duration-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+      {children}
+    </div>
+  )
+}
+
+// Copyable code block with syntax highlighting
+function CodeBlock({ children, title }: { children: string; title?: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const copyToClipboard = async () => {
+    await navigator.clipboard.writeText(children)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const highlighted = highlightCode(children)
+
+  return (
+    <div className="group relative my-4 rounded-lg overflow-hidden border border-slate-200 bg-slate-950">
+      {title && (
+        <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800">
+          <span className="text-xs font-medium text-slate-400">{title}</span>
+        </div>
+      )}
+      <div className="relative">
+        <pre className="p-4 overflow-x-auto text-sm leading-relaxed">
+          <code className="font-mono" dangerouslySetInnerHTML={{ __html: highlighted }} />
+        </pre>
+        <button
+          onClick={copyToClipboard}
+          className="absolute top-3 right-3 p-2 rounded-md bg-slate-800 hover:bg-slate-700 transition-colors opacity-0 group-hover:opacity-100"
+          aria-label="Copy code"
+        >
+          {copied ? (
+            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          )}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// Simple syntax highlighting
+function highlightCode(code: string): string {
+  let result = code
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+
+  // Comments
+  result = result.replace(/(\/\/.*$)/gm, '<span class="text-slate-500">$1</span>')
+
+  // Strings
+  result = result.replace(/(['"`])((?:\\.|(?!\1)[^\\])*?)\1/g, '<span class="text-emerald-400">$1$2$1</span>')
+
+  // Keywords
+  const keywords = ['import', 'export', 'from', 'const', 'let', 'var', 'function', 'return', 'if', 'else', 'async', 'await', 'new', 'class', 'extends', 'true', 'false', 'null', 'undefined']
+  keywords.forEach(kw => {
+    result = result.replace(new RegExp(`\\b(${kw})\\b`, 'g'), '<span class="text-purple-400">$1</span>')
+  })
+
+  // Functions
+  result = result.replace(/\b([a-zA-Z_]\w*)\s*\(/g, '<span class="text-blue-400">$1</span>(')
+
+  // Numbers
+  result = result.replace(/\b(\d+)\b/g, '<span class="text-amber-400">$1</span>')
+
+  return result
+}
 
 export default function DocsPage() {
   const [activeSection, setActiveSection] = useState<Section>('installation')
@@ -11,73 +98,78 @@ export default function DocsPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <Link href="/" className="text-xl font-bold text-slate-900">
+            <Link href="/" className="font-semibold text-slate-900">
               Whenny
             </Link>
-            <span className="text-sm text-slate-500">Documentation</span>
+            <span className="text-sm text-slate-400">Documentation</span>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/demo" className="text-sm text-slate-600 hover:text-slate-900">
+          <div className="flex items-center gap-6">
+            <Link href="/demo" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
               Demo
             </Link>
-            <a href="https://github.com/ZVN-DEV/whenny" className="text-sm text-slate-600 hover:text-slate-900">
+            <Link href="/server" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
+              Server
+            </Link>
+            <a href="https://github.com/ZVN-DEV/whenny" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
               GitHub
             </a>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-8">
+      <div className="max-w-5xl mx-auto px-6 py-8">
+        <div className="flex gap-12">
           {/* Sidebar */}
-          <nav className="w-64 flex-shrink-0 hidden lg:block">
+          <nav className="w-56 flex-shrink-0 hidden lg:block">
             <div className="sticky top-24 space-y-1">
               <NavSection title="Getting Started">
                 <NavItem section="installation" active={activeSection} onClick={setActiveSection}>Installation</NavItem>
                 <NavItem section="quickstart" active={activeSection} onClick={setActiveSection}>Quick Start</NavItem>
               </NavSection>
               <NavSection title="Core API">
-                <NavItem section="core" active={activeSection} onClick={setActiveSection}>The whenny Function</NavItem>
+                <NavItem section="core" active={activeSection} onClick={setActiveSection}>whenny()</NavItem>
                 <NavItem section="formatting" active={activeSection} onClick={setActiveSection}>Formatting</NavItem>
                 <NavItem section="relative" active={activeSection} onClick={setActiveSection}>Relative Time</NavItem>
                 <NavItem section="smart" active={activeSection} onClick={setActiveSection}>Smart Formatting</NavItem>
-                <NavItem section="compare" active={activeSection} onClick={setActiveSection}>Date Comparison</NavItem>
+                <NavItem section="compare" active={activeSection} onClick={setActiveSection}>Comparison</NavItem>
                 <NavItem section="duration" active={activeSection} onClick={setActiveSection}>Duration</NavItem>
               </NavSection>
               <NavSection title="Advanced">
                 <NavItem section="timezone" active={activeSection} onClick={setActiveSection}>Timezones</NavItem>
-                <NavItem section="calendar" active={activeSection} onClick={setActiveSection}>Calendar Helpers</NavItem>
+                <NavItem section="calendar" active={activeSection} onClick={setActiveSection}>Calendar</NavItem>
                 <NavItem section="natural" active={activeSection} onClick={setActiveSection}>Natural Language</NavItem>
               </NavSection>
               <NavSection title="Integrations">
                 <NavItem section="react" active={activeSection} onClick={setActiveSection}>React Hooks</NavItem>
               </NavSection>
               <NavSection title="Configuration">
-                <NavItem section="config" active={activeSection} onClick={setActiveSection}>Config File</NavItem>
+                <NavItem section="config" active={activeSection} onClick={setActiveSection}>Config</NavItem>
                 <NavItem section="cli" active={activeSection} onClick={setActiveSection}>CLI</NavItem>
               </NavSection>
             </div>
           </nav>
 
           {/* Content */}
-          <div className="flex-1 min-w-0">
-            {activeSection === 'installation' && <InstallationSection />}
-            {activeSection === 'quickstart' && <QuickStartSection />}
-            {activeSection === 'core' && <CoreSection />}
-            {activeSection === 'formatting' && <FormattingSection />}
-            {activeSection === 'relative' && <RelativeSection />}
-            {activeSection === 'smart' && <SmartSection />}
-            {activeSection === 'compare' && <CompareSection />}
-            {activeSection === 'duration' && <DurationSection />}
-            {activeSection === 'timezone' && <TimezoneSection />}
-            {activeSection === 'calendar' && <CalendarSection />}
-            {activeSection === 'natural' && <NaturalSection />}
-            {activeSection === 'react' && <ReactSection />}
-            {activeSection === 'config' && <ConfigSection />}
-            {activeSection === 'cli' && <CLISection />}
+          <div className="flex-1 min-w-0 max-w-2xl">
+            <FadeIn key={activeSection}>
+              {activeSection === 'installation' && <InstallationSection />}
+              {activeSection === 'quickstart' && <QuickStartSection />}
+              {activeSection === 'core' && <CoreSection />}
+              {activeSection === 'formatting' && <FormattingSection />}
+              {activeSection === 'relative' && <RelativeSection />}
+              {activeSection === 'smart' && <SmartSection />}
+              {activeSection === 'compare' && <CompareSection />}
+              {activeSection === 'duration' && <DurationSection />}
+              {activeSection === 'timezone' && <TimezoneSection />}
+              {activeSection === 'calendar' && <CalendarSection />}
+              {activeSection === 'natural' && <NaturalSection />}
+              {activeSection === 'react' && <ReactSection />}
+              {activeSection === 'config' && <ConfigSection />}
+              {activeSection === 'cli' && <CLISection />}
+            </FadeIn>
           </div>
         </div>
       </div>
@@ -87,9 +179,9 @@ export default function DocsPage() {
 
 function NavSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="py-2">
-      <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{title}</h3>
-      <div className="space-y-1">{children}</div>
+    <div className="py-3">
+      <h3 className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-2">{title}</h3>
+      <div className="space-y-0.5">{children}</div>
     </div>
   )
 }
@@ -110,24 +202,9 @@ function NavItem({ section, active, onClick, children }: { section: Section; act
 
 function DocSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="prose prose-slate max-w-none">
-      <h1 className="text-3xl font-bold text-slate-900 mb-6">{title}</h1>
+    <div>
+      <h1 className="text-2xl font-semibold text-slate-900 mb-6">{title}</h1>
       {children}
-    </div>
-  )
-}
-
-function CodeBlock({ children, title }: { children: string; title?: string }) {
-  return (
-    <div className="my-4 rounded-lg overflow-hidden border border-slate-200">
-      {title && (
-        <div className="bg-slate-100 px-4 py-2 text-sm text-slate-600 border-b border-slate-200">
-          {title}
-        </div>
-      )}
-      <pre className="bg-slate-900 p-4 overflow-x-auto">
-        <code className="text-sm text-slate-100 whitespace-pre">{children}</code>
-      </pre>
     </div>
   )
 }
@@ -136,16 +213,16 @@ function InstallationSection() {
   return (
     <DocSection title="Installation">
       <p className="text-slate-600 mb-6">
-        Whenny can be installed via npm. It works in both browser and Node.js environments.
+        Install Whenny via npm. Works in browser and Node.js.
       </p>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">npm</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Core library</h2>
       <CodeBlock>{`npm install whenny`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">With React hooks</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">With React hooks</h2>
       <CodeBlock>{`npm install whenny whenny-react`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Import</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Import</h2>
       <CodeBlock>{`import { whenny, compare, duration, calendar } from 'whenny'
 import { useRelativeTime, useCountdown } from 'whenny-react'`}</CodeBlock>
     </DocSection>
@@ -156,13 +233,13 @@ function QuickStartSection() {
   return (
     <DocSection title="Quick Start">
       <p className="text-slate-600 mb-6">
-        Get up and running with Whenny in minutes.
+        Get up and running in minutes.
       </p>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Basic Usage</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Basic Usage</h2>
       <CodeBlock>{`import { whenny } from 'whenny'
 
-// Smart formatting - automatically picks the best format
+// Smart formatting - picks the best format automatically
 whenny(new Date()).smart()           // "just now"
 whenny(fiveMinutesAgo).smart()       // "5 minutes ago"
 whenny(yesterday).smart()            // "Yesterday at 3:45 PM"
@@ -173,7 +250,7 @@ whenny(lastMonth).smart()            // "Jan 15"
 whenny(date).relative()              // "5 minutes ago"
 whenny(futureDate).relative()        // "in 3 days"
 
-// Formatting presets
+// Format presets
 whenny(date).short()                 // "Jan 15"
 whenny(date).long()                  // "January 15, 2024"
 whenny(date).time()                  // "3:45 PM"
@@ -182,7 +259,7 @@ whenny(date).iso()                   // "2024-01-15T15:45:00.000Z"
 // Custom formats
 whenny(date).format('{weekday}, {monthFull} {day}')`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">React Hooks</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">React Hooks</h2>
       <CodeBlock>{`import { useRelativeTime, useCountdown } from 'whenny-react'
 
 function Comment({ createdAt }) {
@@ -201,12 +278,12 @@ function Timer({ deadline }) {
 
 function CoreSection() {
   return (
-    <DocSection title="The whenny Function">
+    <DocSection title="The whenny() Function">
       <p className="text-slate-600 mb-6">
-        The <code className="bg-slate-100 px-1.5 py-0.5 rounded text-sm">whenny()</code> function is your entry point for all date operations.
+        The <code className="bg-slate-100 px-1.5 py-0.5 rounded text-sm font-mono">whenny()</code> function is your entry point for all date operations.
       </p>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Creating Whenny Instances</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Creating Instances</h2>
       <CodeBlock>{`import { whenny, now, utcNow, localNow, inZone } from 'whenny'
 
 // From various inputs
@@ -221,7 +298,7 @@ utcNow()                              // Current UTC time
 localNow()                            // Current local time
 inZone('America/New_York')            // Current time in specific zone`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Chaining Methods</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Chaining Methods</h2>
       <CodeBlock>{`const date = whenny('2024-01-15T15:30:00Z')
 
 // All methods return strings
@@ -234,7 +311,7 @@ date.datetime()                       // "Jan 15, 3:30 PM"
 date.iso()                            // ISO 8601 format
 date.format('{...}')                  // Custom format`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Timezone Methods</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Timezone Methods</h2>
       <CodeBlock>{`const date = whenny('2024-01-15T15:30:00Z')
 
 date.inZone('America/New_York')       // Convert to timezone
@@ -252,7 +329,7 @@ function FormattingSection() {
         Format dates using presets or custom format strings with tokens.
       </p>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Presets</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Presets</h2>
       <CodeBlock>{`const date = whenny('2024-01-15T15:30:00Z')
 
 date.short()      // "Jan 15"
@@ -261,37 +338,37 @@ date.time()       // "3:30 PM"
 date.datetime()   // "Jan 15, 3:30 PM"
 date.iso()        // "2024-01-15T15:30:00.000Z"`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Custom Formats</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Custom Formats</h2>
       <CodeBlock>{`date.format('{monthFull} {day}, {year}')       // "January 15, 2024"
 date.format('{weekday}, {monthShort} {day}')   // "Monday, Jan 15"
 date.format('{year}-{month}-{day}')            // "2024-01-15"
 date.format('{hour}:{minute} {ampm}')          // "3:30 PM"
 date.format('{hour24}:{minute}:{second}')      // "15:30:00"`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Available Tokens</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Available Tokens</h2>
       <div className="overflow-x-auto my-4">
-        <table className="w-full text-sm border border-slate-200 rounded-lg">
+        <table className="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
           <thead className="bg-slate-50">
             <tr>
-              <th className="text-left px-4 py-2 border-b border-slate-200">Token</th>
-              <th className="text-left px-4 py-2 border-b border-slate-200">Output</th>
-              <th className="text-left px-4 py-2 border-b border-slate-200">Example</th>
+              <th className="text-left px-4 py-2 border-b border-slate-200 font-medium text-slate-700">Token</th>
+              <th className="text-left px-4 py-2 border-b border-slate-200 font-medium text-slate-700">Output</th>
+              <th className="text-left px-4 py-2 border-b border-slate-200 font-medium text-slate-700">Example</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200">
-            <tr><td className="px-4 py-2 font-mono text-xs">{'{year}'}</td><td className="px-4 py-2">Full year</td><td className="px-4 py-2">2024</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs">{'{month}'}</td><td className="px-4 py-2">Month (padded)</td><td className="px-4 py-2">01</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs">{'{monthShort}'}</td><td className="px-4 py-2">Month name short</td><td className="px-4 py-2">Jan</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs">{'{monthFull}'}</td><td className="px-4 py-2">Month name full</td><td className="px-4 py-2">January</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs">{'{day}'}</td><td className="px-4 py-2">Day of month</td><td className="px-4 py-2">15</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs">{'{dayOrdinal}'}</td><td className="px-4 py-2">Day with suffix</td><td className="px-4 py-2">15th</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs">{'{weekday}'}</td><td className="px-4 py-2">Weekday name</td><td className="px-4 py-2">Monday</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs">{'{weekdayShort}'}</td><td className="px-4 py-2">Weekday short</td><td className="px-4 py-2">Mon</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs">{'{hour}'}</td><td className="px-4 py-2">Hour (12h)</td><td className="px-4 py-2">3</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs">{'{hour24}'}</td><td className="px-4 py-2">Hour (24h)</td><td className="px-4 py-2">15</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs">{'{minute}'}</td><td className="px-4 py-2">Minute</td><td className="px-4 py-2">30</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs">{'{second}'}</td><td className="px-4 py-2">Second</td><td className="px-4 py-2">00</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs">{'{ampm}'}</td><td className="px-4 py-2">AM/PM</td><td className="px-4 py-2">PM</td></tr>
+          <tbody className="divide-y divide-slate-200 text-slate-600">
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{year}'}</td><td className="px-4 py-2">Full year</td><td className="px-4 py-2">2024</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{month}'}</td><td className="px-4 py-2">Month (padded)</td><td className="px-4 py-2">01</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{monthShort}'}</td><td className="px-4 py-2">Month name short</td><td className="px-4 py-2">Jan</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{monthFull}'}</td><td className="px-4 py-2">Month name full</td><td className="px-4 py-2">January</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{day}'}</td><td className="px-4 py-2">Day of month</td><td className="px-4 py-2">15</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{dayOrdinal}'}</td><td className="px-4 py-2">Day with suffix</td><td className="px-4 py-2">15th</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{weekday}'}</td><td className="px-4 py-2">Weekday name</td><td className="px-4 py-2">Monday</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{weekdayShort}'}</td><td className="px-4 py-2">Weekday short</td><td className="px-4 py-2">Mon</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{hour}'}</td><td className="px-4 py-2">Hour (12h)</td><td className="px-4 py-2">3</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{hour24}'}</td><td className="px-4 py-2">Hour (24h)</td><td className="px-4 py-2">15</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{minute}'}</td><td className="px-4 py-2">Minute</td><td className="px-4 py-2">30</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{second}'}</td><td className="px-4 py-2">Second</td><td className="px-4 py-2">00</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{ampm}'}</td><td className="px-4 py-2">AM/PM</td><td className="px-4 py-2">PM</td></tr>
           </tbody>
         </table>
       </div>
@@ -306,7 +383,7 @@ function RelativeSection() {
         Display human-readable time distances like "5 minutes ago" or "in 3 days".
       </p>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Basic Usage</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Basic Usage</h2>
       <CodeBlock>{`import { whenny, relative } from 'whenny'
 
 // Using whenny instance
@@ -319,16 +396,16 @@ relative(date)                        // "5 minutes ago"
 // Relative to another date (not now)
 whenny(date).from(otherDate)          // "3 days ago"`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Output Examples</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Output Examples</h2>
       <div className="overflow-x-auto my-4">
-        <table className="w-full text-sm border border-slate-200 rounded-lg">
+        <table className="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
           <thead className="bg-slate-50">
             <tr>
-              <th className="text-left px-4 py-2 border-b border-slate-200">Time Difference</th>
-              <th className="text-left px-4 py-2 border-b border-slate-200">Output</th>
+              <th className="text-left px-4 py-2 border-b border-slate-200 font-medium text-slate-700">Time Difference</th>
+              <th className="text-left px-4 py-2 border-b border-slate-200 font-medium text-slate-700">Output</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200">
+          <tbody className="divide-y divide-slate-200 text-slate-600">
             <tr><td className="px-4 py-2">&lt; 30 seconds</td><td className="px-4 py-2">just now</td></tr>
             <tr><td className="px-4 py-2">&lt; 1 minute</td><td className="px-4 py-2">45 seconds ago</td></tr>
             <tr><td className="px-4 py-2">&lt; 1 hour</td><td className="px-4 py-2">5 minutes ago</td></tr>
@@ -352,7 +429,7 @@ function SmartSection() {
         Context-aware formatting that automatically picks the best representation based on how far away the date is.
       </p>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Basic Usage</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Basic Usage</h2>
       <CodeBlock>{`import { whenny, smart } from 'whenny'
 
 // Using whenny instance
@@ -367,16 +444,16 @@ whenny(date).smart({ for: 'America/New_York' })
 // Relative to a specific time (not now)
 whenny(date).smart({ from: referenceDate })`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Output Buckets</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Output Buckets</h2>
       <div className="overflow-x-auto my-4">
-        <table className="w-full text-sm border border-slate-200 rounded-lg">
+        <table className="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
           <thead className="bg-slate-50">
             <tr>
-              <th className="text-left px-4 py-2 border-b border-slate-200">When</th>
-              <th className="text-left px-4 py-2 border-b border-slate-200">Output</th>
+              <th className="text-left px-4 py-2 border-b border-slate-200 font-medium text-slate-700">When</th>
+              <th className="text-left px-4 py-2 border-b border-slate-200 font-medium text-slate-700">Output</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200">
+          <tbody className="divide-y divide-slate-200 text-slate-600">
             <tr><td className="px-4 py-2">Within last minute</td><td className="px-4 py-2">just now</td></tr>
             <tr><td className="px-4 py-2">Within last hour</td><td className="px-4 py-2">5 minutes ago</td></tr>
             <tr><td className="px-4 py-2">Today</td><td className="px-4 py-2">3:45 PM</td></tr>
@@ -398,7 +475,7 @@ function CompareSection() {
         Compare two dates and get human-readable descriptions of the difference.
       </p>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Basic Usage</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Basic Usage</h2>
       <CodeBlock>{`import { compare } from 'whenny'
 
 const result = compare(dateA, dateB)
@@ -411,7 +488,7 @@ result.days()         // -3 (negative = before)
 result.hours()        // -72
 result.minutes()      // -4320`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Distance (No Direction)</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Distance (No Direction)</h2>
       <CodeBlock>{`import { distance } from 'whenny'
 
 const dist = distance(dateA, dateB)
@@ -432,7 +509,7 @@ function DurationSection() {
         Format time durations in various styles. Great for video lengths, timers, and countdowns.
       </p>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Basic Usage</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Basic Usage</h2>
       <CodeBlock>{`import { duration, durationMs, durationBetween } from 'whenny'
 
 // From seconds
@@ -447,7 +524,7 @@ durationMs(3661000).compact()   // "1h 1m 1s"
 // Between two dates
 durationBetween(startDate, endDate).compact()`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Accessing Parts</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Accessing Parts</h2>
       <CodeBlock>{`const d = duration(3661)
 
 d.hours        // 1
@@ -465,18 +542,31 @@ function TimezoneSection() {
         Handle timezones properly with the Transfer Protocol - designed to solve server/browser confusion.
       </p>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">The Transfer Protocol</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">The Problem</h2>
       <p className="text-slate-600 mb-4">
-        When sending dates between server and browser, use the Transfer Protocol to preserve timezone context.
+        When a user in New York schedules an event at 3pm, and you save it to your database, how do you make sure it displays as 3pm EST for them and 12pm PST for someone in California?
+      </p>
+      <p className="text-slate-600 mb-6">
+        The answer is UTC. There's one point in time, universally. The Transfer Protocol preserves the original timezone context alongside the UTC timestamp.
       </p>
 
-      <CodeBlock title="Browser: Sending to Server">{`import { createTransfer } from 'whenny'
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Browser to Server</h2>
+      <CodeBlock title="Browser: Creating a Transfer">{`import { createTransfer } from 'whenny'
+
+// User selects a date in their local timezone
+const selectedDate = new Date('2024-01-15T15:00:00')
 
 // Create a transfer payload with timezone context
 const payload = createTransfer(selectedDate, {
-  timezone: 'America/New_York'
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
 })
-// { iso: "2024-01-15T15:30:00.000Z", originZone: "America/New_York", originOffset: -300 }
+
+// Result:
+// {
+//   iso: "2024-01-15T20:00:00.000Z",  // UTC timestamp
+//   originZone: "America/New_York",    // Where user was
+//   originOffset: -300                 // UTC offset in minutes
+// }
 
 // Send to your API
 fetch('/api/events', {
@@ -484,35 +574,53 @@ fetch('/api/events', {
   body: JSON.stringify({ scheduledAt: payload })
 })`}</CodeBlock>
 
-      <CodeBlock title="Server: Receiving and Processing">{`import { fromTransfer, whenny } from 'whenny'
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Server: Receiving and Storing</h2>
+      <CodeBlock title="Server: Processing the Transfer">{`import { fromTransfer, whenny } from 'whenny'
 
-// Receive with full context preserved
+// Receive the transfer payload
 const received = fromTransfer(body.scheduledAt)
 
-received.date           // Date object
+received.date           // JavaScript Date object (UTC)
 received.originZone     // "America/New_York"
 received.originOffset   // -300
 
-// Format in original timezone
-whenny(received.date)
-  .inZone(received.originZone)
-  .format('{time} {timezone}')
-// "10:30 AM EST"`}</CodeBlock>
+// Store in database: save both the UTC timestamp AND the origin zone
+await db.events.create({
+  datetime: received.date,        // Store as UTC
+  timezone: received.originZone,  // Remember where it was created
+})
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Timezone Utilities</h2>
+// The UTC timestamp is the universal truth.
+// The timezone tells you how to display it.`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Displaying Correctly</h2>
+      <CodeBlock title="Displaying in Different Contexts">{`import { whenny } from 'whenny'
+
+// Display in the event's original timezone
+whenny(event.datetime).inZone(event.timezone).format('{time} {timezone}')
+// "3:00 PM EST"
+
+// Display in viewer's local timezone
+whenny(event.datetime).format('{time}')
+// "12:00 PM" (for someone in PST)
+
+// Display in UTC
+whenny(event.datetime).inZone('UTC').format('{time} UTC')
+// "8:00 PM UTC"`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Timezone Utilities</h2>
       <CodeBlock>{`import { tz, inZone } from 'whenny'
 
-// Create dates in specific timezones
-inZone('America/New_York')               // Current time in NYC
-inZone('America/New_York', '2024-01-15') // Specific date in NYC
+// Get user's local timezone
+tz.local()                               // "America/New_York"
 
-// Convert between timezones
-whenny(date).inZone('Asia/Tokyo')
+// All IANA timezone names
+tz.list()                                // ["Africa/Abidjan", ...]
 
-// Get timezone info
-tz.local()                               // User's local timezone
-tz.list()                                // All IANA timezone names
-tz.offset('America/New_York')            // Current offset
+// Get current offset for a timezone
+tz.offset('America/New_York')            // -300 (or -240 during DST)
+
+// Get abbreviation
 tz.abbreviation('America/New_York')      // "EST" or "EDT"`}</CodeBlock>
     </DocSection>
   )
@@ -525,7 +633,7 @@ function CalendarSection() {
         Utility functions for common calendar operations.
       </p>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Day Queries</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Day Queries</h2>
       <CodeBlock>{`import { calendar } from 'whenny'
 
 calendar.isToday(date)
@@ -541,7 +649,7 @@ calendar.isBusinessDay(date)
 calendar.isPast(date)
 calendar.isFuture(date)`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Boundaries</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Boundaries</h2>
       <CodeBlock>{`calendar.startOf(date, 'day')
 calendar.startOf(date, 'week')
 calendar.startOf(date, 'month')
@@ -552,7 +660,7 @@ calendar.endOf(date, 'week')
 calendar.endOf(date, 'month')
 calendar.endOf(date, 'year')`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Distances</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Distances</h2>
       <CodeBlock>{`calendar.daysUntil(futureDate)      // 15
 calendar.daysSince(pastDate)        // 7
 calendar.businessDaysBetween(a, b)  // 10`}</CodeBlock>
@@ -567,7 +675,7 @@ function NaturalSection() {
         Parse human-friendly date expressions into Date objects.
       </p>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Basic Usage</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Basic Expressions</h2>
       <CodeBlock>{`import { parse } from 'whenny/natural'
 
 parse('now')                    // Current date/time
@@ -579,14 +687,14 @@ parse('next week')              // Start of next week
 parse('last month')             // Start of last month
 parse('next tuesday')           // The coming Tuesday`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Time Expressions</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Time Expressions</h2>
       <CodeBlock>{`parse('tomorrow at 3pm')
 parse('next friday at 10:30')
 parse('in 2 hours')
 parse('in 30 minutes')
 parse('in 3 days')`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Semantic Expressions</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Semantic Expressions</h2>
       <CodeBlock>{`parse('end of month')
 parse('end of year')
 parse('start of week')
@@ -601,11 +709,12 @@ function ReactSection() {
   return (
     <DocSection title="React Hooks">
       <p className="text-slate-600 mb-6">
-        React bindings for common date patterns. Install with <code className="bg-slate-100 px-1.5 py-0.5 rounded text-sm">npm install whenny-react</code>
+        React bindings for common date patterns.
       </p>
+      <CodeBlock>{`npm install whenny-react`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">useRelativeTime</h2>
-      <p className="text-slate-600 mb-4">Auto-updating relative time display.</p>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">useRelativeTime</h2>
+      <p className="text-slate-600 mb-3">Auto-updating relative time display.</p>
       <CodeBlock>{`import { useRelativeTime } from 'whenny-react'
 
 function Comment({ createdAt }) {
@@ -615,13 +724,13 @@ function Comment({ createdAt }) {
   return <span className="text-gray-500">{timeAgo}</span>
 }
 
-// With options
+// With custom update interval
 const timeAgo = useRelativeTime(createdAt, {
   updateInterval: 30000,  // Update every 30s (default: 60s)
 })`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">useCountdown</h2>
-      <p className="text-slate-600 mb-4">Countdown timer with all the parts.</p>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">useCountdown</h2>
+      <p className="text-slate-600 mb-3">Countdown timer with all the parts.</p>
       <CodeBlock>{`import { useCountdown } from 'whenny-react'
 
 function SaleTimer({ endsAt }) {
@@ -641,8 +750,8 @@ function SaleTimer({ endsAt }) {
   )
 }`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">useTimezone</h2>
-      <p className="text-slate-600 mb-4">Access and react to timezone context.</p>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">useTimezone</h2>
+      <p className="text-slate-600 mb-3">Access and manage timezone context.</p>
       <CodeBlock>{`import { useTimezone, TimezoneProvider } from 'whenny-react'
 
 // Wrap your app
@@ -668,6 +777,21 @@ function TimeDisplay({ date }) {
     </div>
   )
 }`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">useDateFormatter</h2>
+      <p className="text-slate-600 mb-3">Memoized formatter that updates when config changes.</p>
+      <CodeBlock>{`import { useDateFormatter } from 'whenny-react'
+
+function EventDate({ date }) {
+  const format = useDateFormatter()
+
+  return (
+    <div>
+      <span>{format(date).smart()}</span>
+      <span>{format(date).relative()}</span>
+    </div>
+  )
+}`}</CodeBlock>
     </DocSection>
   )
 }
@@ -679,7 +803,7 @@ function ConfigSection() {
         Customize Whenny's output by configuring strings, thresholds, and formats.
       </p>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Runtime Configuration</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Runtime Configuration</h2>
       <CodeBlock>{`import { configure } from 'whenny'
 
 configure({
@@ -693,7 +817,7 @@ configure({
 // Now all relative times use your config
 whenny(date).relative()  // "moments ago", "5m ago", "2h ago"`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Thresholds</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Thresholds</h2>
       <CodeBlock>{`configure({
   relative: {
     thresholds: {
@@ -708,7 +832,7 @@ whenny(date).relative()  // "moments ago", "5m ago", "2h ago"`}</CodeBlock>
   }
 })`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Using Themes</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Using Themes</h2>
       <CodeBlock>{`import { configure } from 'whenny'
 import { slack, twitter, formal } from 'whenny/themes'
 
@@ -734,7 +858,7 @@ function CLISection() {
         The Whenny CLI lets you add modules directly to your project (shadcn style).
       </p>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Initialize</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Initialize</h2>
       <CodeBlock>{`npx whenny init
 
 # Options
@@ -742,7 +866,7 @@ npx whenny init --minimal    # Just core, nothing else
 npx whenny init --full       # Everything included
 npx whenny init -y           # Skip prompts, use defaults`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Add Modules</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Add Modules</h2>
       <CodeBlock>{`npx whenny add relative
 npx whenny add smart timezone
 npx whenny add all
@@ -751,11 +875,11 @@ npx whenny add all
 npx whenny add relative --path src/utils/whenny
 npx whenny add relative --overwrite`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">List Available Modules</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">List Available Modules</h2>
       <CodeBlock>{`npx whenny list
 npx whenny ls --installed`}</CodeBlock>
 
-      <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">Check for Updates</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Check for Updates</h2>
       <CodeBlock>{`npx whenny diff relative`}</CodeBlock>
     </DocSection>
   )
