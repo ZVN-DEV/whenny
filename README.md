@@ -1,6 +1,6 @@
 # Whenny
 
-[![CI](https://github.com/ZVN-DEV/whenny/actions/workflows/ci.yml/badge.svg)](https://github.com/ZVN-DEV/whenny/actions/workflows/ci.yml)
+[[CI](https://github.com/ZVN-DEV/whenny/actions/workflows/ci.yml/badge.svg)](https://github.com/ZVN-DEV/whenny/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/whenny.svg)](https://www.npmjs.com/package/whenny)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
