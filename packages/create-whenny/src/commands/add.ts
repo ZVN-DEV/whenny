@@ -62,9 +62,9 @@ export async function add(
   }
 
   // Detect whenny path
-  let targetPath = options.path
+  let targetPath: string | undefined = options.path
   if (!targetPath) {
-    targetPath = await detectWhennyPath(cwd)
+    targetPath = await detectWhennyPath(cwd) ?? undefined
   }
 
   if (!targetPath) {

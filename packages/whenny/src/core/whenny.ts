@@ -35,7 +35,7 @@ import {
   getTimezoneOffset,
   formatTimezoneOffset,
 } from './utils'
-import { format, formatPreset, formatISO, formatInTimezone } from './formatter'
+import { format, formatPreset, formatISO } from './formatter'
 import { relative, from as relativeFrom } from '../relative'
 import { smart } from '../smart'
 import { compare, distance } from '../compare'

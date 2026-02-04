@@ -207,7 +207,7 @@ export default {
   }
 }
 
-function generateTestFiles(): Record<string, string> {
+function generateTestFiles(): { files: Record<string, string>; codeMap: TestCodeMap } {
   const files: Record<string, string> = {}
 
   // Core module tests
