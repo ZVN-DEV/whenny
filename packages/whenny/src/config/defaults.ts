@@ -125,11 +125,11 @@ export const defaultConfig: WhennyConfig = {
   },
 
   // ─────────────────────────────────────────────────────────
-  // STYLES (primary API - like Tailwind design tokens)
+  // DATEWIND STYLES (primary API - like Tailwind for dates)
   // ─────────────────────────────────────────────────────────
 
   styles: {
-    // T-shirt sizes (progressive detail)
+    // Datewind sizes (progressive detail)
     xs: 'M/D',                          // "2/3"
     sm: 'MMM D',                        // "Feb 3"
     md: 'MMM D, YYYY',                  // "Feb 3, 2026"

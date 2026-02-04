@@ -236,5 +236,27 @@ export {
   MAX_PARSE_DEPTH,
 } from './errors'
 
+// MCP Server (AI integration)
+export {
+  mcpTools,
+  mcpManifest,
+  getMcpTools,
+  executeMcpTool,
+} from './mcp'
+
+// Internationalization
+export {
+  getLocale,
+  registerLocale,
+  locales,
+  en,
+  es,
+  fr,
+  de,
+  ja,
+  zh,
+  type LocaleStrings,
+} from './i18n'
+
 // Default export
 export default whenny

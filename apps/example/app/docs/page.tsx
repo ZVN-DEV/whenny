@@ -144,10 +144,17 @@ function NavItem({ section, active, onClick, children }: { section: Section; act
   )
 }
 
-function DocSection({ title, children }: { title: string; children: React.ReactNode }) {
+function DocSection({ title, children, cli }: { title: string; children: React.ReactNode; cli?: string }) {
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900 mb-6">{title}</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
+        {cli && (
+          <code className="px-3 py-1.5 bg-slate-900 text-green-400 text-xs rounded-lg font-mono">
+            npx whenny add {cli}
+          </code>
+        )}
+      </div>
       {children}
     </div>
   )
@@ -156,30 +163,51 @@ function DocSection({ title, children }: { title: string; children: React.ReactN
 function InstallationSection() {
   return (
     <DocSection title="Installation">
-      <p className="text-slate-600 mb-6">Install Whenny via npm. Works in browser and Node.js.</p>
+      <p className="text-slate-600 mb-6">Two ways to add Whenny to your project. Choose your style.</p>
 
-      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Core library</h2>
-      <CodeBlock>{`npm install whenny`}</CodeBlock>
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+        <h2 className="text-lg font-medium text-blue-900 mb-2">Recommended: shadcn-style (Own Your Code)</h2>
+        <p className="text-sm text-blue-700 mb-3">Copy code directly into your project. Full ownership, full customization.</p>
+        <CodeBlock>{`# Initialize whenny in your project
+npx whenny init
 
-      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">With React hooks</h2>
+# Add only the modules you need
+npx whenny add relative
+npx whenny add smart calendar duration
+npx whenny add react
+
+# Or grab everything
+npx whenny add all`}</CodeBlock>
+      </div>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Alternative: npm package</h2>
       <CodeBlock>{`npm install whenny whenny-react`}</CodeBlock>
 
       <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Import</h2>
       <CodeBlock>{`import { whenny, compare, duration, calendar } from 'whenny'
 import { useRelativeTime, useCountdown } from 'whenny-react'`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Available Modules</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 my-4">
+        {['core', 'relative', 'smart', 'compare', 'duration', 'timezone', 'calendar', 'transfer', 'natural', 'react'].map(mod => (
+          <div key={mod} className="px-3 py-2 bg-slate-100 rounded text-center">
+            <code className="text-xs text-slate-700 font-mono">{mod}</code>
+          </div>
+        ))}
+      </div>
     </DocSection>
   )
 }
 
 function QuickStartSection() {
   return (
-    <DocSection title="Quick Start">
+    <DocSection title="Quick Start" cli="core">
       <p className="text-slate-600 mb-6">Get up and running in minutes.</p>
 
-      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Style Properties (Recommended)</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Datewind Styles (Recommended)</h2>
       <CodeBlock>{`import { whenny } from 'whenny'
 
-// T-shirt sizes - like Tailwind for dates
+// Datewind - like Tailwind for dates
 whenny(date).xs        // "1/15"
 whenny(date).sm        // "Jan 15"
 whenny(date).md        // "Jan 15, 2024"
@@ -228,7 +256,7 @@ function Timer({ deadline }) {
 
 function CoreSection() {
   return (
-    <DocSection title="The whenny() Function">
+    <DocSection title="The whenny() Function" cli="core">
       <p className="text-slate-600 mb-6">
         The <code className="bg-slate-100 px-1.5 py-0.5 rounded text-sm font-mono">whenny()</code> function is your entry point for all date operations.
       </p>
@@ -385,7 +413,7 @@ date.iso()        // "2024-01-15T15:30:00.000Z"`}</CodeBlock>
 
 function RelativeSection() {
   return (
-    <DocSection title="Relative Time">
+    <DocSection title="Relative Time" cli="relative">
       <p className="text-slate-600 mb-6">Display human-readable time distances like "5 minutes ago" or "in 3 days".</p>
 
       <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Basic Usage</h2>
@@ -406,7 +434,7 @@ whenny(date).from(otherDate)          // "3 days ago"`}</CodeBlock>
 
 function SmartSection() {
   return (
-    <DocSection title="Smart Formatting">
+    <DocSection title="Smart Formatting" cli="smart">
       <p className="text-slate-600 mb-6">Context-aware formatting that automatically picks the best representation.</p>
 
       <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Basic Usage</h2>
@@ -447,7 +475,7 @@ whenny(date).smart({ for: 'America/New_York' })`}</CodeBlock>
 
 function CompareSection() {
   return (
-    <DocSection title="Date Comparison">
+    <DocSection title="Date Comparison" cli="compare">
       <p className="text-slate-600 mb-6">Compare two dates and get human-readable descriptions.</p>
 
       <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Basic Usage</h2>
@@ -468,7 +496,7 @@ result.minutes()      // -4320`}</CodeBlock>
 
 function DurationSection() {
   return (
-    <DocSection title="Duration">
+    <DocSection title="Duration" cli="duration">
       <p className="text-slate-600 mb-6">Format time durations in various styles.</p>
 
       <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Format Methods</h2>
@@ -525,7 +553,7 @@ d.totalHours    // 1`}</CodeBlock>
 
 function TimezoneSection() {
   return (
-    <DocSection title="Timezones">
+    <DocSection title="Timezones" cli="timezone">
       <p className="text-slate-600 mb-6">Handle timezones with the Transfer Protocol - designed for server/browser sync.</p>
 
       <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">The Problem</h2>
@@ -585,7 +613,7 @@ whenny(event.datetime).format('{time}')
 
 function CalendarSection() {
   return (
-    <DocSection title="Calendar Helpers">
+    <DocSection title="Calendar Helpers" cli="calendar">
       <p className="text-slate-600 mb-6">
         Utility functions for common calendar operations including business days.
       </p>
@@ -661,7 +689,7 @@ calendar.daysSince(pastDate)        // Days since a past date`}</CodeBlock>
 
 function NaturalSection() {
   return (
-    <DocSection title="Natural Language">
+    <DocSection title="Natural Language" cli="natural">
       <p className="text-slate-600 mb-6">Parse human-friendly date expressions into Date objects.</p>
 
       <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Basic Expressions</h2>
@@ -688,7 +716,7 @@ parse('in 3 days')`}</CodeBlock>
 
 function ReactSection() {
   return (
-    <DocSection title="React Hooks">
+    <DocSection title="React Hooks" cli="react">
       <p className="text-slate-600 mb-6">React bindings for common date patterns.</p>
       <CodeBlock>{`npm install whenny-react`}</CodeBlock>
 
