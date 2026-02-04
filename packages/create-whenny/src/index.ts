@@ -13,6 +13,7 @@ import { init } from './commands/init.js'
 import { add } from './commands/add.js'
 import { list } from './commands/list.js'
 import { diff } from './commands/diff.js'
+import { testInstall } from './commands/test-install.js'
 
 const program = new Command()
 
@@ -68,5 +69,14 @@ program
   .action(async (module) => {
     console.log(chalk.yellow('Remove command coming soon'))
   })
+
+program
+  .command('test-install')
+  .alias('test')
+  .description('Run the test fair - integration tests in a fresh project')
+  .option('--keep', 'Keep the test directory after running')
+  .option('--verbose', 'Show detailed output')
+  .option('--output <path>', 'Custom path for results HTML')
+  .action(testInstall)
 
 program.parse()

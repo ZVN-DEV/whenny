@@ -161,23 +161,145 @@ function DocSection({ title, children, cli }: { title: string; children: React.R
 }
 
 function InstallationSection() {
+  const [selectedModules, setSelectedModules] = useState<string[]>(['relative', 'smart'])
+  const [copied, setCopied] = useState(false)
+
+  const modules = [
+    { name: 'core', description: 'Core whenny() function (always included)', required: true },
+    { name: 'relative', description: 'Relative time formatting ("5 minutes ago")' },
+    { name: 'smart', description: 'Context-aware smart formatting' },
+    { name: 'compare', description: 'Date comparison and distance calculations' },
+    { name: 'duration', description: 'Duration formatting ("2h 30m")' },
+    { name: 'timezone', description: 'Timezone utilities and conversions' },
+    { name: 'calendar', description: 'Calendar helpers (isToday, isWeekend, etc.)' },
+    { name: 'transfer', description: 'Server/browser transfer protocol' },
+    { name: 'natural', description: 'Natural language date parsing' },
+    { name: 'react', description: 'React hooks (useRelativeTime, useCountdown)' },
+  ]
+
+  const toggleModule = (name: string) => {
+    if (name === 'core') return // Can't toggle core
+    setSelectedModules(prev =>
+      prev.includes(name)
+        ? prev.filter(m => m !== name)
+        : [...prev, name]
+    )
+  }
+
+  const selectAll = () => {
+    setSelectedModules(modules.filter(m => !m.required).map(m => m.name))
+  }
+
+  const selectNone = () => {
+    setSelectedModules([])
+  }
+
+  const addCommand = selectedModules.length === modules.length - 1
+    ? 'npx whenny add all'
+    : selectedModules.length === 0
+    ? 'npx whenny init'
+    : `npx whenny add ${selectedModules.join(' ')}`
+
+  const copyCommand = async () => {
+    await navigator.clipboard.writeText(addCommand)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
     <DocSection title="Installation">
       <p className="text-slate-600 mb-6">Two ways to add Whenny to your project. Choose your style.</p>
 
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
         <h2 className="text-lg font-medium text-blue-900 mb-2">Recommended: shadcn-style (Own Your Code)</h2>
-        <p className="text-sm text-blue-700 mb-3">Copy code directly into your project. Full ownership, full customization.</p>
-        <CodeBlock>{`# Initialize whenny in your project
-npx whenny init
+        <p className="text-sm text-blue-700 mb-4">Copy code directly into your project. Full ownership, full customization.</p>
 
-# Add only the modules you need
-npx whenny add relative
-npx whenny add smart calendar duration
-npx whenny add react
+        {/* Step 1: Init */}
+        <div className="mb-4">
+          <p className="text-xs font-medium text-blue-800 mb-2">Step 1: Initialize</p>
+          <button
+            onClick={async () => {
+              await navigator.clipboard.writeText('npx whenny init')
+              setCopied(true)
+              setTimeout(() => setCopied(false), 2000)
+            }}
+            className="group w-full flex items-center justify-between px-4 py-3 bg-slate-900 rounded-lg text-left hover:bg-slate-800 transition-colors"
+          >
+            <code className="text-sm text-green-400 font-mono">npx whenny init</code>
+            <span className="text-slate-500 group-hover:text-slate-400">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </span>
+          </button>
+        </div>
 
-# Or grab everything
-npx whenny add all`}</CodeBlock>
+        {/* Step 2: Select modules */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-medium text-blue-800">Step 2: Select modules</p>
+            <div className="flex gap-2">
+              <button onClick={selectAll} className="text-xs text-blue-600 hover:text-blue-800">Select all</button>
+              <span className="text-blue-300">|</span>
+              <button onClick={selectNone} className="text-xs text-blue-600 hover:text-blue-800">Clear</button>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {modules.map(mod => (
+              <button
+                key={mod.name}
+                onClick={() => toggleModule(mod.name)}
+                disabled={mod.required}
+                className={`group p-3 rounded-lg border text-left transition-all ${
+                  mod.required
+                    ? 'bg-slate-100 border-slate-200 cursor-not-allowed opacity-60'
+                    : selectedModules.includes(mod.name)
+                    ? 'bg-blue-100 border-blue-300 hover:bg-blue-200'
+                    : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                }`}
+                title={mod.description}
+              >
+                <div className="flex items-center gap-2">
+                  <div className={`w-4 h-4 rounded border flex items-center justify-center ${
+                    mod.required || selectedModules.includes(mod.name)
+                      ? 'bg-blue-600 border-blue-600'
+                      : 'border-slate-300'
+                  }`}>
+                    {(mod.required || selectedModules.includes(mod.name)) && (
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <code className="text-xs font-mono text-slate-700">{mod.name}</code>
+                </div>
+                <p className="mt-1 text-[10px] text-slate-500 leading-tight">{mod.description}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Generated command */}
+        <div>
+          <p className="text-xs font-medium text-blue-800 mb-2">Step 3: Run this command</p>
+          <button
+            onClick={copyCommand}
+            className="group w-full flex items-center justify-between px-4 py-3 bg-slate-900 rounded-lg text-left hover:bg-slate-800 transition-colors"
+          >
+            <code className="text-sm text-green-400 font-mono">{addCommand}</code>
+            <span className={`transition-colors ${copied ? 'text-green-400' : 'text-slate-500 group-hover:text-slate-400'}`}>
+              {copied ? (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              )}
+            </span>
+          </button>
+        </div>
       </div>
 
       <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Alternative: npm package</h2>
@@ -186,15 +308,6 @@ npx whenny add all`}</CodeBlock>
       <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Import</h2>
       <CodeBlock>{`import { whenny, compare, duration, calendar } from 'whenny'
 import { useRelativeTime, useCountdown } from 'whenny-react'`}</CodeBlock>
-
-      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Available Modules</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 my-4">
-        {['core', 'relative', 'smart', 'compare', 'duration', 'timezone', 'calendar', 'transfer', 'natural', 'react'].map(mod => (
-          <div key={mod} className="px-3 py-2 bg-slate-100 rounded text-center">
-            <code className="text-xs text-slate-700 font-mono">{mod}</code>
-          </div>
-        ))}
-      </div>
     </DocSection>
   )
 }
