@@ -1,6 +1,6 @@
 {
   "name": "create-whenny",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI for adding Whenny date utilities to your project",
   "keywords": [
     "whenny",
@@ -16,6 +16,10 @@
     "type": "git",
     "url": "https://github.com/whenny/whenny.git",
     "directory": "packages/create-whenny"
+  },
+  "homepage": "https://whenny.dev",
+  "bugs": {
+    "url": "https://github.com/whenny/whenny/issues"
   },
   "type": "module",
   "bin": {

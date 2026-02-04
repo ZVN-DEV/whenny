@@ -18,6 +18,10 @@
     "url": "https://github.com/whenny/whenny.git",
     "directory": "packages/whenny-react"
   },
+  "homepage": "https://whenny.dev",
+  "bugs": {
+    "url": "https://github.com/whenny/whenny/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
