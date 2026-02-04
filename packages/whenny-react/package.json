@@ -15,12 +15,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/whenny/whenny.git",
+    "url": "https://github.com/ZVN-DEV/whenny.git",
     "directory": "packages/whenny-react"
   },
   "homepage": "https://whenny.dev",
   "bugs": {
-    "url": "https://github.com/whenny/whenny/issues"
+    "url": "https://github.com/ZVN-DEV/whenny/issues"
   },
   "type": "module",
   "main": "./dist/index.cjs",

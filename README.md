@@ -1,5 +1,9 @@
 # Whenny
 
+[![CI](https://github.com/ZVN-DEV/whenny/actions/workflows/ci.yml/badge.svg)](https://github.com/ZVN-DEV/whenny/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/whenny.svg)](https://www.npmjs.com/package/whenny)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 A modern date library for the AI era.
 
 **Own your code. Configure your voice. Never think about timezones again.**
@@ -14,12 +18,14 @@ Whenny is different from other date libraries in three key ways:
 
 3. **Timezone Solved** — The Transfer Protocol carries timezone context across the wire. Server and browser always show the right time. Automatically.
 
+4. **AI-Friendly** — Built with MCP server support so AI assistants can understand and use date functions directly.
+
 ## Installation
 
 ### NPM Package (Traditional)
 
 ```bash
-npm install whenny @whenny/react
+npm install whenny whenny-react
 ```
 
 ### shadcn Style (Recommended)
@@ -33,9 +39,27 @@ This copies the code directly into your project at `src/lib/whenny/`.
 
 ## Quick Start
 
-```typescript
-import { whenny, duration, calendar, compare } from 'whenny'
+### Datewind Styles (Recommended)
 
+Like Tailwind for dates. Simple properties, consistent output:
+
+```typescript
+import { whenny } from 'whenny'
+
+whenny(date).xs        // "2/3"
+whenny(date).sm        // "Feb 3"
+whenny(date).md        // "Feb 3, 2026"
+whenny(date).lg        // "February 3rd, 2026"
+whenny(date).xl        // "Tuesday, February 3rd, 2026"
+
+whenny(date).clock     // "3:45 PM"
+whenny(date).sortable  // "2026-02-03"
+whenny(date).log       // "2026-02-03 15:45:30"
+```
+
+### Smart & Relative Formatting
+
+```typescript
 // Smart formatting - picks the best representation automatically
 whenny(date).smart()
 // → "just now"
@@ -46,39 +70,46 @@ whenny(date).smart()
 
 // Relative time
 whenny(date).relative()           // "5 minutes ago"
+```
 
-// Format presets
-whenny(date).short()              // "Jan 15"
-whenny(date).long()               // "January 15, 2024"
-whenny(date).time()               // "3:45 PM"
-whenny(date).datetime()           // "Jan 15, 3:45 PM"
-whenny(date).iso()                // "2024-01-15T15:45:00Z"
+### Duration Formatting
 
-// Custom templates
-whenny(date).format('{weekday}, {monthFull} {dayOrdinal}')
-// → "Monday, January 15th"
+```typescript
+import { duration } from 'whenny'
 
-// Duration formatting
 duration(3661).long()             // "1 hour, 1 minute, 1 second"
 duration(3661).compact()          // "1h 1m 1s"
 duration(3661).clock()            // "1:01:01"
+duration(3661).timer()            // "01:01:01"
 duration(7200).human()            // "2 hours"
+```
 
-// Calendar helpers
+### Calendar Helpers
+
+```typescript
+import { calendar } from 'whenny'
+
 calendar.isToday(date)            // true
 calendar.isWeekend(date)          // false
 calendar.isBusinessDay(date)      // true
 calendar.daysUntil(futureDate)    // 7
+calendar.addBusinessDays(date, 5) // Date (skips weekends)
+```
 
-// Date comparison
+### Date Comparison
+
+```typescript
+import { compare } from 'whenny'
+
 compare(dateA, dateB).smart()     // "2 days before"
 compare(dateA, dateB).days()      // 2
+compare(dateA, dateB).hours()     // 48
 ```
 
 ## React Hooks
 
 ```tsx
-import { useRelativeTime, useCountdown } from '@whenny/react'
+import { useRelativeTime, useCountdown } from 'whenny-react'
 
 function Comment({ createdAt }) {
   // Auto-updates every minute
@@ -92,6 +123,67 @@ function Sale({ endsAt }) {
   return <span>{days}d {hours}h {minutes}m {seconds}s</span>
 }
 ```
+
+## MCP Server (AI Integration)
+
+Whenny includes an MCP (Model Context Protocol) server so AI assistants like Claude can use date functions directly:
+
+```json
+{
+  "mcpServers": {
+    "whenny": {
+      "command": "npx",
+      "args": ["whenny", "mcp"]
+    }
+  }
+}
+```
+
+### Available MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `whenny` | Create a Whenny date instance |
+| `format_datewind` | Format using Datewind styles (xs, sm, md, lg, xl) |
+| `format_smart` | Smart context-aware formatting |
+| `format_relative` | Relative time ("5 minutes ago") |
+| `format_duration` | Duration formatting (long, compact, timer) |
+| `compare_dates` | Compare two dates |
+| `calendar_check` | Check calendar properties (isToday, isWeekend, etc.) |
+| `add_business_days` | Add business days to a date |
+| `parse_natural` | Parse natural language ("tomorrow at 3pm") |
+| `create_transfer` | Create timezone-aware transfer payload |
+
+```typescript
+// Access MCP tools programmatically
+import { mcpTools, executeMcpTool } from 'whenny'
+
+const result = executeMcpTool('format_datewind', {
+  date: '2024-01-15',
+  style: 'lg'
+})
+// → "January 15th, 2024"
+```
+
+## Internationalization
+
+Whenny supports multiple locales:
+
+```typescript
+import { getLocale, registerLocale, en, es, fr, de, ja, zh } from 'whenny'
+
+// Get locale strings
+const spanish = getLocale('es')
+
+// Register custom locale
+registerLocale('pt', {
+  justNow: 'agora mesmo',
+  minutesAgo: (n) => `${n} minutos atrás`,
+  // ...
+})
+```
+
+Built-in locales: `en`, `es`, `fr`, `de`, `ja`, `zh`
 
 ## Configuration
 
@@ -109,12 +201,12 @@ export default defineConfig({
     hoursAgo: (n) => `${n}h ago`,
   },
 
-  formats: {
-    presets: {
-      short: '{day}/{month}/{year}',
-      long: '{monthFull} {day}, {year}',
-    },
-    hour12: true,
+  styles: {
+    xs: 'D/M',
+    sm: 'D MMM',
+    md: 'D MMM YYYY',
+    lg: 'D MMMM YYYY',
+    xl: 'dddd, D MMMM YYYY',
   },
 
   calendar: {
@@ -153,52 +245,33 @@ The Transfer Protocol solves the server/browser timezone problem:
 
 ```typescript
 // Server: serialize with timezone context
-import { transfer } from 'whenny'
+import { createTransfer } from 'whenny'
 
 const response = {
   event: {
     name: 'Meeting',
-    date: transfer.toJSON(event.date, 'America/New_York')
+    date: createTransfer(event.date, { timezone: 'America/New_York' })
   }
 }
 
 // Client: deserialize and format
-const { date, originZone } = transfer.fromJSON(response.event.date)
-whenny(date).format('{time} {timezone}')
-// → "3:00 PM EST" (original timezone preserved!)
+import { fromTransfer, whenny } from 'whenny'
+
+const { date, originZone } = fromTransfer(response.event.date)
+whenny(date).inZone(originZone).clock
+// → "3:00 PM" (original timezone preserved!)
 ```
 
 ## Natural Language Parsing
 
 ```typescript
-import { natural } from 'whenny'
+import { parse } from 'whenny/natural'
 
-natural.parse('tomorrow at 3pm')        // Date object
-natural.parse('next friday')            // Date object
-natural.parse('in 2 hours')             // Date object
-natural.parse('december 25th')          // Date object
+parse('tomorrow at 3pm')        // Date object
+parse('next friday')            // Date object
+parse('in 2 hours')             // Date object
+parse('december 25th')          // Date object
 ```
-
-## Format Tokens
-
-Available tokens for custom formats:
-
-| Token | Output | Example |
-|-------|--------|---------|
-| `{year}` | 4-digit year | 2024 |
-| `{month}` | 2-digit month | 01 |
-| `{day}` | 2-digit day | 15 |
-| `{hour}` | 12-hour | 3 |
-| `{hour24}` | 24-hour | 15 |
-| `{minute}` | Minutes | 45 |
-| `{second}` | Seconds | 30 |
-| `{AMPM}` | Uppercase | PM |
-| `{ampm}` | Lowercase | pm |
-| `{weekday}` | Full weekday | Monday |
-| `{weekdayShort}` | Short weekday | Mon |
-| `{monthFull}` | Full month | January |
-| `{monthShort}` | Short month | Jan |
-| `{dayOrdinal}` | Ordinal day | 15th |
 
 ## CLI Commands
 
@@ -207,7 +280,7 @@ Available tokens for custom formats:
 npx whenny init
 
 # Add specific modules
-npx whenny add relative smart calendar duration
+npx whenny add relative smart calendar duration timezone
 
 # List available modules
 npx whenny list
@@ -216,13 +289,26 @@ npx whenny list
 npx whenny diff
 ```
 
+## Tests
+
+All 374 tests passing. View tests:
+
+- [Core tests](packages/whenny/test/)
+- [React tests](packages/whenny-react/test/)
+
+Run tests locally:
+
+```bash
+npm test
+```
+
 ## Packages
 
-| Package | Description |
-|---------|-------------|
-| `whenny` | Core date library |
-| `@whenny/react` | React hooks and components |
-| `create-whenny` | CLI for shadcn-style installation |
+| Package | Description | npm |
+|---------|-------------|-----|
+| [`whenny`](packages/whenny/) | Core date library | [![npm](https://img.shields.io/npm/v/whenny.svg)](https://www.npmjs.com/package/whenny) |
+| [`whenny-react`](packages/whenny-react/) | React hooks and components | [![npm](https://img.shields.io/npm/v/whenny-react.svg)](https://www.npmjs.com/package/whenny-react) |
+| [`create-whenny`](packages/create-whenny/) | CLI for shadcn-style installation | [![npm](https://img.shields.io/npm/v/create-whenny.svg)](https://www.npmjs.com/package/create-whenny) |
 
 ## License
 
