@@ -148,34 +148,95 @@ export default function DemoPage() {
             </div>
           </Section>
 
-          {/* Custom Templates */}
-          <Section title="Custom Templates" description="Use tokens to build any format you need.">
+          {/* Datewind Styles */}
+          <Section title="Datewind Styles" description="Like Tailwind for dates. Semantic styles configured once, used everywhere with simple properties.">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              <DemoCard
+                label=".xs"
+                code="whenny(now).xs"
+                result={whenny(now).xs}
+              />
+              <DemoCard
+                label=".sm"
+                code="whenny(now).sm"
+                result={whenny(now).sm}
+              />
+              <DemoCard
+                label=".md"
+                code="whenny(now).md"
+                result={whenny(now).md}
+              />
+              <DemoCard
+                label=".lg"
+                code="whenny(now).lg"
+                result={whenny(now).lg}
+              />
+              <DemoCard
+                label=".xl"
+                code="whenny(now).xl"
+                result={whenny(now).xl}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+              <DemoCard
+                label=".clock"
+                code="whenny(now).clock"
+                result={whenny(now).clock}
+              />
+              <DemoCard
+                label=".sortable"
+                code="whenny(now).sortable"
+                result={whenny(now).sortable}
+              />
+              <DemoCard
+                label=".log"
+                code="whenny(now).log"
+                result={whenny(now).log}
+              />
+            </div>
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <p className="text-sm font-medium text-blue-800 mb-2">Configure your own styles:</p>
+              <pre className="text-xs text-blue-700 bg-blue-100 p-3 rounded overflow-x-auto">
+{`configure({
+  styles: {
+    xs: 'D/M',
+    sm: 'D MMM',
+    md: 'D MMM YYYY',
+    // Add custom styles...
+  }
+})`}
+              </pre>
+            </div>
+          </Section>
+
+          {/* Custom Patterns */}
+          <Section title="Custom Patterns" description="Moment.js-style patterns when you need full control.">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <DemoCard
-                label="Weekday + Full date"
-                code="whenny(now).format('{weekday}, {monthFull} {day}')"
-                result={whenny(now).format('{weekday}, {monthFull} {day}')}
+                label="ISO Date"
+                code="whenny(now).format('YYYY-MM-DD')"
+                result={whenny(now).format('YYYY-MM-DD')}
               />
               <DemoCard
-                label="Ordinal day"
-                code="whenny(now).format('{monthFull} {dayOrdinal}, {year}')"
-                result={whenny(now).format('{monthFull} {dayOrdinal}, {year}')}
+                label="Full Date"
+                code="whenny(now).format('dddd, MMMM Do')"
+                result={whenny(now).format('dddd, MMMM Do')}
               />
               <DemoCard
-                label="Numeric"
-                code="whenny(now).format('{month}/{day}/{year}')"
-                result={whenny(now).format('{month}/{day}/{year}')}
+                label="Time"
+                code="whenny(now).format('h:mm A')"
+                result={whenny(now).format('h:mm A')}
               />
               <DemoCard
-                label="24-hour time"
-                code="whenny(now).format('{hour24}:{minute}:{second}')"
-                result={whenny(now).format('{hour24}:{minute}:{second}')}
+                label="With Text"
+                code="whenny(now).format('[Today is] dddd')"
+                result={whenny(now).format('[Today is] dddd')}
               />
             </div>
             <div className="mt-4 p-4 bg-slate-100 rounded-lg">
-              <p className="text-sm font-medium text-slate-700 mb-2">Available tokens:</p>
+              <p className="text-sm font-medium text-slate-700 mb-2">Pattern tokens:</p>
               <code className="text-xs text-slate-600">
-                {'{year} {month} {day} {hour} {hour24} {minute} {second} {AMPM} {ampm} {weekday} {weekdayShort} {monthFull} {monthShort} {dayOrdinal}'}
+                YYYY YY MMMM MMM MM M dddd ddd DD D Do HH H hh h mm ss A a Z [escaped]
               </code>
             </div>
           </Section>

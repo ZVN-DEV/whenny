@@ -1,6 +1,6 @@
 {
   "name": "whenny-react",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "React hooks and components for Whenny, with shadcn/ui calendar integration",
   "keywords": [
     "whenny",
@@ -15,8 +15,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/whenny/whenny.git",
+    "url": "https://github.com/ZVN-DEV/whenny.git",
     "directory": "packages/whenny-react"
+  },
+  "homepage": "https://whenny.dev",
+  "bugs": {
+    "url": "https://github.com/ZVN-DEV/whenny/issues"
   },
   "type": "module",
   "main": "./dist/index.cjs",

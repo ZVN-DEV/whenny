@@ -1,6 +1,6 @@
 {
   "name": "whenny",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A modern date library for the AI era. Own your code. Configure your voice. Never think about timezones again.",
   "keywords": [
     "date",
@@ -20,12 +20,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/whenny/whenny.git",
+    "url": "https://github.com/ZVN-DEV/whenny.git",
     "directory": "packages/whenny"
   },
   "homepage": "https://whenny.dev",
   "bugs": {
-    "url": "https://github.com/whenny/whenny/issues"
+    "url": "https://github.com/ZVN-DEV/whenny/issues"
   },
   "type": "module",
   "main": "./dist/index.cjs",
