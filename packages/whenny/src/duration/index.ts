@@ -17,6 +17,8 @@ import { parseDate, differenceInMilliseconds } from '../core/utils'
  * duration(3661).long()     // "1 hour, 1 minute, 1 second"
  * duration(3661).compact()  // "1h 1m 1s"
  * duration(3661).clock()    // "1:01:01"
+ * duration(3661).brief()    // "1h 1m" (no seconds)
+ * duration(3661).timer()    // "01:01:01" (padded)
  * ```
  */
 export function duration(
@@ -63,11 +65,47 @@ export function duration(
       return parts.join(style.separator)
     },
 
+    /** Brief format - no seconds unless duration < 1 minute: "1h 30m" */
+    brief(): string {
+      const parts: string[] = []
+      const style = config.duration.compact
+
+      if (hours > 0) {
+        parts.push(style.hours(hours))
+      }
+      if (minutes > 0 || hours > 0) {
+        parts.push(style.minutes(minutes))
+      }
+      // Only show seconds if total duration < 1 minute
+      if (parts.length === 0) {
+        parts.push(style.seconds(secs))
+      }
+
+      return parts.join(style.separator)
+    },
+
     clock(): string {
       if (hours > 0) {
         return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
       }
       return `${minutes}:${secs.toString().padStart(2, '0')}`
+    },
+
+    /** Timer format - always padded with hours: "01:30:45" */
+    timer(): string {
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+    },
+
+    /** Minimal format - just the largest unit: "1h" or "30m" or "45s" */
+    minimal(): string {
+      const style = config.duration.compact
+      if (hours > 0) {
+        return style.hours(hours)
+      }
+      if (minutes > 0) {
+        return style.minutes(minutes)
+      }
+      return style.seconds(secs)
     },
 
     human(): string {

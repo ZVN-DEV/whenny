@@ -59,22 +59,22 @@ export const defaultConfig: WhennyConfig = {
 
   smart: {
     buckets: [
-      { within: 'minute', show: 'just now' },
+      { within: 'minute', show: '[just now]' },
       { within: 'hour', show: 'relative' },
-      { within: 'today', show: '{time}' },
-      { within: 'yesterday', show: 'Yesterday at {time}' },
-      { within: 'week', show: '{weekday} at {time}' },
-      { within: 'year', show: '{monthShort} {day}' },
-      { older: true, show: '{monthShort} {day}, {year}' },
+      { within: 'today', show: 'h:mm A' },
+      { within: 'yesterday', show: '[Yesterday at] h:mm A' },
+      { within: 'week', show: 'dddd [at] h:mm A' },
+      { within: 'year', show: 'MMM D' },
+      { older: true, show: 'MMM D, YYYY' },
     ],
     futureBuckets: [
-      { within: 'minute', show: 'now' },
+      { within: 'minute', show: '[now]' },
       { within: 'hour', show: 'relative' },
-      { within: 'today', show: 'today at {time}' },
-      { within: 'yesterday', show: 'tomorrow at {time}' }, // "yesterday" bucket used for "tomorrow" in future
-      { within: 'week', show: '{weekday} at {time}' },
-      { within: 'year', show: '{monthShort} {day}' },
-      { older: true, show: '{monthShort} {day}, {year}' },
+      { within: 'today', show: '[today at] h:mm A' },
+      { within: 'yesterday', show: '[tomorrow at] h:mm A' }, // "yesterday" bucket used for "tomorrow" in future
+      { within: 'week', show: 'dddd [at] h:mm A' },
+      { within: 'year', show: 'MMM D' },
+      { older: true, show: 'MMM D, YYYY' },
     ],
   },
 
@@ -110,18 +110,37 @@ export const defaultConfig: WhennyConfig = {
   },
 
   // ─────────────────────────────────────────────────────────
-  // FORMAT PRESETS
+  // FORMAT PRESETS (legacy)
   // ─────────────────────────────────────────────────────────
 
   formats: {
     presets: {
-      short: '{monthShort} {day}',
-      long: '{monthFull} {day}, {year}',
-      iso: '{year}-{month}-{day}T{hour24}:{minute}:{second}Z',
-      time: '{hour}:{minute} {AMPM}',
-      datetime: '{monthShort} {day}, {hour}:{minute} {AMPM}',
+      short: 'MMM D',
+      long: 'MMMM D, YYYY',
+      iso: 'YYYY-MM-DD[T]HH:mm:ss[Z]',
+      time: 'h:mm A',
+      datetime: 'MMM D, h:mm A',
     },
     hour12: true,
+  },
+
+  // ─────────────────────────────────────────────────────────
+  // STYLES (primary API - like Tailwind design tokens)
+  // ─────────────────────────────────────────────────────────
+
+  styles: {
+    // T-shirt sizes (progressive detail)
+    xs: 'M/D',                          // "2/3"
+    sm: 'MMM D',                        // "Feb 3"
+    md: 'MMM D, YYYY',                  // "Feb 3, 2026"
+    lg: 'MMMM Do, YYYY',                // "February 3rd, 2026"
+    xl: 'dddd, MMMM Do, YYYY',          // "Tuesday, February 3rd, 2026"
+
+    // Semantic styles
+    time: 'h:mm A',                     // "3:30 PM"
+    sortable: 'YYYY-MM-DD',             // "2026-02-03"
+    log: 'YYYY-MM-DD HH:mm:ss',         // "2026-02-03 15:30:45"
+    iso: 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]', // ISO 8601
   },
 
   // ─────────────────────────────────────────────────────────

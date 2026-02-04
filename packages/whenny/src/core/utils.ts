@@ -131,6 +131,8 @@ export function parseDate(input: DateInput): Date {
           'ISO 8601 (2024-01-15, 2024-01-15T10:30:00Z)',
           'Slash format (2024/01/15, 01/15/2024)',
           'European (15.01.2024)',
+          'Month names (Feb 3, 2024, February 3rd, 2024)',
+          'Day first (3 Feb 2024, 3rd February 2024)',
           'Unix timestamp (1705276800000)',
         ],
       }
@@ -233,6 +235,71 @@ function tryParseString(input: string): Date | null {
     const recursive = tryParseString(dateWithoutTz)
     if (recursive) {
       return recursive
+    }
+  }
+
+  // Strategy 6: Month name formats
+  // "Feb 3, 2026", "February 3, 2026", "February 3rd, 2026"
+  const monthNames: Record<string, number> = {
+    jan: 0, january: 0,
+    feb: 1, february: 1,
+    mar: 2, march: 2,
+    apr: 3, april: 3,
+    may: 4,
+    jun: 5, june: 5,
+    jul: 6, july: 6,
+    aug: 7, august: 7,
+    sep: 8, sept: 8, september: 8,
+    oct: 9, october: 9,
+    nov: 10, november: 10,
+    dec: 11, december: 11,
+  }
+
+  // "Feb 3, 2026" or "February 3rd, 2026"
+  const monthFirstMatch = input.match(
+    /^([a-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?,?\s*(\d{4})$/i
+  )
+  if (monthFirstMatch) {
+    const monthStr = monthFirstMatch[1].toLowerCase()
+    const day = parseInt(monthFirstMatch[2], 10)
+    const year = parseInt(monthFirstMatch[3], 10)
+    const month = monthNames[monthStr]
+    if (month !== undefined) {
+      const date = new Date(year, month, day)
+      if (!isNaN(date.getTime())) {
+        return date
+      }
+    }
+  }
+
+  // "3 Feb 2026" or "3rd February 2026"
+  const dayFirstMatch = input.match(
+    /^(\d{1,2})(?:st|nd|rd|th)?\s+([a-z]+),?\s*(\d{4})$/i
+  )
+  if (dayFirstMatch) {
+    const day = parseInt(dayFirstMatch[1], 10)
+    const monthStr = dayFirstMatch[2].toLowerCase()
+    const year = parseInt(dayFirstMatch[3], 10)
+    const month = monthNames[monthStr]
+    if (month !== undefined) {
+      const date = new Date(year, month, day)
+      if (!isNaN(date.getTime())) {
+        return date
+      }
+    }
+  }
+
+  // "Feb 3" (current year implied)
+  const monthDayMatch = input.match(/^([a-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?$/i)
+  if (monthDayMatch) {
+    const monthStr = monthDayMatch[1].toLowerCase()
+    const day = parseInt(monthDayMatch[2], 10)
+    const month = monthNames[monthStr]
+    if (month !== undefined) {
+      const date = new Date(new Date().getFullYear(), month, day)
+      if (!isNaN(date.getTime())) {
+        return date
+      }
     }
   }
 

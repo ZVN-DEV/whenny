@@ -509,8 +509,21 @@ describe('format', () => {
     expect(format(date, '{year}-{month}-{day}', defaultConfig)).toBe('2024-01-15')
   })
 
-  it('should preserve unknown tokens', () => {
-    expect(format(date, '{unknown} test', defaultConfig)).toBe('{unknown} test')
+  it('should preserve unknown legacy tokens', () => {
+    expect(format(date, '{unknown}', defaultConfig)).toBe('{unknown}')
+  })
+
+  it('should support escape sequences for literal text', () => {
+    expect(format(date, '[test] YYYY', defaultConfig)).toBe('test 2024')
+    expect(format(date, 'MMM D [at] h:mm A', defaultConfig)).toBe('Jan 15 at 3:30 PM')
+  })
+
+  it('should support new pattern syntax', () => {
+    expect(format(date, 'dddd, MMMM D', defaultConfig)).toBe('Monday, January 15')
+    expect(format(date, 'MMMM Do, YYYY', defaultConfig)).toBe('January 15th, 2024')
+    expect(format(date, 'MM/DD/YYYY', defaultConfig)).toBe('01/15/2024')
+    expect(format(date, 'h:mm A', defaultConfig)).toBe('3:30 PM')
+    expect(format(date, 'HH:mm:ss', defaultConfig)).toBe('15:30:45')
   })
 })
 

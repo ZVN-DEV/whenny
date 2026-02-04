@@ -176,28 +176,38 @@ function QuickStartSection() {
     <DocSection title="Quick Start">
       <p className="text-slate-600 mb-6">Get up and running in minutes.</p>
 
-      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Basic Usage</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Style Properties (Recommended)</h2>
       <CodeBlock>{`import { whenny } from 'whenny'
 
-// Smart formatting - picks the best format automatically
+// T-shirt sizes - like Tailwind for dates
+whenny(date).xs        // "1/15"
+whenny(date).sm        // "Jan 15"
+whenny(date).md        // "Jan 15, 2024"
+whenny(date).lg        // "January 15th, 2024"
+whenny(date).xl        // "Wednesday, January 15th, 2024"
+
+// Utility formats
+whenny(date).clock     // "3:45 PM"
+whenny(date).sortable  // "2024-01-15"
+whenny(date).log       // "2024-01-15 15:45:00"`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Smart & Relative</h2>
+      <CodeBlock>{`// Smart formatting - picks the best format automatically
 whenny(new Date()).smart()           // "just now"
 whenny(fiveMinutesAgo).smart()       // "5 minutes ago"
 whenny(yesterday).smart()            // "Yesterday at 3:45 PM"
 whenny(lastWeek).smart()             // "Monday at 9:00 AM"
-whenny(lastMonth).smart()            // "Jan 15"
 
 // Relative time
 whenny(date).relative()              // "5 minutes ago"
-whenny(futureDate).relative()        // "in 3 days"
+whenny(futureDate).relative()        // "in 3 days"`}</CodeBlock>
 
-// Format presets
-whenny(date).short()                 // "Jan 15"
-whenny(date).long()                  // "January 15, 2024"
-whenny(date).time()                  // "3:45 PM"
-whenny(date).iso()                   // "2024-01-15T15:45:00.000Z"
-
-// Custom formats
-whenny(date).format('{weekday}, {monthFull} {day}')`}</CodeBlock>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Custom Patterns</h2>
+      <CodeBlock>{`// Moment.js-style patterns when you need them
+whenny(date).format('YYYY-MM-DD')          // "2024-01-15"
+whenny(date).format('dddd, MMMM Do')       // "Wednesday, January 15th"
+whenny(date).format('h:mm A')              // "3:45 PM"
+whenny(date).format('[Today is] dddd')     // "Today is Wednesday"`}</CodeBlock>
 
       <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">React Hooks</h2>
       <CodeBlock>{`import { useRelativeTime, useCountdown } from 'whenny-react'
@@ -238,10 +248,24 @@ utcNow()                              // Current UTC time
 localNow()                            // Current local time
 inZone('America/New_York')            // Current time in specific zone`}</CodeBlock>
 
-      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Chaining Methods</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Style Properties</h2>
       <CodeBlock>{`const date = whenny('2024-01-15T15:30:00Z')
 
-// All methods return strings
+// T-shirt sizes (configurable)
+date.xs         // "1/15"
+date.sm         // "Jan 15"
+date.md         // "Jan 15, 2024"
+date.lg         // "January 15th, 2024"
+date.xl         // "Wednesday, January 15th, 2024"
+
+// Utility formats
+date.clock      // "3:30 PM"
+date.sortable   // "2024-01-15"
+date.log        // "2024-01-15 15:30:00"`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Formatting Methods</h2>
+      <CodeBlock>{`const date = whenny('2024-01-15T15:30:00Z')
+
 date.smart()                          // Context-aware format
 date.relative()                       // Relative to now
 date.short()                          // "Jan 15"
@@ -249,7 +273,18 @@ date.long()                           // "January 15, 2024"
 date.time()                           // "3:30 PM"
 date.datetime()                       // "Jan 15, 3:30 PM"
 date.iso()                            // ISO 8601 format
+date.format('dddd, MMMM Do')          // Custom pattern`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Timezone Methods</h2>
+      <CodeBlock>{`const date = whenny('2024-01-15T15:30:00Z')
+
+date.inZone('America/New_York')       // Convert to timezone
+date.zone                             // Get current timezone
+date.offset                           // Get offset in minutes
+date.transfer()                       // Create transfer payload`}</CodeBlock>
+
 date.format('{...}')                  // Custom format`}</CodeBlock>
+
     </DocSection>
   )
 }
@@ -257,25 +292,62 @@ date.format('{...}')                  // Custom format`}</CodeBlock>
 function FormattingSection() {
   return (
     <DocSection title="Formatting">
-      <p className="text-slate-600 mb-6">Format dates using presets or custom format strings with tokens.</p>
+      <p className="text-slate-600 mb-6">
+        Format dates using style properties, pattern syntax, or presets.
+      </p>
 
-      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Presets</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Style Properties (Recommended)</h2>
+      <p className="text-slate-600 mb-3">
+        Like Tailwind for dates. Configure once, use everywhere with simple properties.
+      </p>
       <CodeBlock>{`const date = whenny('2024-01-15T15:30:00Z')
 
-date.short()      // "Jan 15"
+// T-shirt sizes - no format strings needed
+date.xs         // "1/15"
+date.sm         // "Jan 15"
+date.md         // "Jan 15, 2024"
+date.lg         // "January 15th, 2024"
+date.xl         // "Wednesday, January 15th, 2024"
+
+// Utility formats
+date.clock      // "3:30 PM"
+date.sortable   // "2024-01-15"
+date.log        // "2024-01-15 15:30:00"`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Customize Styles</h2>
+      <CodeBlock>{`import { configure } from 'whenny'
+
+// Configure your styles once
+configure({
+  styles: {
+    xs: 'D/M',
+    sm: 'D MMM',
+    md: 'D MMM YYYY',
+    lg: 'Do MMMM, YYYY',
+    xl: 'dddd, Do MMMM, YYYY',
+    time: 'HH:mm',
+  }
+})
+
+// Use everywhere
+whenny(date).md  // "15 Jan 2024"`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Pattern Syntax (Moment.js-style)</h2>
+      <CodeBlock>{`// Custom format patterns when you need them
+date.format('YYYY-MM-DD')           // "2024-01-15"
+date.format('dddd, MMMM Do')        // "Wednesday, January 15th"
+date.format('h:mm A')               // "3:30 PM"
+date.format('[Today is] dddd')      // "Today is Wednesday"
+date.format('MMM Do, YYYY')         // "Jan 15th, 2024"`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Presets</h2>
+      <CodeBlock>{`date.short()      // "Jan 15"
 date.long()       // "January 15, 2024"
 date.time()       // "3:30 PM"
 date.datetime()   // "Jan 15, 3:30 PM"
 date.iso()        // "2024-01-15T15:30:00.000Z"`}</CodeBlock>
 
-      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Custom Formats</h2>
-      <CodeBlock>{`date.format('{monthFull} {day}, {year}')       // "January 15, 2024"
-date.format('{weekday}, {monthShort} {day}')   // "Monday, Jan 15"
-date.format('{year}-{month}-{day}')            // "2024-01-15"
-date.format('{hour}:{minute} {ampm}')          // "3:30 PM"
-date.format('{hour24}:{minute}:{second}')      // "15:30:00"`}</CodeBlock>
-
-      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Available Tokens</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Available Pattern Tokens</h2>
       <div className="overflow-x-auto my-4">
         <table className="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
           <thead className="bg-slate-50">
@@ -286,16 +358,27 @@ date.format('{hour24}:{minute}:{second}')      // "15:30:00"`}</CodeBlock>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 text-slate-600">
-            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{year}'}</td><td className="px-4 py-2">Full year</td><td className="px-4 py-2">2024</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{month}'}</td><td className="px-4 py-2">Month (padded)</td><td className="px-4 py-2">01</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{monthShort}'}</td><td className="px-4 py-2">Month name short</td><td className="px-4 py-2">Jan</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{monthFull}'}</td><td className="px-4 py-2">Month name full</td><td className="px-4 py-2">January</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{day}'}</td><td className="px-4 py-2">Day of month</td><td className="px-4 py-2">15</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{weekday}'}</td><td className="px-4 py-2">Weekday name</td><td className="px-4 py-2">Monday</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{hour}'}</td><td className="px-4 py-2">Hour (12h)</td><td className="px-4 py-2">3</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{hour24}'}</td><td className="px-4 py-2">Hour (24h)</td><td className="px-4 py-2">15</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{minute}'}</td><td className="px-4 py-2">Minute</td><td className="px-4 py-2">30</td></tr>
-            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">{'{ampm}'}</td><td className="px-4 py-2">AM/PM</td><td className="px-4 py-2">PM</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">YYYY</td><td className="px-4 py-2">Full year</td><td className="px-4 py-2">2024</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">YY</td><td className="px-4 py-2">2-digit year</td><td className="px-4 py-2">24</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">MMMM</td><td className="px-4 py-2">Full month name</td><td className="px-4 py-2">January</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">MMM</td><td className="px-4 py-2">Short month name</td><td className="px-4 py-2">Jan</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">MM</td><td className="px-4 py-2">Month (padded)</td><td className="px-4 py-2">01</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">M</td><td className="px-4 py-2">Month</td><td className="px-4 py-2">1</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">dddd</td><td className="px-4 py-2">Full weekday</td><td className="px-4 py-2">Wednesday</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">ddd</td><td className="px-4 py-2">Short weekday</td><td className="px-4 py-2">Wed</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">DD</td><td className="px-4 py-2">Day (padded)</td><td className="px-4 py-2">03</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">D</td><td className="px-4 py-2">Day</td><td className="px-4 py-2">3</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">Do</td><td className="px-4 py-2">Day with ordinal</td><td className="px-4 py-2">3rd</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">HH</td><td className="px-4 py-2">Hour 24h (padded)</td><td className="px-4 py-2">15</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">H</td><td className="px-4 py-2">Hour 24h</td><td className="px-4 py-2">15</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">hh</td><td className="px-4 py-2">Hour 12h (padded)</td><td className="px-4 py-2">03</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">h</td><td className="px-4 py-2">Hour 12h</td><td className="px-4 py-2">3</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">mm</td><td className="px-4 py-2">Minute (padded)</td><td className="px-4 py-2">30</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">ss</td><td className="px-4 py-2">Second (padded)</td><td className="px-4 py-2">45</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">A</td><td className="px-4 py-2">AM/PM uppercase</td><td className="px-4 py-2">PM</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">a</td><td className="px-4 py-2">am/pm lowercase</td><td className="px-4 py-2">pm</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">Z</td><td className="px-4 py-2">Timezone offset</td><td className="px-4 py-2">+05:30</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">[text]</td><td className="px-4 py-2">Escaped literal</td><td className="px-4 py-2">text</td></tr>
           </tbody>
         </table>
       </div>
@@ -391,20 +474,54 @@ function DurationSection() {
     <DocSection title="Duration">
       <p className="text-slate-600 mb-6">Format time durations in various styles.</p>
 
-      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Basic Usage</h2>
-      <CodeBlock>{`import { duration, durationMs, durationBetween } from 'whenny'
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Format Methods</h2>
+      <CodeBlock>{`import { duration } from 'whenny'
+
+const d = duration(3661)  // 1 hour, 1 minute, 1 second
+
+// Different formats for different use cases
+d.long()      // "1 hour, 1 minute, 1 second"
+d.compact()   // "1h 1m 1s"
+d.brief()     // "1h 1m"        (no seconds unless < 1 minute)
+d.clock()     // "1:01:01"      (like media player)
+d.timer()     // "01:01:01"     (padded, like stopwatch)
+d.minimal()   // "1h"           (largest unit only)
+d.human()     // "about 1 hour" (approximate)`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Creating Durations</h2>
+      <CodeBlock>{`import { duration, durationMs, durationBetween, until, since } from 'whenny'
 
 // From seconds
-duration(3661).long()      // "1 hour, 1 minute, 1 second"
-duration(3661).compact()   // "1h 1m 1s"
-duration(3661).clock()     // "1:01:01"
-duration(3661).human()     // "about 1 hour"
+duration(3661).compact()              // "1h 1m 1s"
 
 // From milliseconds
-durationMs(3661000).compact()   // "1h 1m 1s"
+durationMs(3661000).compact()         // "1h 1m 1s"
 
 // Between two dates
-durationBetween(startDate, endDate).compact()`}</CodeBlock>
+durationBetween(start, end).brief()   // "2h 30m"
+
+// From now to a future date
+until(deadline).timer()               // "02:30:45"
+
+// From a past date to now
+since(createdAt).human()              // "about 3 hours"`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Parse Duration Strings</h2>
+      <CodeBlock>{`import { parseDuration } from 'whenny'
+
+parseDuration('1h 30m')        // 5400 (seconds)
+parseDuration('90m')           // 5400
+parseDuration('2h 30m 15s')    // 9015`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Accessing Parts</h2>
+      <CodeBlock>{`const d = duration(3661)
+
+d.hours         // 1
+d.minutes       // 1
+d.seconds       // 1
+d.totalSeconds  // 3661
+d.totalMinutes  // 61
+d.totalHours    // 1`}</CodeBlock>
     </DocSection>
   )
 }
@@ -472,7 +589,9 @@ whenny(event.datetime).format('{time}')
 function CalendarSection() {
   return (
     <DocSection title="Calendar Helpers">
-      <p className="text-slate-600 mb-6">Utility functions for common calendar operations.</p>
+      <p className="text-slate-600 mb-6">
+        Utility functions for common calendar operations including business days.
+      </p>
 
       <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Day Queries</h2>
       <CodeBlock>{`import { calendar } from 'whenny'
@@ -490,6 +609,37 @@ calendar.isBusinessDay(date)
 calendar.isPast(date)
 calendar.isFuture(date)`}</CodeBlock>
 
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Business Days</h2>
+      <CodeBlock>{`import { calendar } from 'whenny'
+
+// Check if a date is a business day
+calendar.isBusinessDay(date)              // true/false
+
+// Get next/previous business day
+calendar.nextBusinessDay()                // Next business day from today
+calendar.nextBusinessDay(date)            // Next business day from date
+calendar.previousBusinessDay(date)        // Previous business day
+
+// Add/subtract business days
+calendar.addBusinessDays(date, 5)         // Skip weekends
+calendar.addBusinessDays(date, -3)        // Go backwards
+calendar.subtractBusinessDays(date, 5)    // Same as add -5
+
+// Count business days between dates
+calendar.businessDaysBetween(start, end)  // 10`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Configure Business Days</h2>
+      <CodeBlock>{`import { configure } from 'whenny'
+
+configure({
+  calendar: {
+    weekStartsOn: 'monday',
+    businessDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+  }
+})
+
+// Now all business day functions use your config`}</CodeBlock>
+
       <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Boundaries</h2>
       <CodeBlock>{`calendar.startOf(date, 'day')
 calendar.startOf(date, 'week')
@@ -500,6 +650,14 @@ calendar.endOf(date, 'day')
 calendar.endOf(date, 'week')
 calendar.endOf(date, 'month')
 calendar.endOf(date, 'year')`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Date Arithmetic</h2>
+      <CodeBlock>{`calendar.add(date, 5, 'day')        // Add 5 days
+calendar.add(date, 2, 'week')       // Add 2 weeks
+calendar.subtract(date, 1, 'month') // Subtract 1 month
+
+calendar.daysUntil(futureDate)      // Days until a future date
+calendar.daysSince(pastDate)        // Days since a past date`}</CodeBlock>
     </DocSection>
   )
 }
@@ -580,21 +738,97 @@ function SaleTimer({ endsAt }) {
 function ConfigSection() {
   return (
     <DocSection title="Configuration">
-      <p className="text-slate-600 mb-6">Customize Whenny&apos;s output.</p>
+      <p className="text-slate-600 mb-6">
+        Customize Whenny's output by configuring styles, strings, thresholds, and formats.
+      </p>
 
-      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Runtime Configuration</h2>
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Style Configuration</h2>
       <CodeBlock>{`import { configure } from 'whenny'
 
+// Configure your T-shirt size styles
 configure({
+  styles: {
+    xs: 'D/M',                     // Extra small
+    sm: 'D MMM',                   // Small
+    md: 'D MMM YYYY',              // Medium
+    lg: 'Do MMMM, YYYY',           // Large
+    xl: 'dddd, Do MMMM, YYYY',     // Extra large
+    time: 'HH:mm',                 // Time only
+    sortable: 'YYYY-MM-DD',        // Machine sortable
+    log: 'YYYY-MM-DD HH:mm:ss',    // Log format
+  }
+})
+
+// Now use everywhere
+whenny(date).md  // "3 Feb 2024"`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Relative Time Configuration</h2>
+      <CodeBlock>{`configure({
   relative: {
     justNow: 'moments ago',
     minutesAgo: (n) => \`\${n}m ago\`,
     hoursAgo: (n) => \`\${n}h ago\`,
+    thresholds: {
+      justNow: 30,        // < 30s = "just now"
+      seconds: 60,        // < 60s = "X seconds ago"
+      minutes: 3600,      // < 1hr = "X minutes ago"
+      hours: 86400,       // < 24hr = "X hours ago"
+    },
   }
 })
 
 // Now all relative times use your config
 whenny(date).relative()  // "moments ago", "5m ago", "2h ago"`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Business Days Configuration</h2>
+      <CodeBlock>{`configure({
+  calendar: {
+    weekStartsOn: 'monday',
+    businessDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+  }
+})`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Using Themes</h2>
+      <CodeBlock>{`import { configure } from 'whenny'
+import { slack, twitter, formal, technical, github } from 'whenny/themes'
+
+// Use a pre-built theme
+configure(slack)
+
+// Or extend one
+configure({
+  ...slack,
+  styles: {
+    ...slack.styles,
+    md: 'MMM Do, YYYY',
+  },
+  relative: {
+    ...slack.relative,
+    justNow: 'right now',
+  }
+})`}</CodeBlock>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Available Themes</h2>
+      <div className="overflow-x-auto my-4">
+        <table className="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
+          <thead className="bg-slate-50">
+            <tr>
+              <th className="text-left px-4 py-2 border-b border-slate-200 font-medium text-slate-700">Theme</th>
+              <th className="text-left px-4 py-2 border-b border-slate-200 font-medium text-slate-700">Style</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200 text-slate-600">
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">casual</td><td className="px-4 py-2">Default friendly: "just now", "5 minutes ago"</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">formal</td><td className="px-4 py-2">Professional: "a moment ago", "January 15th, 2024"</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">slack</td><td className="px-4 py-2">Slack-style: "just now", "5 min", "Yesterday at 3:45 PM"</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">twitter</td><td className="px-4 py-2">Ultra-compact: "now", "5m", "1h", "Jan 15"</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">minimal</td><td className="px-4 py-2">Clean: "now", "5m ago", "1d ago"</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">technical</td><td className="px-4 py-2">ISO 8601: "2024-01-15T15:45:00Z"</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">discord</td><td className="px-4 py-2">Discord-style: "Today at 3:45 PM"</td></tr>
+            <tr><td className="px-4 py-2 font-mono text-xs text-slate-800">github</td><td className="px-4 py-2">GitHub-style: "now", "2 minutes ago", "on Jan 15, 2024"</td></tr>
+          </tbody>
+        </table>
+      </div>
     </DocSection>
   )
 }
