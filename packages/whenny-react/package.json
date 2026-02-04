@@ -1,6 +1,6 @@
 {
   "name": "whenny-react",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "React hooks and components for Whenny, with shadcn/ui calendar integration",
   "keywords": [
     "whenny",

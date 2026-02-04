@@ -4,6 +4,8 @@
 [![npm version](https://img.shields.io/npm/v/whenny.svg)](https://www.npmjs.com/package/whenny)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
+**[Documentation](https://whenny.dev)** | **[Demo](https://whenny.dev/demo)** | **[Sanity Test](https://whenny.dev/sanity-test.html)**
+
 A modern date library for the AI era.
 
 **Own your code. Configure your voice. Never think about timezones again.**
@@ -295,12 +297,23 @@ All 374 tests passing. View tests:
 
 - [Core tests](packages/whenny/test/)
 - [React tests](packages/whenny-react/test/)
+- [Live Sanity Test](https://whenny.dev/sanity-test.html)
 
 Run tests locally:
 
 ```bash
 npm test
 ```
+
+### Integration Test (Sanity Test)
+
+Run a full integration test that installs whenny from npm and runs 75+ tests:
+
+```bash
+npx create-whenny test-install
+```
+
+This creates a fresh project, installs whenny, generates test files for every module, runs them, and opens an HTML report with results.
 
 ## Packages
 
