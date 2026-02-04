@@ -41,9 +41,9 @@ This copies the code directly into your project at `src/lib/whenny/`.
 
 ## Quick Start
 
-### Datewind Styles (Recommended)
+### Size-Based Formatting
 
-Like Tailwind for dates. Simple properties, consistent output:
+Simple properties, consistent output — like Tailwind for dates:
 
 ```typescript
 import { whenny } from 'whenny'
@@ -146,7 +146,7 @@ Whenny includes an MCP (Model Context Protocol) server so AI assistants like Cla
 | Tool | Description |
 |------|-------------|
 | `whenny` | Create a Whenny date instance |
-| `format_datewind` | Format using Datewind styles (xs, sm, md, lg, xl) |
+| `format_datewind` | Format using size-based styles (xs, sm, md, lg, xl) |
 | `format_smart` | Smart context-aware formatting |
 | `format_relative` | Relative time ("5 minutes ago") |
 | `format_duration` | Duration formatting (long, compact, timer) |
