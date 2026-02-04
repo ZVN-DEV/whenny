@@ -9,7 +9,7 @@ CLI for installing Whenny using the shadcn-style approach. Copy code directly in
 Set up Whenny in your project:
 
 ```bash
-npx whenny init
+npx create-whenny init
 ```
 
 This creates:
@@ -22,9 +22,9 @@ This creates:
 Add specific modules to your project:
 
 ```bash
-npx whenny add relative
-npx whenny add smart calendar duration
-npx whenny add all
+npx create-whenny add relative
+npx create-whenny add smart calendar duration
+npx create-whenny add all
 ```
 
 Available modules:
@@ -41,7 +41,7 @@ Available modules:
 See all available modules:
 
 ```bash
-npx whenny list
+npx create-whenny list
 ```
 
 ### Check for Updates
@@ -49,7 +49,7 @@ npx whenny list
 See what's changed between your local code and the latest version:
 
 ```bash
-npx whenny diff
+npx create-whenny diff
 ```
 
 ## Why Copy Code?

@@ -33,8 +33,8 @@ npm install whenny whenny-react
 ### shadcn Style (Recommended)
 
 ```bash
-npx whenny init
-npx whenny add relative smart calendar
+npx create-whenny init
+npx create-whenny add relative smart calendar
 ```
 
 This copies the code directly into your project at `src/lib/whenny/`.
@@ -279,16 +279,16 @@ parse('december 25th')          // Date object
 
 ```bash
 # Initialize whenny in your project
-npx whenny init
+npx create-whenny init
 
 # Add specific modules
-npx whenny add relative smart calendar duration timezone
+npx create-whenny add relative smart calendar duration timezone
 
 # List available modules
-npx whenny list
+npx create-whenny list
 
 # Show changes between your code and latest version
-npx whenny diff
+npx create-whenny diff
 ```
 
 ## Tests
