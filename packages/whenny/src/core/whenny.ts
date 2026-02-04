@@ -85,7 +85,51 @@ class WhennyImpl implements WhennyInterface {
   }
 
   // ─────────────────────────────────────────────────────────
-  // FORMATTING
+  // STYLE PROPERTIES (primary API - like Tailwind tokens)
+  // ─────────────────────────────────────────────────────────
+
+  /** Extra small: "2/3" - minimal numeric */
+  get xs(): string {
+    return format(this._date, this._config.styles.xs, this._config, this._timezone)
+  }
+
+  /** Small: "Feb 3" - abbreviated */
+  get sm(): string {
+    return format(this._date, this._config.styles.sm, this._config, this._timezone)
+  }
+
+  /** Medium: "Feb 3, 2026" - default readable */
+  get md(): string {
+    return format(this._date, this._config.styles.md, this._config, this._timezone)
+  }
+
+  /** Large: "February 3rd, 2026" - full names */
+  get lg(): string {
+    return format(this._date, this._config.styles.lg, this._config, this._timezone)
+  }
+
+  /** Extra large: "Tuesday, February 3rd, 2026" - includes weekday */
+  get xl(): string {
+    return format(this._date, this._config.styles.xl, this._config, this._timezone)
+  }
+
+  /** Time only: "3:30 PM" */
+  get clock(): string {
+    return format(this._date, this._config.styles.time, this._config, this._timezone)
+  }
+
+  /** Sortable: "2026-02-03" - machine-sortable */
+  get sortable(): string {
+    return format(this._date, this._config.styles.sortable, this._config, this._timezone)
+  }
+
+  /** Log format: "2026-02-03 15:30:45" - for logs */
+  get log(): string {
+    return format(this._date, this._config.styles.log, this._config, this._timezone)
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // FORMATTING (methods - for backward compat & custom)
   // ─────────────────────────────────────────────────────────
 
   format(template: string): string {

@@ -87,6 +87,14 @@ export const formal: WhennyConfig = {
       datetime: 'MMMM Do [at] h:mm A',
     },
   },
+  styles: {
+    ...defaultConfig.styles,
+    xs: 'D/M',
+    sm: 'Do MMM',
+    md: 'Do MMM, YYYY',
+    lg: 'Do MMMM, YYYY',
+    xl: 'dddd, Do MMMM, YYYY',
+  },
 }
 
 // ============================================================================
@@ -267,6 +275,15 @@ export const technical: WhennyConfig = {
       datetime: 'YYYY-MM-DD HH:mm:ss',
     },
     hour12: false,
+  },
+  styles: {
+    ...defaultConfig.styles,
+    xs: 'YYMMDD',
+    sm: 'YYYY-MM-DD',
+    md: 'YYYY-MM-DD HH:mm',
+    lg: 'YYYY-MM-DD HH:mm:ss',
+    xl: 'YYYY-MM-DD[T]HH:mm:ss[Z]',
+    time: 'HH:mm:ss',
   },
 }
 

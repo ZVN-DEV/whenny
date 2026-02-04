@@ -175,6 +175,40 @@ export interface FormatConfig {
 }
 
 /**
+ * Style configuration - semantic date format tokens (like Tailwind's design tokens)
+ *
+ * T-shirt sizes for progressive detail:
+ * - xs: minimal (numeric only)
+ * - sm: short (abbreviated)
+ * - md: medium (default readable)
+ * - lg: long (full names)
+ * - xl: extra long (includes weekday)
+ *
+ * Plus semantic styles for specific use cases:
+ * - time: time only
+ * - sortable: YYYY-MM-DD
+ * - log: YYYY-MM-DD HH:mm:ss
+ * - iso: ISO 8601
+ */
+export interface StylesConfig {
+  // T-shirt sizes (progressive detail)
+  xs: string       // "2/3" - minimal
+  sm: string       // "Feb 3" - short
+  md: string       // "Feb 3, 2026" - medium (default)
+  lg: string       // "February 3rd, 2026" - long
+  xl: string       // "Tuesday, February 3rd, 2026" - extra long
+
+  // Semantic styles
+  time: string     // "3:30 PM" - time only
+  sortable: string // "2026-02-03" - machine-sortable
+  log: string      // "2026-02-03 15:30:45" - for logs
+  iso: string      // ISO 8601 format
+
+  // Allow custom styles
+  [key: string]: string
+}
+
+/**
  * Calendar configuration
  */
 export interface CalendarConfig {
@@ -222,6 +256,7 @@ export interface WhennyConfig {
   compare: CompareConfig
   duration: DurationConfig
   formats: FormatConfig
+  styles: StylesConfig
   calendar: CalendarConfig
   natural: NaturalConfig
   server: ServerConfig
@@ -298,7 +333,35 @@ export interface Whenny {
   isValid(): boolean
 
   // ─────────────────────────────────────────────────────────
-  // FORMATTING
+  // STYLE PROPERTIES (primary API - like Tailwind tokens)
+  // ─────────────────────────────────────────────────────────
+
+  /** Extra small: "2/3" - minimal numeric */
+  readonly xs: string
+
+  /** Small: "Feb 3" - abbreviated */
+  readonly sm: string
+
+  /** Medium: "Feb 3, 2026" - default readable */
+  readonly md: string
+
+  /** Large: "February 3rd, 2026" - full names */
+  readonly lg: string
+
+  /** Extra large: "Tuesday, February 3rd, 2026" - includes weekday */
+  readonly xl: string
+
+  /** Time only: "3:30 PM" */
+  readonly clock: string
+
+  /** Sortable: "2026-02-03" - machine-sortable */
+  readonly sortable: string
+
+  /** Log format: "2026-02-03 15:30:45" - for logs */
+  readonly log: string
+
+  // ─────────────────────────────────────────────────────────
+  // FORMATTING (methods - kept for backward compat & custom)
   // ─────────────────────────────────────────────────────────
 
   /** Format with custom template */

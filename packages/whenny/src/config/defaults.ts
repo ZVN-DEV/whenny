@@ -110,7 +110,7 @@ export const defaultConfig: WhennyConfig = {
   },
 
   // ─────────────────────────────────────────────────────────
-  // FORMAT PRESETS
+  // FORMAT PRESETS (legacy)
   // ─────────────────────────────────────────────────────────
 
   formats: {
@@ -122,6 +122,25 @@ export const defaultConfig: WhennyConfig = {
       datetime: 'MMM D, h:mm A',
     },
     hour12: true,
+  },
+
+  // ─────────────────────────────────────────────────────────
+  // STYLES (primary API - like Tailwind design tokens)
+  // ─────────────────────────────────────────────────────────
+
+  styles: {
+    // T-shirt sizes (progressive detail)
+    xs: 'M/D',                          // "2/3"
+    sm: 'MMM D',                        // "Feb 3"
+    md: 'MMM D, YYYY',                  // "Feb 3, 2026"
+    lg: 'MMMM Do, YYYY',                // "February 3rd, 2026"
+    xl: 'dddd, MMMM Do, YYYY',          // "Tuesday, February 3rd, 2026"
+
+    // Semantic styles
+    time: 'h:mm A',                     // "3:30 PM"
+    sortable: 'YYYY-MM-DD',             // "2026-02-03"
+    log: 'YYYY-MM-DD HH:mm:ss',         // "2026-02-03 15:30:45"
+    iso: 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]', // ISO 8601
   },
 
   // ─────────────────────────────────────────────────────────
