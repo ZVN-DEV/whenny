@@ -21,6 +21,72 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   )
 }
 
+// Copy button component
+function CopyButton({ text, className = '' }: { text: string; className?: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className={`transition-all ${className}`}
+      title="Click to copy"
+    >
+      {copied ? (
+        <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      ) : (
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+      )}
+    </button>
+  )
+}
+
+// Copyable command block
+function CommandBlock({ command, variant = 'dark' }: { command: string; variant?: 'dark' | 'light' }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(command)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const isDark = variant === 'dark'
+
+  return (
+    <button
+      onClick={handleCopy}
+      className={`group relative px-4 py-3 rounded-lg text-sm font-mono flex items-center gap-3 transition-all hover:scale-[1.02] active:scale-[0.98] ${
+        isDark
+          ? 'bg-slate-900 text-slate-100 hover:bg-slate-800'
+          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+      }`}
+    >
+      <span>{command}</span>
+      <span className={`transition-all ${copied ? 'text-green-400' : isDark ? 'text-slate-500 group-hover:text-slate-300' : 'text-slate-400 group-hover:text-slate-600'}`}>
+        {copied ? (
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        ) : (
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        )}
+      </span>
+    </button>
+  )
+}
+
 export default function HomePage() {
   const now = new Date()
   const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000)
@@ -66,12 +132,8 @@ export default function HomePage() {
 
           <FadeIn delay={150}>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <code className="px-4 py-3 bg-slate-900 text-slate-100 rounded-lg text-sm font-mono">
-                npx whenny init
-              </code>
-              <code className="px-4 py-3 bg-slate-100 text-slate-700 rounded-lg text-sm font-mono">
-                npm install whenny
-              </code>
+              <CommandBlock command="npx whenny init" variant="dark" />
+              <CommandBlock command="npm install whenny" variant="light" />
             </div>
           </FadeIn>
         </div>
@@ -253,25 +315,24 @@ export default function HomePage() {
 
           <FadeIn delay={100}>
             <div className="bg-slate-900 rounded-xl p-6 shadow-xl">
-              <pre className="text-sm leading-loose overflow-x-auto">
-                <code className="text-slate-300">
-                  <span className="text-slate-500"># Initialize whenny in your project</span>{'\n'}
-                  <span className="text-green-400">npx whenny init</span>{'\n'}
-                  {'\n'}
-                  <span className="text-slate-500"># Add only the modules you need</span>{'\n'}
-                  <span className="text-green-400">npx whenny add relative</span>{'\n'}
-                  <span className="text-green-400">npx whenny add smart calendar</span>{'\n'}
-                  <span className="text-green-400">npx whenny add duration</span>{'\n'}
-                  {'\n'}
-                  <span className="text-slate-500"># Or grab everything</span>{'\n'}
-                  <span className="text-green-400">npx whenny add all</span>
-                </code>
-              </pre>
+              <div className="space-y-2">
+                <p className="text-slate-500 text-sm mb-3"># Initialize whenny in your project</p>
+                <CopyableLine command="npx whenny init" />
+
+                <p className="text-slate-500 text-sm mt-4 mb-3"># Add only the modules you need</p>
+                <CopyableLine command="npx whenny add relative" />
+                <CopyableLine command="npx whenny add smart calendar" />
+                <CopyableLine command="npx whenny add duration" />
+
+                <p className="text-slate-500 text-sm mt-4 mb-3"># Or grab everything</p>
+                <CopyableLine command="npx whenny add all" />
+              </div>
             </div>
           </FadeIn>
 
           <FadeIn delay={150}>
-            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <p className="text-center text-sm text-slate-500 mt-6 mb-3">Click any module to copy its install command:</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <ModuleChip name="core" />
               <ModuleChip name="relative" />
               <ModuleChip name="smart" />
@@ -407,9 +468,58 @@ function QuickExample({ title, code, outputs, live }: {
 }
 
 function ModuleChip({ name }: { name: string }) {
+  const [copied, setCopied] = useState(false)
+  const command = `npx whenny add ${name}`
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(command)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
-    <div className="px-3 py-2 bg-white rounded-lg border border-slate-200 text-center">
-      <code className="text-xs text-slate-700 font-mono">{name}</code>
-    </div>
+    <button
+      onClick={handleCopy}
+      className={`group px-3 py-2 rounded-lg border text-center transition-all hover:scale-[1.02] active:scale-[0.98] ${
+        copied
+          ? 'bg-green-50 border-green-300 text-green-700'
+          : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+      }`}
+      title={`Copy: ${command}`}
+    >
+      <code className={`text-xs font-mono ${copied ? 'text-green-700' : 'text-slate-700'}`}>
+        {copied ? '✓ copied!' : name}
+      </code>
+    </button>
+  )
+}
+
+function CopyableLine({ command }: { command: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(command)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="group w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors text-left"
+    >
+      <code className="text-sm text-green-400">{command}</code>
+      <span className={`transition-all ${copied ? 'text-green-400' : 'text-slate-600 group-hover:text-slate-400'}`}>
+        {copied ? (
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        ) : (
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        )}
+      </span>
+    </button>
   )
 }
