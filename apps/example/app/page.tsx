@@ -101,6 +101,7 @@ export default function HomePage() {
           <div className="flex items-center gap-6">
             <Link href="/demo" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">Demo</Link>
             <Link href="/docs" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">Docs</Link>
+            <a href="/sanity-test.html" className="text-sm text-green-600 hover:text-green-700 transition-colors">Sanity Test ✓</a>
             <a href="https://github.com/ZVN-DEV/whenny" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">GitHub</a>
           </div>
         </div>
