@@ -135,7 +135,7 @@ Whenny includes an MCP (Model Context Protocol) server so AI assistants like Cla
   "mcpServers": {
     "whenny": {
       "command": "npx",
-      "args": ["whenny", "mcp"]
+      "args": ["create-whenny", "mcp"]
     }
   }
 }

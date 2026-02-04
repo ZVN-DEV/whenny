@@ -11,6 +11,40 @@ import ora from 'ora'
 import prompts from 'prompts'
 import { MODULES, getModuleTemplate } from '../templates/index.js'
 import { detectWhennyPath } from '../utils/detect.js'
+import { writeDocsFile, getInstalledModules } from '../utils/docs-generator.js'
+
+/**
+ * Resolve all dependencies for the given modules
+ */
+function resolveAllDependencies(modules: string[]): string[] {
+  const resolved = new Set<string>()
+
+  function addWithDeps(moduleName: string) {
+    if (resolved.has(moduleName)) return
+    const module = MODULES.find(m => m.name === moduleName)
+    if (!module) return
+
+    // Add dependencies first
+    if (module.dependencies) {
+      for (const dep of module.dependencies) {
+        addWithDeps(dep)
+      }
+    }
+
+    resolved.add(moduleName)
+  }
+
+  for (const mod of modules) {
+    addWithDeps(mod)
+  }
+
+  // Sort: core first, then alphabetically
+  return Array.from(resolved).sort((a, b) => {
+    if (a === 'core') return -1
+    if (b === 'core') return 1
+    return a.localeCompare(b)
+  })
+}
 
 interface AddOptions {
   path?: string
@@ -59,6 +93,16 @@ export async function add(
       console.log(chalk.gray(`    - ${m.name}: ${m.description}`))
     })
     return
+  }
+
+  // Resolve all dependencies
+  const originalModules = [...modules]
+  modules = resolveAllDependencies(modules)
+
+  // Show which dependencies will be added
+  const addedDeps = modules.filter(m => !originalModules.includes(m))
+  if (addedDeps.length > 0) {
+    console.log(chalk.cyan(`  Adding dependencies: ${addedDeps.join(', ')}`))
   }
 
   // Detect whenny path
@@ -121,6 +165,11 @@ export async function add(
     spinner.text = 'Updating index.ts...'
     await updateIndexFile(fullPath, modules)
 
+    // Regenerate documentation
+    spinner.text = 'Updating documentation...'
+    const allModules = await getInstalledModules(fullPath)
+    await writeDocsFile(fullPath, allModules)
+
     spinner.succeed(`Added ${modules.length} module(s)`)
 
     console.log()
@@ -128,6 +177,7 @@ export async function add(
     modules.forEach(m => {
       console.log(chalk.gray(`    - ${targetPath}/${m}.ts`))
     })
+    console.log(chalk.gray(`  Updated: Whenny-Dates-Agents.md`))
     console.log()
   } catch (error) {
     spinner.fail('Failed to add modules')

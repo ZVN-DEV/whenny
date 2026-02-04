@@ -11,6 +11,40 @@ import chalk from 'chalk'
 import ora from 'ora'
 import prompts from 'prompts'
 import { MODULES, getModuleTemplate, getConfigTemplate } from '../templates/index.js'
+import { writeDocsFile } from '../utils/docs-generator.js'
+
+/**
+ * Resolve all dependencies for the given modules
+ */
+function resolveAllDependencies(modules: string[]): string[] {
+  const resolved = new Set<string>()
+
+  function addWithDeps(moduleName: string) {
+    if (resolved.has(moduleName)) return
+    const module = MODULES.find(m => m.name === moduleName)
+    if (!module) return
+
+    // Add dependencies first
+    if (module.dependencies) {
+      for (const dep of module.dependencies) {
+        addWithDeps(dep)
+      }
+    }
+
+    resolved.add(moduleName)
+  }
+
+  for (const mod of modules) {
+    addWithDeps(mod)
+  }
+
+  // Sort: core first, then alphabetically
+  return Array.from(resolved).sort((a, b) => {
+    if (a === 'core') return -1
+    if (b === 'core') return 1
+    return a.localeCompare(b)
+  })
+}
 
 interface InitOptions {
   yes?: boolean
@@ -74,11 +108,14 @@ export async function init(options: InitOptions): Promise<void> {
     }
 
     targetPath = response.path
-    selectedModules = ['core', ...(response.modules || [])]
+    selectedModules = resolveAllDependencies(['core', ...(response.modules || [])])
   } else if (options.full) {
     selectedModules = MODULES.map(m => m.name)
   } else if (options.minimal) {
     selectedModules = ['core']
+  } else {
+    // Default with --yes flag
+    selectedModules = resolveAllDependencies(['core', 'relative', 'smart'])
   }
 
   const spinner = ora('Initializing Whenny...').start()
@@ -107,6 +144,10 @@ export async function init(options: InitOptions): Promise<void> {
     spinner.text = 'Creating index.ts...'
     await writeIndexFile(selectedModules, fullPath)
 
+    // Generate documentation
+    spinner.text = 'Generating documentation...'
+    await writeDocsFile(fullPath, selectedModules)
+
     spinner.succeed('Whenny initialized successfully!')
 
     console.log()
@@ -117,6 +158,7 @@ export async function init(options: InitOptions): Promise<void> {
       console.log(chalk.gray(`      - ${moduleName}.ts`))
     }
     console.log(chalk.gray(`      - index.ts`))
+    console.log(chalk.gray(`    - Whenny-Dates-Agents.md`))
 
     console.log()
     console.log(chalk.bold('  Usage:'))

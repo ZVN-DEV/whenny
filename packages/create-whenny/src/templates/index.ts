@@ -48,7 +48,7 @@ export const MODULES: ModuleInfo[] = [
   {
     name: 'transfer',
     description: 'Server/browser transfer protocol',
-    dependencies: ['core'],
+    dependencies: ['core', 'timezone'],
   },
   {
     name: 'natural',
@@ -59,6 +59,11 @@ export const MODULES: ModuleInfo[] = [
     name: 'react',
     description: 'React hooks (useRelativeTime, useCountdown)',
     dependencies: ['core', 'relative'],
+  },
+  {
+    name: 'constants',
+    description: 'Timezone list, format patterns, and useful constants',
+    dependencies: ['core'],
   },
 ]
 
@@ -84,6 +89,8 @@ export function getModuleTemplate(name: string): string | null {
       return NATURAL_TEMPLATE
     case 'react':
       return REACT_TEMPLATE
+    case 'constants':
+      return CONSTANTS_TEMPLATE
     default:
       return null
   }
@@ -181,6 +188,36 @@ const CORE_TEMPLATE = `/**
  *
  * Core date primitives and the main whenny function.
  * This file is the foundation - modify freely to customize behavior.
+ *
+ * @example Basic Usage
+ * \`\`\`ts
+ * import { whenny } from './core'
+ *
+ * // Create from various inputs
+ * whenny(new Date())           // from Date object
+ * whenny('2024-01-15')         // from ISO string
+ * whenny(1705276800000)        // from timestamp
+ * whenny.now()                 // current time
+ *
+ * // Format dates
+ * whenny('2024-01-15').short()     // "Jan 15"
+ * whenny('2024-01-15').long()      // "January 15, 2024"
+ * whenny('2024-01-15').time()      // "12:00 AM"
+ * whenny('2024-01-15').iso()       // "2024-01-15T00:00:00.000Z"
+ *
+ * // Custom formatting
+ * whenny('2024-01-15').format('{weekday}, {monthFull} {day}')  // "Monday, January 15"
+ *
+ * // Date math
+ * whenny('2024-01-15').add(7, 'days')       // Jan 22
+ * whenny('2024-01-15').subtract(1, 'month') // Dec 15
+ *
+ * // Access components
+ * const d = whenny('2024-01-15')
+ * d.year   // 2024
+ * d.month  // 1
+ * d.day    // 15
+ * \`\`\`
  */
 
 // ============================================================================
@@ -679,6 +716,25 @@ const RELATIVE_TEMPLATE = `/**
  *
  * Format dates as relative time strings.
  * Customize text in whenny.config.ts
+ *
+ * @example Basic Usage
+ * \`\`\`ts
+ * import { relative, fromNow } from './relative'
+ *
+ * // Relative to now
+ * relative(new Date())                         // "just now"
+ * relative(Date.now() - 60000)                 // "1 minute ago"
+ * relative(Date.now() - 3600000)               // "1 hour ago"
+ * relative(Date.now() - 86400000)              // "yesterday"
+ * relative(Date.now() + 86400000)              // "tomorrow"
+ * relative(Date.now() + 3600000)               // "in 1 hour"
+ *
+ * // fromNow() is an alias
+ * fromNow('2024-01-15')                        // "3 months ago"
+ *
+ * // Relative to a specific date
+ * relative('2024-01-20', { from: '2024-01-15' })  // "in 5 days"
+ * \`\`\`
  */
 
 import { config, parseDate, differenceInSeconds, type DateInput } from './core.js'
@@ -727,6 +783,34 @@ const SMART_TEMPLATE = `/**
  * Whenny Smart Formatting
  *
  * Context-aware formatting that picks the best representation.
+ * Shows relative time for recent, absolute for older dates.
+ *
+ * @example Basic Usage
+ * \`\`\`ts
+ * import { smart } from './smart'
+ *
+ * // Recent dates show relative time
+ * smart(Date.now() - 30000)        // "just now" (within a minute)
+ * smart(Date.now() - 300000)       // "5 minutes ago" (within an hour)
+ *
+ * // Today shows time only
+ * smart(todayAt9am)                // "9:00 AM"
+ *
+ * // Yesterday shows "Yesterday at..."
+ * smart(yesterdayAt3pm)            // "Yesterday at 3:00 PM"
+ *
+ * // This week shows weekday
+ * smart(lastTuesday)               // "Tuesday at 2:30 PM"
+ *
+ * // This year shows month/day
+ * smart('2024-03-15')              // "Mar 15"
+ *
+ * // Older shows full date
+ * smart('2023-06-20')              // "Jun 20, 2023"
+ *
+ * // With timezone context
+ * smart(date, { for: 'America/New_York' })
+ * \`\`\`
  */
 
 import { config, parseDate, format, isToday, isYesterday, isTomorrow, differenceInSeconds, type DateInput, type Timezone } from './core.js'
@@ -764,6 +848,35 @@ const COMPARE_TEMPLATE = `/**
  * Whenny Compare
  *
  * Compare two dates and get formatted descriptions.
+ *
+ * @example Basic Usage
+ * \`\`\`ts
+ * import { compare, distance } from './compare'
+ *
+ * const meeting = '2024-01-20T14:00:00'
+ * const deadline = '2024-01-15T09:00:00'
+ *
+ * // Compare two dates
+ * compare(meeting, deadline).smart()     // "5 days after"
+ * compare(deadline, meeting).smart()     // "5 days before"
+ * compare(deadline, deadline).smart()    // "at the same time"
+ *
+ * // Get numeric differences
+ * compare(meeting, deadline).days()      // 5
+ * compare(meeting, deadline).hours()     // 125
+ * compare(meeting, deadline).minutes()   // 7500
+ *
+ * // Boolean checks
+ * compare(meeting, deadline).isAfter()   // true
+ * compare(meeting, deadline).isBefore()  // false
+ * compare(meeting, deadline).isSame()    // false
+ * compare(meeting, deadline).isSame('day')  // false
+ *
+ * // Distance between dates
+ * distance(meeting, deadline).human()    // "5 days"
+ * distance(meeting, deadline).exact()    // "5 days, 5 hours"
+ * distance(meeting, deadline).totalSeconds  // 450000
+ * \`\`\`
  */
 
 import { config, parseDate, differenceInSeconds, type DateInput } from './core.js'
@@ -839,6 +952,35 @@ const DURATION_TEMPLATE = `/**
  * Whenny Duration
  *
  * Format durations in various styles.
+ *
+ * @example Basic Usage
+ * \`\`\`ts
+ * import { duration, durationBetween, until, since } from './duration'
+ *
+ * // Format seconds as duration
+ * duration(3661).long()      // "1 hour, 1 minute, 1 second"
+ * duration(3661).compact()   // "1h 1m 1s"
+ * duration(3661).clock()     // "1:01:01"
+ * duration(3661).human()     // "about 1 hour"
+ *
+ * // Without hours
+ * duration(125).clock()      // "2:05"
+ *
+ * // Access components
+ * const d = duration(3661)
+ * d.hours          // 1
+ * d.minutes        // 1
+ * d.seconds        // 1
+ * d.totalSeconds   // 3661
+ * d.totalMinutes   // 61
+ *
+ * // Duration between two dates
+ * durationBetween('2024-01-15', '2024-01-16').long()  // "24 hours"
+ *
+ * // Countdown helpers
+ * until('2024-12-31').human()    // "about 11 months"
+ * since('2024-01-01').compact()  // "2h 30m 15s"
+ * \`\`\`
  */
 
 import { config, parseDate, type DateInput } from './core.js'
@@ -898,6 +1040,35 @@ const TIMEZONE_TEMPLATE = `/**
  * Whenny Timezone
  *
  * Timezone utilities and conversions.
+ *
+ * @example Basic Usage
+ * \`\`\`ts
+ * import { local, offset, dayBounds, isTodayIn, tz } from './timezone'
+ *
+ * // Get user's local timezone
+ * local()                            // "America/New_York"
+ *
+ * // Get UTC offset in minutes
+ * offset('America/New_York')         // -300 (EST) or -240 (EDT)
+ * offset('Europe/London')            // 0 or 60 (DST)
+ * offset('Asia/Tokyo')               // 540
+ *
+ * // Get day boundaries in a timezone
+ * const bounds = dayBounds({ for: 'America/Los_Angeles' })
+ * bounds.start  // Start of day in LA (as UTC Date)
+ * bounds.end    // End of day in LA (as UTC Date)
+ *
+ * // With specific date
+ * dayBounds({ date: '2024-01-15', for: 'Europe/Paris' })
+ *
+ * // Check if a UTC date is "today" in a timezone
+ * isTodayIn(new Date(), 'Asia/Tokyo')  // true/false
+ *
+ * // Namespace shortcuts
+ * tz.local()
+ * tz.offset('UTC')
+ * tz.dayBounds({ for: 'America/Chicago' })
+ * \`\`\`
  */
 
 import { parseDate, getLocalTimezone, startOfDay, endOfDay, type DateInput, type Timezone } from './core.js'
@@ -936,6 +1107,50 @@ const CALENDAR_TEMPLATE = `/**
  * Whenny Calendar
  *
  * Calendar helpers for common operations.
+ *
+ * @example Basic Usage
+ * \`\`\`ts
+ * import {
+ *   isToday, isYesterday, isTomorrow, isThisWeek, isThisMonth, isThisYear,
+ *   isWeekend, isWeekday, isBusinessDay, isPast, isFuture, isBetween,
+ *   startOf, endOf, add, subtract, daysUntil, daysSince, calendar
+ * } from './calendar'
+ *
+ * // Date checks
+ * isToday(new Date())                    // true
+ * isYesterday(Date.now() - 86400000)     // true
+ * isTomorrow(Date.now() + 86400000)      // true
+ * isThisWeek('2024-01-15')               // depends on current date
+ * isThisMonth('2024-01-15')              // depends on current date
+ *
+ * // Weekend/weekday checks
+ * isWeekend('2024-01-13')                // true (Saturday)
+ * isWeekday('2024-01-15')                // true (Monday)
+ * isBusinessDay('2024-01-15')            // true (configurable in whenny.config.ts)
+ *
+ * // Past/future checks
+ * isPast('2020-01-01')                   // true
+ * isFuture('2030-01-01')                 // true
+ * isBetween('2024-06-15', '2024-01-01', '2024-12-31')  // true
+ *
+ * // Get boundaries
+ * startOf('2024-01-15', 'day')           // 2024-01-15 00:00:00
+ * startOf('2024-01-15', 'week')          // Start of week containing Jan 15
+ * startOf('2024-01-15', 'month')         // 2024-01-01 00:00:00
+ * endOf('2024-01-15', 'day')             // 2024-01-15 23:59:59.999
+ *
+ * // Date math
+ * add('2024-01-15', 7, 'days')           // 2024-01-22
+ * subtract('2024-01-15', 1, 'month')     // 2023-12-15
+ *
+ * // Countdown helpers
+ * daysUntil('2024-12-31')                // days until New Year
+ * daysSince('2024-01-01')                // days since New Year
+ *
+ * // Namespace shortcut
+ * calendar.isToday(date)
+ * calendar.add(date, 5, 'days')
+ * \`\`\`
  */
 
 import { config, parseDate, addTime, startOfDay, endOfDay, isSameDay, isToday, isYesterday, isTomorrow, type DateInput, type TimeUnit } from './core.js'
@@ -1048,6 +1263,43 @@ const TRANSFER_TEMPLATE = `/**
  * Whenny Transfer
  *
  * Handle date serialization with timezone context.
+ * Perfect for server/client date synchronization.
+ *
+ * @example Basic Usage
+ * \`\`\`ts
+ * import { createTransfer, fromTransfer, localTransfer, utcTransfer, transfer } from './transfer'
+ *
+ * // === SERVER SIDE ===
+ * // Create a transfer payload to send to client
+ * const payload = createTransfer(new Date(), { timezone: 'America/New_York' })
+ * // { iso: "2024-01-15T20:00:00.000Z", originZone: "America/New_York", originOffset: -300 }
+ *
+ * // Quick helpers
+ * const local = localTransfer(new Date())  // Uses browser's timezone
+ * const utc = utcTransfer(new Date())      // Uses UTC
+ *
+ * // === CLIENT SIDE ===
+ * // Receive and work with transferred date
+ * const received = fromTransfer(payload)
+ *
+ * received.date                  // UTC Date object
+ * received.originZone            // "America/New_York"
+ * received.originOffset          // -300
+ *
+ * received.utc()                 // Date in UTC
+ * received.inOrigin()            // Date adjusted to origin timezone
+ * received.startOfDayInOrigin()  // Start of day in origin timezone
+ * received.endOfDayInOrigin()    // End of day in origin timezone
+ * received.dayBoundsInOrigin()   // { start, end } in origin timezone
+ * received.toISO()               // ISO string
+ * received.transfer()            // Get payload back for re-sending
+ *
+ * // Namespace shortcuts
+ * transfer.create(date, { timezone: 'UTC' })
+ * transfer.from(payload)
+ * transfer.local(date)
+ * transfer.utc(date)
+ * \`\`\`
  */
 
 import { parseDate, getLocalTimezone, startOfDay, endOfDay, type DateInput, type Timezone } from './core.js'
@@ -1109,6 +1361,55 @@ const NATURAL_TEMPLATE = `/**
  * Whenny Natural Language
  *
  * Parse human-friendly date expressions.
+ *
+ * @example Basic Usage
+ * \`\`\`ts
+ * import { parse, canParse, natural } from './natural'
+ *
+ * // Basic expressions
+ * parse('now')                      // Current date/time
+ * parse('today')                    // Start of today
+ * parse('tomorrow')                 // Start of tomorrow
+ * parse('yesterday')                // Start of yesterday
+ *
+ * // Relative expressions
+ * parse('in 5 minutes')             // 5 minutes from now
+ * parse('in 2 hours')               // 2 hours from now
+ * parse('in 3 days')                // 3 days from now
+ * parse('in 1 week')                // 1 week from now
+ * parse('5 minutes ago')            // 5 minutes ago
+ * parse('2 days ago')               // 2 days ago
+ *
+ * // Named days
+ * parse('next friday')              // Next Friday
+ * parse('next monday')              // Next Monday
+ * parse('next week')                // Start of next week
+ * parse('last week')                // Start of last week
+ * parse('next month')               // Start of next month
+ *
+ * // Time of day
+ * parse('tomorrow at 3pm')          // Tomorrow at 3:00 PM
+ * parse('tomorrow at 3:30pm')       // Tomorrow at 3:30 PM
+ * parse('next friday at 9am')       // Next Friday at 9:00 AM
+ * parse('tomorrow morning')         // Tomorrow at 9:00 AM (configurable)
+ * parse('tomorrow afternoon')       // Tomorrow at 2:00 PM (configurable)
+ * parse('tomorrow evening')         // Tomorrow at 6:00 PM (configurable)
+ *
+ * // End of period
+ * parse('end of month')             // Last day of current month
+ * parse('end of year')              // December 31st
+ *
+ * // Check if expression is parseable
+ * canParse('tomorrow at 3pm')       // true
+ * canParse('gibberish')             // false
+ *
+ * // Parse with custom reference date
+ * parse('tomorrow', { from: new Date('2024-01-15') })  // 2024-01-16
+ *
+ * // Namespace shortcuts
+ * natural.parse('in 5 days')
+ * natural.canParse('next week')
+ * \`\`\`
  */
 
 import { config, parseDate, addTime, startOfDay, startOfWeek, type DateInput } from './core.js'
@@ -1190,6 +1491,53 @@ const REACT_TEMPLATE = `/**
  * Whenny React Hooks
  *
  * React integration for Whenny.
+ *
+ * @example Basic Usage
+ * \`\`\`tsx
+ * import { useRelativeTime, useCountdown, useDateFormatter } from './react'
+ *
+ * // === Auto-updating Relative Time ===
+ * function Comment({ createdAt }: { createdAt: Date }) {
+ *   // Updates every 60 seconds by default
+ *   const timeAgo = useRelativeTime(createdAt)
+ *   return <span>{timeAgo}</span>  // "5 minutes ago"
+ * }
+ *
+ * // With custom interval
+ * const timeAgo = useRelativeTime(date, { updateInterval: 10000 })  // every 10s
+ *
+ * // Use smart formatting instead of relative
+ * const smartTime = useRelativeTime(date, { smart: true })
+ *
+ * // === Countdown Timer ===
+ * function LaunchCountdown({ launchDate }: { launchDate: Date }) {
+ *   const countdown = useCountdown(launchDate)
+ *
+ *   if (countdown.isExpired) {
+ *     return <span>Launched!</span>
+ *   }
+ *
+ *   return (
+ *     <div>
+ *       <span>{countdown.formatted}</span>  // "2d 5h 30m 15s"
+ *       {/* Or access individual values *}
+ *       <span>{countdown.days}d {countdown.hours}h {countdown.minutes}m {countdown.seconds}s</span>
+ *     </div>
+ *   )
+ * }
+ *
+ * // === Memoized Date Formatter ===
+ * function DateList({ dates }: { dates: Date[] }) {
+ *   const fmt = useDateFormatter()
+ *   return (
+ *     <ul>
+ *       {dates.map((d, i) => (
+ *         <li key={i}>{fmt(d).smart()}</li>
+ *       ))}
+ *     </ul>
+ *   )
+ * }
+ * \`\`\`
  */
 
 import { useState, useEffect, useCallback } from 'react'
@@ -1263,5 +1611,394 @@ export function useCountdown(targetDate: DateInput) {
  */
 export function useDateFormatter() {
   return useCallback((date: DateInput) => whenny(date), [])
+}
+`
+
+const CONSTANTS_TEMPLATE = `/**
+ * Whenny Constants
+ *
+ * Useful constants for date formatting: timezone lists, format patterns, and more.
+ * Never have to look up timezones on Wikipedia again!
+ *
+ * @example Basic Usage
+ * \\\`\\\`\\\`ts
+ * import {
+ *   TIMEZONES, TIMEZONE_REGIONS, COMMON_TIMEZONES,
+ *   FORMAT_PATTERNS, TIME_UNITS, DURATION_MS
+ * } from './constants'
+ *
+ * // Get all timezones
+ * TIMEZONES.length  // 400+
+ *
+ * // Common US timezones
+ * COMMON_TIMEZONES.US  // ['America/New_York', 'America/Chicago', ...]
+ *
+ * // Timezone regions
+ * TIMEZONE_REGIONS.America  // ['America/New_York', 'America/Los_Angeles', ...]
+ *
+ * // Format patterns
+ * FORMAT_PATTERNS.ISO_8601       // 'YYYY-MM-DDTHH:mm:ss.sssZ'
+ * FORMAT_PATTERNS.RFC_2822       // 'ddd, DD MMM YYYY HH:mm:ss ZZ'
+ *
+ * // Time unit conversions
+ * DURATION_MS.HOUR               // 3600000
+ * DURATION_MS.DAY                // 86400000
+ * \\\`\\\`\\\`
+ */
+
+// ============================================================================
+// TIMEZONES
+// ============================================================================
+
+/**
+ * All IANA timezone names
+ */
+export const TIMEZONES = [
+  // Africa
+  'Africa/Abidjan', 'Africa/Accra', 'Africa/Addis_Ababa', 'Africa/Algiers', 'Africa/Asmara',
+  'Africa/Bamako', 'Africa/Bangui', 'Africa/Banjul', 'Africa/Bissau', 'Africa/Blantyre',
+  'Africa/Brazzaville', 'Africa/Bujumbura', 'Africa/Cairo', 'Africa/Casablanca', 'Africa/Ceuta',
+  'Africa/Conakry', 'Africa/Dakar', 'Africa/Dar_es_Salaam', 'Africa/Djibouti', 'Africa/Douala',
+  'Africa/El_Aaiun', 'Africa/Freetown', 'Africa/Gaborone', 'Africa/Harare', 'Africa/Johannesburg',
+  'Africa/Juba', 'Africa/Kampala', 'Africa/Khartoum', 'Africa/Kigali', 'Africa/Kinshasa',
+  'Africa/Lagos', 'Africa/Libreville', 'Africa/Lome', 'Africa/Luanda', 'Africa/Lubumbashi',
+  'Africa/Lusaka', 'Africa/Malabo', 'Africa/Maputo', 'Africa/Maseru', 'Africa/Mbabane',
+  'Africa/Mogadishu', 'Africa/Monrovia', 'Africa/Nairobi', 'Africa/Ndjamena', 'Africa/Niamey',
+  'Africa/Nouakchott', 'Africa/Ouagadougou', 'Africa/Porto-Novo', 'Africa/Sao_Tome',
+  'Africa/Tripoli', 'Africa/Tunis', 'Africa/Windhoek',
+
+  // America
+  'America/Adak', 'America/Anchorage', 'America/Anguilla', 'America/Antigua', 'America/Araguaina',
+  'America/Argentina/Buenos_Aires', 'America/Argentina/Catamarca', 'America/Argentina/Cordoba',
+  'America/Argentina/Jujuy', 'America/Argentina/La_Rioja', 'America/Argentina/Mendoza',
+  'America/Argentina/Rio_Gallegos', 'America/Argentina/Salta', 'America/Argentina/San_Juan',
+  'America/Argentina/San_Luis', 'America/Argentina/Tucuman', 'America/Argentina/Ushuaia',
+  'America/Aruba', 'America/Asuncion', 'America/Atikokan', 'America/Bahia', 'America/Bahia_Banderas',
+  'America/Barbados', 'America/Belem', 'America/Belize', 'America/Blanc-Sablon', 'America/Boa_Vista',
+  'America/Bogota', 'America/Boise', 'America/Cambridge_Bay', 'America/Campo_Grande', 'America/Cancun',
+  'America/Caracas', 'America/Cayenne', 'America/Cayman', 'America/Chicago', 'America/Chihuahua',
+  'America/Costa_Rica', 'America/Creston', 'America/Cuiaba', 'America/Curacao', 'America/Danmarkshavn',
+  'America/Dawson', 'America/Dawson_Creek', 'America/Denver', 'America/Detroit', 'America/Dominica',
+  'America/Edmonton', 'America/Eirunepe', 'America/El_Salvador', 'America/Fort_Nelson',
+  'America/Fortaleza', 'America/Glace_Bay', 'America/Godthab', 'America/Goose_Bay',
+  'America/Grand_Turk', 'America/Grenada', 'America/Guadeloupe', 'America/Guatemala', 'America/Guayaquil',
+  'America/Guyana', 'America/Halifax', 'America/Havana', 'America/Hermosillo', 'America/Indiana/Indianapolis',
+  'America/Indiana/Knox', 'America/Indiana/Marengo', 'America/Indiana/Petersburg', 'America/Indiana/Tell_City',
+  'America/Indiana/Vevay', 'America/Indiana/Vincennes', 'America/Indiana/Winamac', 'America/Inuvik',
+  'America/Iqaluit', 'America/Jamaica', 'America/Juneau', 'America/Kentucky/Louisville',
+  'America/Kentucky/Monticello', 'America/Kralendijk', 'America/La_Paz', 'America/Lima',
+  'America/Los_Angeles', 'America/Lower_Princes', 'America/Maceio', 'America/Managua', 'America/Manaus',
+  'America/Marigot', 'America/Martinique', 'America/Matamoros', 'America/Mazatlan', 'America/Menominee',
+  'America/Merida', 'America/Metlakatla', 'America/Mexico_City', 'America/Miquelon', 'America/Moncton',
+  'America/Monterrey', 'America/Montevideo', 'America/Montserrat', 'America/Nassau', 'America/New_York',
+  'America/Nipigon', 'America/Nome', 'America/Noronha', 'America/North_Dakota/Beulah',
+  'America/North_Dakota/Center', 'America/North_Dakota/New_Salem', 'America/Ojinaga', 'America/Panama',
+  'America/Pangnirtung', 'America/Paramaribo', 'America/Phoenix', 'America/Port-au-Prince',
+  'America/Port_of_Spain', 'America/Porto_Velho', 'America/Puerto_Rico', 'America/Punta_Arenas',
+  'America/Rainy_River', 'America/Rankin_Inlet', 'America/Recife', 'America/Regina', 'America/Resolute',
+  'America/Rio_Branco', 'America/Santarem', 'America/Santiago', 'America/Santo_Domingo', 'America/Sao_Paulo',
+  'America/Scoresbysund', 'America/Sitka', 'America/St_Barthelemy', 'America/St_Johns', 'America/St_Kitts',
+  'America/St_Lucia', 'America/St_Thomas', 'America/St_Vincent', 'America/Swift_Current', 'America/Tegucigalpa',
+  'America/Thule', 'America/Thunder_Bay', 'America/Tijuana', 'America/Toronto', 'America/Tortola',
+  'America/Vancouver', 'America/Whitehorse', 'America/Winnipeg', 'America/Yakutat', 'America/Yellowknife',
+
+  // Antarctica
+  'Antarctica/Casey', 'Antarctica/Davis', 'Antarctica/DumontDUrville', 'Antarctica/Macquarie',
+  'Antarctica/Mawson', 'Antarctica/McMurdo', 'Antarctica/Palmer', 'Antarctica/Rothera',
+  'Antarctica/Syowa', 'Antarctica/Troll', 'Antarctica/Vostok',
+
+  // Asia
+  'Asia/Aden', 'Asia/Almaty', 'Asia/Amman', 'Asia/Anadyr', 'Asia/Aqtau', 'Asia/Aqtobe', 'Asia/Ashgabat',
+  'Asia/Atyrau', 'Asia/Baghdad', 'Asia/Bahrain', 'Asia/Baku', 'Asia/Bangkok', 'Asia/Barnaul', 'Asia/Beirut',
+  'Asia/Bishkek', 'Asia/Brunei', 'Asia/Chita', 'Asia/Choibalsan', 'Asia/Colombo', 'Asia/Damascus',
+  'Asia/Dhaka', 'Asia/Dili', 'Asia/Dubai', 'Asia/Dushanbe', 'Asia/Famagusta', 'Asia/Gaza', 'Asia/Hebron',
+  'Asia/Ho_Chi_Minh', 'Asia/Hong_Kong', 'Asia/Hovd', 'Asia/Irkutsk', 'Asia/Jakarta', 'Asia/Jayapura',
+  'Asia/Jerusalem', 'Asia/Kabul', 'Asia/Kamchatka', 'Asia/Karachi', 'Asia/Kathmandu', 'Asia/Khandyga',
+  'Asia/Kolkata', 'Asia/Krasnoyarsk', 'Asia/Kuala_Lumpur', 'Asia/Kuching', 'Asia/Kuwait', 'Asia/Macau',
+  'Asia/Magadan', 'Asia/Makassar', 'Asia/Manila', 'Asia/Muscat', 'Asia/Nicosia', 'Asia/Novokuznetsk',
+  'Asia/Novosibirsk', 'Asia/Omsk', 'Asia/Oral', 'Asia/Phnom_Penh', 'Asia/Pontianak', 'Asia/Pyongyang',
+  'Asia/Qatar', 'Asia/Qostanay', 'Asia/Qyzylorda', 'Asia/Riyadh', 'Asia/Sakhalin', 'Asia/Samarkand',
+  'Asia/Seoul', 'Asia/Shanghai', 'Asia/Singapore', 'Asia/Srednekolymsk', 'Asia/Taipei', 'Asia/Tashkent',
+  'Asia/Tbilisi', 'Asia/Tehran', 'Asia/Thimphu', 'Asia/Tokyo', 'Asia/Tomsk', 'Asia/Ulaanbaatar',
+  'Asia/Urumqi', 'Asia/Ust-Nera', 'Asia/Vientiane', 'Asia/Vladivostok', 'Asia/Yakutsk', 'Asia/Yangon',
+  'Asia/Yekaterinburg', 'Asia/Yerevan',
+
+  // Atlantic
+  'Atlantic/Azores', 'Atlantic/Bermuda', 'Atlantic/Canary', 'Atlantic/Cape_Verde', 'Atlantic/Faroe',
+  'Atlantic/Madeira', 'Atlantic/Reykjavik', 'Atlantic/South_Georgia', 'Atlantic/St_Helena', 'Atlantic/Stanley',
+
+  // Australia
+  'Australia/Adelaide', 'Australia/Brisbane', 'Australia/Broken_Hill', 'Australia/Darwin',
+  'Australia/Eucla', 'Australia/Hobart', 'Australia/Lindeman', 'Australia/Lord_Howe',
+  'Australia/Melbourne', 'Australia/Perth', 'Australia/Sydney',
+
+  // Europe
+  'Europe/Amsterdam', 'Europe/Andorra', 'Europe/Astrakhan', 'Europe/Athens', 'Europe/Belgrade',
+  'Europe/Berlin', 'Europe/Bratislava', 'Europe/Brussels', 'Europe/Bucharest', 'Europe/Budapest',
+  'Europe/Busingen', 'Europe/Chisinau', 'Europe/Copenhagen', 'Europe/Dublin', 'Europe/Gibraltar',
+  'Europe/Guernsey', 'Europe/Helsinki', 'Europe/Isle_of_Man', 'Europe/Istanbul', 'Europe/Jersey',
+  'Europe/Kaliningrad', 'Europe/Kiev', 'Europe/Kirov', 'Europe/Lisbon', 'Europe/Ljubljana',
+  'Europe/London', 'Europe/Luxembourg', 'Europe/Madrid', 'Europe/Malta', 'Europe/Mariehamn',
+  'Europe/Minsk', 'Europe/Monaco', 'Europe/Moscow', 'Europe/Oslo', 'Europe/Paris', 'Europe/Podgorica',
+  'Europe/Prague', 'Europe/Riga', 'Europe/Rome', 'Europe/Samara', 'Europe/San_Marino', 'Europe/Sarajevo',
+  'Europe/Saratov', 'Europe/Simferopol', 'Europe/Skopje', 'Europe/Sofia', 'Europe/Stockholm',
+  'Europe/Tallinn', 'Europe/Tirane', 'Europe/Ulyanovsk', 'Europe/Uzhgorod', 'Europe/Vaduz',
+  'Europe/Vatican', 'Europe/Vienna', 'Europe/Vilnius', 'Europe/Volgograd', 'Europe/Warsaw',
+  'Europe/Zagreb', 'Europe/Zaporozhye', 'Europe/Zurich',
+
+  // Indian Ocean
+  'Indian/Antananarivo', 'Indian/Chagos', 'Indian/Christmas', 'Indian/Cocos', 'Indian/Comoro',
+  'Indian/Kerguelen', 'Indian/Mahe', 'Indian/Maldives', 'Indian/Mauritius', 'Indian/Mayotte', 'Indian/Reunion',
+
+  // Pacific
+  'Pacific/Apia', 'Pacific/Auckland', 'Pacific/Bougainville', 'Pacific/Chatham', 'Pacific/Chuuk',
+  'Pacific/Easter', 'Pacific/Efate', 'Pacific/Enderbury', 'Pacific/Fakaofo', 'Pacific/Fiji',
+  'Pacific/Funafuti', 'Pacific/Galapagos', 'Pacific/Gambier', 'Pacific/Guadalcanal', 'Pacific/Guam',
+  'Pacific/Honolulu', 'Pacific/Kiritimati', 'Pacific/Kosrae', 'Pacific/Kwajalein', 'Pacific/Majuro',
+  'Pacific/Marquesas', 'Pacific/Midway', 'Pacific/Nauru', 'Pacific/Niue', 'Pacific/Norfolk',
+  'Pacific/Noumea', 'Pacific/Pago_Pago', 'Pacific/Palau', 'Pacific/Pitcairn', 'Pacific/Pohnpei',
+  'Pacific/Port_Moresby', 'Pacific/Rarotonga', 'Pacific/Saipan', 'Pacific/Tahiti', 'Pacific/Tarawa',
+  'Pacific/Tongatapu', 'Pacific/Wake', 'Pacific/Wallis',
+
+  // UTC
+  'UTC',
+] as const
+
+export type TimezoneId = typeof TIMEZONES[number]
+
+/**
+ * Timezones grouped by region
+ */
+export const TIMEZONE_REGIONS = {
+  Africa: TIMEZONES.filter(tz => tz.startsWith('Africa/')),
+  America: TIMEZONES.filter(tz => tz.startsWith('America/')),
+  Antarctica: TIMEZONES.filter(tz => tz.startsWith('Antarctica/')),
+  Asia: TIMEZONES.filter(tz => tz.startsWith('Asia/')),
+  Atlantic: TIMEZONES.filter(tz => tz.startsWith('Atlantic/')),
+  Australia: TIMEZONES.filter(tz => tz.startsWith('Australia/')),
+  Europe: TIMEZONES.filter(tz => tz.startsWith('Europe/')),
+  Indian: TIMEZONES.filter(tz => tz.startsWith('Indian/')),
+  Pacific: TIMEZONES.filter(tz => tz.startsWith('Pacific/')),
+}
+
+/**
+ * Common timezones by country/region
+ */
+export const COMMON_TIMEZONES = {
+  US: [
+    'America/New_York',      // Eastern
+    'America/Chicago',       // Central
+    'America/Denver',        // Mountain
+    'America/Los_Angeles',   // Pacific
+    'America/Anchorage',     // Alaska
+    'Pacific/Honolulu',      // Hawaii
+    'America/Phoenix',       // Arizona (no DST)
+  ],
+  UK: ['Europe/London'],
+  EU: [
+    'Europe/London',         // GMT/BST
+    'Europe/Paris',          // CET/CEST
+    'Europe/Berlin',
+    'Europe/Amsterdam',
+    'Europe/Rome',
+    'Europe/Madrid',
+    'Europe/Athens',         // EET/EEST
+  ],
+  Asia: [
+    'Asia/Tokyo',            // JST
+    'Asia/Shanghai',         // CST China
+    'Asia/Hong_Kong',
+    'Asia/Singapore',
+    'Asia/Seoul',
+    'Asia/Dubai',
+    'Asia/Kolkata',          // IST India
+    'Asia/Bangkok',
+  ],
+  Oceania: [
+    'Australia/Sydney',
+    'Australia/Melbourne',
+    'Australia/Brisbane',
+    'Australia/Perth',
+    'Pacific/Auckland',
+  ],
+}
+
+/**
+ * Timezone abbreviations to IANA names
+ */
+export const TIMEZONE_ABBREVIATIONS: Record<string, string> = {
+  // US
+  EST: 'America/New_York',
+  EDT: 'America/New_York',
+  CST: 'America/Chicago',
+  CDT: 'America/Chicago',
+  MST: 'America/Denver',
+  MDT: 'America/Denver',
+  PST: 'America/Los_Angeles',
+  PDT: 'America/Los_Angeles',
+  AKST: 'America/Anchorage',
+  AKDT: 'America/Anchorage',
+  HST: 'Pacific/Honolulu',
+
+  // Europe
+  GMT: 'Europe/London',
+  BST: 'Europe/London',
+  CET: 'Europe/Paris',
+  CEST: 'Europe/Paris',
+  EET: 'Europe/Athens',
+  EEST: 'Europe/Athens',
+  WET: 'Europe/Lisbon',
+  WEST: 'Europe/Lisbon',
+
+  // Asia
+  JST: 'Asia/Tokyo',
+  KST: 'Asia/Seoul',
+  CST_CHINA: 'Asia/Shanghai',
+  HKT: 'Asia/Hong_Kong',
+  SGT: 'Asia/Singapore',
+  IST: 'Asia/Kolkata',
+  PKT: 'Asia/Karachi',
+
+  // Australia
+  AEST: 'Australia/Sydney',
+  AEDT: 'Australia/Sydney',
+  ACST: 'Australia/Adelaide',
+  ACDT: 'Australia/Adelaide',
+  AWST: 'Australia/Perth',
+
+  // New Zealand
+  NZST: 'Pacific/Auckland',
+  NZDT: 'Pacific/Auckland',
+
+  // Universal
+  UTC: 'UTC',
+  Z: 'UTC',
+}
+
+// ============================================================================
+// FORMAT PATTERNS
+// ============================================================================
+
+/**
+ * Common date format patterns
+ */
+export const FORMAT_PATTERNS = {
+  // ISO Standards
+  ISO_8601: '{year}-{month}-{day}T{hour24}:{minute}:{second}Z',
+  ISO_DATE: '{year}-{month}-{day}',
+  ISO_TIME: '{hour24}:{minute}:{second}',
+
+  // RFC Standards
+  RFC_2822: '{weekdayShort}, {day} {monthShort} {year} {hour24}:{minute}:{second}',
+
+  // US formats
+  US_DATE: '{month}/{day}/{year}',
+  US_DATE_LONG: '{monthFull} {day}, {year}',
+  US_TIME_12: '{hour}:{minute} {AMPM}',
+  US_TIME_24: '{hour24}:{minute}',
+  US_DATETIME: '{month}/{day}/{year} {hour}:{minute} {AMPM}',
+
+  // EU formats
+  EU_DATE: '{day}/{month}/{year}',
+  EU_DATE_LONG: '{day} {monthFull} {year}',
+  EU_DATETIME: '{day}/{month}/{year} {hour24}:{minute}',
+
+  // Sortable
+  SORTABLE: '{year}{month}{day}',
+  SORTABLE_DATETIME: '{year}{month}{day}{hour24}{minute}{second}',
+
+  // Logging
+  LOG: '{year}-{month}-{day} {hour24}:{minute}:{second}',
+  LOG_MS: '{year}-{month}-{day} {hour24}:{minute}:{second}.{ms}',
+
+  // Human readable
+  FRIENDLY_DATE: '{weekday}, {monthFull} {day}',
+  FRIENDLY_DATETIME: '{weekday}, {monthFull} {day} at {hour}:{minute} {AMPM}',
+  SHORT: '{monthShort} {day}',
+  LONG: '{monthFull} {day}, {year}',
+
+  // Relative-friendly
+  TIME_ONLY: '{hour}:{minute} {AMPM}',
+  DATE_ONLY: '{monthShort} {day}, {year}',
+}
+
+// ============================================================================
+// TIME CONSTANTS
+// ============================================================================
+
+/**
+ * Duration in milliseconds
+ */
+export const DURATION_MS = {
+  MILLISECOND: 1,
+  SECOND: 1000,
+  MINUTE: 60 * 1000,
+  HOUR: 60 * 60 * 1000,
+  DAY: 24 * 60 * 60 * 1000,
+  WEEK: 7 * 24 * 60 * 60 * 1000,
+  MONTH_AVG: 30.44 * 24 * 60 * 60 * 1000,  // Average month
+  YEAR_AVG: 365.25 * 24 * 60 * 60 * 1000,  // Average year (accounting for leap)
+} as const
+
+/**
+ * Duration in seconds
+ */
+export const DURATION_SEC = {
+  MINUTE: 60,
+  HOUR: 3600,
+  DAY: 86400,
+  WEEK: 604800,
+  MONTH_AVG: 2629746,  // 30.44 days
+  YEAR_AVG: 31556952,  // 365.25 days
+} as const
+
+/**
+ * Time units for iteration
+ */
+export const TIME_UNITS = [
+  'millisecond', 'milliseconds',
+  'second', 'seconds',
+  'minute', 'minutes',
+  'hour', 'hours',
+  'day', 'days',
+  'week', 'weeks',
+  'month', 'months',
+  'year', 'years',
+] as const
+
+/**
+ * Days of the week
+ */
+export const WEEKDAYS = {
+  NAMES: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const,
+  NAMES_SHORT: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const,
+  INDICES: { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 } as const,
+}
+
+/**
+ * Months of the year
+ */
+export const MONTHS = {
+  NAMES: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] as const,
+  NAMES_SHORT: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const,
+  DAYS: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] as const,
+  DAYS_LEAP: [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] as const,
+}
+
+/**
+ * Check if a year is a leap year
+ */
+export function isLeapYear(year: number): boolean {
+  return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)
+}
+
+/**
+ * Get days in a month
+ */
+export function getDaysInMonth(year: number, month: number): number {
+  if (month === 2) {
+    return isLeapYear(year) ? 29 : 28
+  }
+  return MONTHS.DAYS[month - 1]
 }
 `

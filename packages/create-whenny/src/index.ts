@@ -14,6 +14,7 @@ import { add } from './commands/add.js'
 import { list } from './commands/list.js'
 import { diff } from './commands/diff.js'
 import { testInstall } from './commands/test-install.js'
+import { mcp } from './commands/mcp.js'
 
 const program = new Command()
 
@@ -78,5 +79,10 @@ program
   .option('--verbose', 'Show detailed output')
   .option('--output <path>', 'Custom path for results HTML')
   .action(testInstall)
+
+program
+  .command('mcp')
+  .description('Start the MCP server for AI assistant integration')
+  .action(mcp)
 
 program.parse()
