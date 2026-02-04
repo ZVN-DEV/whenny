@@ -7,7 +7,5 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   clean: true,
-  banner: {
-    js: '#!/usr/bin/env node',
-  },
+  // Shebang is already in src/index.ts, no need for banner
 })
