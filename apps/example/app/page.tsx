@@ -1,9 +1,25 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { whenny, compare } from 'whenny'
 import { useRelativeTime } from 'whenny-react'
+
+// Fade-in animation wrapper
+function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(true), delay)
+    return () => clearTimeout(timer)
+  }, [delay])
+
+  return (
+    <div className={`transition-all duration-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+      {children}
+    </div>
+  )
+}
 
 // Copyable code block - plain text, no syntax highlighting
 function CodeBlock({ children, title }: { children: string; title?: string }) {
@@ -282,6 +298,7 @@ whenny(date).format('[Today is] dddd')      // "Today is Tuesday"`}
 compare(eventDate, now).smart()   // "3 days before"
 compare(startDate, endDate).days() // 14
 compare(deadline, now).hours()     // 48`}</CodeBlock>
+            </FadeIn>
 
             <FadeIn delay={250}>
               <CodeBlock title="Duration Formatting">
@@ -311,6 +328,7 @@ function Timer({ deadline }) {
   const { days, hours, minutes, seconds } = useCountdown(deadline)
   return <span>{days}d {hours}h {minutes}m {seconds}s</span>
 }`}</CodeBlock>
+            </FadeIn>
 
             <FadeIn delay={350}>
               <CodeBlock title="Business Days">
@@ -337,9 +355,10 @@ configure({
 })
 
 // Now: "moments ago", "5m ago", "2h ago"`}</CodeBlock>
+            </FadeIn>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* Timezone Section */}
       <section className="py-20 px-6">

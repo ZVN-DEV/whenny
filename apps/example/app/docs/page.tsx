@@ -282,9 +282,6 @@ date.inZone('America/New_York')       // Convert to timezone
 date.zone                             // Get current timezone
 date.offset                           // Get offset in minutes
 date.transfer()                       // Create transfer payload`}</CodeBlock>
-
-date.format('{...}')                  // Custom format`}</CodeBlock>
-
     </DocSection>
   )
 }
