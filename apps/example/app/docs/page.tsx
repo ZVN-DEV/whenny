@@ -46,6 +46,24 @@ function CodeBlock({ children, title }: { children: string; title?: string }) {
   )
 }
 
+// Navigation items for mobile chips
+const navItems: { section: Section; label: string }[] = [
+  { section: 'installation', label: 'Install' },
+  { section: 'quickstart', label: 'Quick Start' },
+  { section: 'core', label: 'whenny()' },
+  { section: 'formatting', label: 'Formatting' },
+  { section: 'relative', label: 'Relative' },
+  { section: 'smart', label: 'Smart' },
+  { section: 'compare', label: 'Compare' },
+  { section: 'duration', label: 'Duration' },
+  { section: 'timezone', label: 'Timezones' },
+  { section: 'calendar', label: 'Calendar' },
+  { section: 'natural', label: 'Natural' },
+  { section: 'react', label: 'React' },
+  { section: 'config', label: 'Config' },
+  { section: 'cli', label: 'CLI' },
+]
+
 export default function DocsPage() {
   const [activeSection, setActiveSection] = useState<Section>('installation')
 
@@ -53,22 +71,43 @@ export default function DocsPage() {
     <main className="min-h-screen bg-white">
       {/* Header */}
       <header className="border-b border-slate-200 bg-white/90 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3 sm:gap-6">
             <Link href="/" className="font-semibold text-slate-900">Whenny</Link>
-            <span className="text-sm text-slate-400">Documentation</span>
+            <span className="text-xs sm:text-sm text-slate-400 hidden xs:inline">Documentation</span>
           </div>
-          <div className="flex items-center gap-6">
-            <Link href="/demo" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">Demo</Link>
-            <Link href="/server" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">Server</Link>
-            <a href="https://github.com/ZVN-DEV/whenny" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">GitHub</a>
+          <div className="flex items-center gap-3 sm:gap-6">
+            <Link href="/demo" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">Demo</Link>
+            <Link href="/server" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors hidden sm:inline">Server</Link>
+            <a href="https://github.com/ZVN-DEV/whenny" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">GitHub</a>
           </div>
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-6 py-8">
+      {/* Mobile Navigation - Scrollable Chips */}
+      <div className="lg:hidden border-b border-slate-200 bg-slate-50 sticky top-[49px] sm:top-[57px] z-10">
+        <div className="overflow-x-auto scrollbar-hide">
+          <div className="flex gap-2 px-4 py-3 min-w-max">
+            {navItems.map((item) => (
+              <button
+                key={item.section}
+                onClick={() => setActiveSection(item.section)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                  activeSection === item.section
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="flex gap-12">
-          {/* Sidebar */}
+          {/* Sidebar - Desktop only */}
           <nav className="w-56 flex-shrink-0 hidden lg:block">
             <div className="sticky top-24 space-y-1">
               <NavSection title="Getting Started">
