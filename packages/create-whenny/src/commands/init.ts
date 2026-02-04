@@ -127,7 +127,7 @@ export async function init(options: InitOptions): Promise<void> {
     console.log(chalk.cyan(`    whenny(date).relative()  // "5 minutes ago"`))
     console.log()
     console.log(chalk.gray('  Add more modules:'))
-    console.log(chalk.cyan('    npx whenny add timezone duration'))
+    console.log(chalk.cyan('    npx create-whenny add timezone duration'))
     console.log()
   } catch (error) {
     spinner.fail('Failed to initialize Whenny')

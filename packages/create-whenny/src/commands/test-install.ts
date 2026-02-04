@@ -81,12 +81,36 @@ export async function testInstall(options: {
     }
     await fs.writeJson(path.join(testDir, 'package.json'), packageJson, { spaces: 2 })
 
-    // Step 4: Install whenny
+    // Step 4: Install whenny packages
     spinner.text = 'Installing whenny from npm...'
     execSync('npm install whenny whenny-react --save', { cwd: testDir, stdio: 'pipe' })
-    execSync('npm install jest @types/jest --save-dev', { cwd: testDir, stdio: 'pipe' })
+    execSync('npm install create-whenny jest @types/jest --save-dev', { cwd: testDir, stdio: 'pipe' })
 
-    // Step 5: Generate test files
+    // Step 5: Test CLI commands (init and add)
+    spinner.text = 'Testing CLI commands...'
+    const cliTestDir = path.join(testDir, 'cli-test')
+    await fs.ensureDir(cliTestDir)
+    execSync('npm init -y', { cwd: cliTestDir, stdio: 'pipe' })
+
+    // Test init command
+    execSync('npx create-whenny init --yes', { cwd: cliTestDir, stdio: 'pipe' })
+    const initConfigExists = await fs.pathExists(path.join(cliTestDir, 'whenny.config.ts'))
+    const initCoreExists = await fs.pathExists(path.join(cliTestDir, 'src/lib/whenny/core.ts'))
+
+    if (!initConfigExists || !initCoreExists) {
+      throw new Error('CLI init command failed - files not created')
+    }
+
+    // Test add command
+    execSync('npx create-whenny add duration calendar', { cwd: cliTestDir, stdio: 'pipe' })
+    const addDurationExists = await fs.pathExists(path.join(cliTestDir, 'src/lib/whenny/duration.ts'))
+    const addCalendarExists = await fs.pathExists(path.join(cliTestDir, 'src/lib/whenny/calendar.ts'))
+
+    if (!addDurationExists || !addCalendarExists) {
+      throw new Error('CLI add command failed - files not created')
+    }
+
+    // Step 7: Generate test files
     spinner.text = 'Generating test files...'
     const { files: testFiles, codeMap } = generateTestFiles()
 
@@ -97,7 +121,7 @@ export async function testInstall(options: {
       await fs.writeFile(path.join(testsDir, filename), content)
     }
 
-    // Step 6: Create jest config
+    // Step 8: Create jest config
     const jestConfig = `
 export default {
   testEnvironment: 'node',
@@ -108,7 +132,7 @@ export default {
 `
     await fs.writeFile(path.join(testDir, 'jest.config.js'), jestConfig)
 
-    // Step 7: Run tests and collect results
+    // Step 9: Run tests and collect results
     spinner.text = 'Running integration tests...'
 
     const startTime = Date.now()
@@ -126,7 +150,7 @@ export default {
 
     const duration = Date.now() - startTime
 
-    // Step 8: Parse results
+    // Step 10: Parse results
     spinner.text = 'Parsing test results...'
 
     let results: TestSuiteResult
@@ -139,7 +163,7 @@ export default {
       results = parseTestOutput(testOutput, duration, codeMap)
     }
 
-    // Step 9: Generate HTML report
+    // Step 11: Generate HTML report
     spinner.text = 'Generating results page...'
     const html = generateResultsHtml(results)
     await fs.writeFile(resultsFile, html)

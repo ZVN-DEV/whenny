@@ -1,11 +1,11 @@
-# @whenny/react
+# whenny-react
 
 React hooks and utilities for the Whenny date library.
 
 ## Installation
 
 ```bash
-npm install whenny @whenny/react
+npm install whenny whenny-react
 ```
 
 ## Hooks
@@ -15,7 +15,7 @@ npm install whenny @whenny/react
 Auto-updating relative time display.
 
 ```tsx
-import { useRelativeTime } from '@whenny/react'
+import { useRelativeTime } from 'whenny-react'
 
 function Comment({ createdAt }) {
   // Updates automatically every minute by default
@@ -33,7 +33,7 @@ const timeAgo = useRelativeTime(date, { updateInterval: 30000 })
 Live countdown timer to a target date.
 
 ```tsx
-import { useCountdown } from '@whenny/react'
+import { useCountdown } from 'whenny-react'
 
 function EventCountdown({ eventDate }) {
   const { days, hours, minutes, seconds, formatted, isComplete } = useCountdown(eventDate)
@@ -54,7 +54,7 @@ function EventCountdown({ eventDate }) {
 Memoized date formatting hook.
 
 ```tsx
-import { useDateFormatter } from '@whenny/react'
+import { useDateFormatter } from 'whenny-react'
 
 function EventCard({ date }) {
   const formatter = useDateFormatter()
@@ -73,7 +73,7 @@ function EventCard({ date }) {
 Timezone context provider and hook.
 
 ```tsx
-import { TimezoneProvider, useTimezone } from '@whenny/react'
+import { TimezoneProvider, useTimezone } from 'whenny-react'
 
 // Wrap your app
 function App() {
@@ -105,7 +105,7 @@ function EventTime({ date }) {
 Integration helpers for shadcn/ui Calendar component (react-day-picker).
 
 ```tsx
-import { useShadcnCalendar } from '@whenny/react'
+import { useShadcnCalendar } from 'whenny-react'
 import { Calendar } from '@/components/ui/calendar'
 
 function DatePicker() {

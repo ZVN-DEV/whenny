@@ -1,6 +1,6 @@
 {
   "name": "create-whenny",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "CLI for adding Whenny date utilities to your project",
   "keywords": [
     "whenny",
@@ -23,7 +23,8 @@
   },
   "type": "module",
   "bin": {
-    "whenny": "./dist/index.js"
+    "create-whenny": "./dist/index.js",
+    "whenny-cli": "./dist/index.js"
   },
   "files": [
     "dist",

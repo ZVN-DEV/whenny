@@ -11,8 +11,8 @@ npm install whenny
 Or use the shadcn-style CLI:
 
 ```bash
-npx whenny init
-npx whenny add relative smart calendar
+npx create-whenny init
+npx create-whenny add relative smart calendar
 ```
 
 ## Usage
