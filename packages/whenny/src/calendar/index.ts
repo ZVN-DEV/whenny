@@ -361,6 +361,45 @@ export function previousBusinessDay(
   return current
 }
 
+/**
+ * Add business days to a date
+ *
+ * @example
+ * ```typescript
+ * addBusinessDays(new Date('2026-02-06'), 5)  // Skip weekends
+ * addBusinessDays(new Date('2026-02-06'), -3) // Go backwards
+ * ```
+ */
+export function addBusinessDays(
+  date: DateInput,
+  days: number,
+  config: WhennyConfig = getConfig()
+): Date {
+  let current = parseDate(date)
+  let remaining = Math.abs(days)
+  const direction = days >= 0 ? 1 : -1
+
+  while (remaining > 0) {
+    current = add(current, direction, 'day')
+    if (isBusinessDay(current, config)) {
+      remaining--
+    }
+  }
+
+  return current
+}
+
+/**
+ * Subtract business days from a date
+ */
+export function subtractBusinessDays(
+  date: DateInput,
+  days: number,
+  config: WhennyConfig = getConfig()
+): Date {
+  return addBusinessDays(date, -days, config)
+}
+
 // ============================================================================
 // EXPORT NAMESPACE
 // ============================================================================
@@ -395,6 +434,8 @@ export const calendar = {
   // Arithmetic
   add,
   subtract,
+  addBusinessDays,
+  subtractBusinessDays,
 
   // Distances
   daysUntil,

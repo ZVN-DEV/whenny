@@ -272,8 +272,76 @@ export default function LandingPage() {
         </div>
       </FadeIn>
 
-      {/* Code Examples */}
+      {/* Style Properties - Key Feature */}
       <div className="bg-slate-50 py-24 px-6">
+        <div className="max-w-3xl mx-auto">
+          <FadeIn>
+            <div className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-blue-50 text-blue-700 border border-blue-200 mb-4">
+              New in v0.0.1
+            </div>
+            <h2 className="text-2xl font-semibold text-slate-900 mb-2">
+              T-Shirt Size Formatting
+            </h2>
+            <p className="text-slate-600 mb-8">
+              Like Tailwind, but for dates. Configure once, use everywhere with simple properties. No format strings needed.
+            </p>
+          </FadeIn>
+
+          <div className="space-y-6">
+            <FadeIn delay={100}>
+              <CodeBlock title="Style Properties">
+{`import { whenny } from 'whenny'
+
+const date = new Date('2026-02-03T15:30:00')
+
+// Semantic sizes - no format strings!
+whenny(date).xs        // "2/3"
+whenny(date).sm        // "Feb 3"
+whenny(date).md        // "Feb 3, 2026"
+whenny(date).lg        // "February 3rd, 2026"
+whenny(date).xl        // "Tuesday, February 3rd, 2026"
+
+// Utility formats
+whenny(date).clock     // "3:30 PM"
+whenny(date).sortable  // "2026-02-03"
+whenny(date).log       // "2026-02-03 15:30:00"`}
+              </CodeBlock>
+            </FadeIn>
+
+            <FadeIn delay={150}>
+              <CodeBlock title="Customize Your Styles">
+{`import { configure } from 'whenny'
+
+// Set up your date styles once
+configure({
+  styles: {
+    xs: 'D/M',
+    sm: 'D MMM',
+    md: 'D MMM YYYY',
+    lg: 'Do MMMM, YYYY',
+    xl: 'dddd, Do MMMM, YYYY',
+  }
+})
+
+// Now use everywhere
+whenny(date).md  // "3 Feb 2026"`}
+              </CodeBlock>
+            </FadeIn>
+
+            <FadeIn delay={200}>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <StyleDemo label=".xs" value={whenny(new Date()).xs} />
+                <StyleDemo label=".sm" value={whenny(new Date()).sm} />
+                <StyleDemo label=".md" value={whenny(new Date()).md} />
+                <StyleDemo label=".lg" value={whenny(new Date()).lg} />
+              </div>
+            </FadeIn>
+          </div>
+        </div>
+      </div>
+
+      {/* Code Examples */}
+      <div className="py-24 px-6">
         <div className="max-w-3xl mx-auto">
           <FadeIn>
             <h2 className="text-2xl font-semibold text-slate-900 mb-2">
@@ -297,6 +365,18 @@ whenny(lastMonth).smart()       // "Jan 15"`}
               </CodeBlock>
             </FadeIn>
 
+            <FadeIn delay={150}>
+              <CodeBlock title="Moment.js-Style Patterns">
+{`import { whenny } from 'whenny'
+
+// Custom format patterns when you need them
+whenny(date).format('YYYY-MM-DD')           // "2026-02-03"
+whenny(date).format('dddd, MMMM Do')        // "Tuesday, February 3rd"
+whenny(date).format('h:mm A')               // "3:30 PM"
+whenny(date).format('[Today is] dddd')      // "Today is Tuesday"`}
+              </CodeBlock>
+            </FadeIn>
+
             <FadeIn delay={200}>
               <CodeBlock title="Date Comparisons">
 {`import { compare } from 'whenny'
@@ -305,6 +385,20 @@ whenny(lastMonth).smart()       // "Jan 15"`}
 compare(eventDate, now).smart()   // "3 days before"
 compare(startDate, endDate).days() // 14
 compare(deadline, now).hours()     // 48`}
+              </CodeBlock>
+            </FadeIn>
+
+            <FadeIn delay={250}>
+              <CodeBlock title="Duration Formatting">
+{`import { duration } from 'whenny'
+
+duration(3661).long()     // "1 hour, 1 minute, 1 second"
+duration(3661).compact()  // "1h 1m 1s"
+duration(3661).brief()    // "1h 1m" (no seconds)
+duration(3661).clock()    // "1:01:01"
+duration(3661).timer()    // "01:01:01" (padded)
+duration(3661).minimal()  // "1h" (largest unit only)
+duration(3661).human()    // "about 1 hour"`}
               </CodeBlock>
             </FadeIn>
 
@@ -322,6 +416,18 @@ function Timer({ deadline }) {
   const { days, hours, minutes, seconds } = useCountdown(deadline)
   return <span>{days}d {hours}h {minutes}m {seconds}s</span>
 }`}
+              </CodeBlock>
+            </FadeIn>
+
+            <FadeIn delay={350}>
+              <CodeBlock title="Business Days">
+{`import { calendar } from 'whenny'
+
+// Business day calculations
+calendar.isBusinessDay(date)           // true/false
+calendar.nextBusinessDay()             // Next business day
+calendar.addBusinessDays(date, 5)      // Add 5 business days
+calendar.businessDaysBetween(a, b)     // Count business days`}
               </CodeBlock>
             </FadeIn>
 
@@ -412,12 +518,21 @@ whenny(date).format('{time}')
             </h2>
           </FadeIn>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <FadeIn delay={100}>
+              <div className="bg-white rounded-lg border border-slate-200 p-5">
+                <h3 className="font-medium text-slate-900 mb-2">T-Shirt Sizes</h3>
+                <p className="text-sm text-slate-600">
+                  Tailwind-inspired API. Use .xs, .sm, .md, .lg, .xl for semantic formatting without format strings.
+                </p>
+              </div>
+            </FadeIn>
+
+            <FadeIn delay={125}>
               <div className="bg-white rounded-lg border border-slate-200 p-5">
                 <h3 className="font-medium text-slate-900 mb-2">Smart Formatting</h3>
                 <p className="text-sm text-slate-600">
-                  Automatically picks the best format. "just now", "5 minutes ago", "Yesterday at 3pm", "Jan 15".
+                  Automatically picks the best format. "just now", "5 minutes ago", "Yesterday at 3pm".
                 </p>
               </div>
             </FadeIn>
@@ -431,6 +546,15 @@ whenny(date).format('{time}')
               </div>
             </FadeIn>
 
+            <FadeIn delay={175}>
+              <div className="bg-white rounded-lg border border-slate-200 p-5">
+                <h3 className="font-medium text-slate-900 mb-2">Duration Formats</h3>
+                <p className="text-sm text-slate-600">
+                  Multiple formats: .compact(), .brief(), .timer(), .minimal(), .human() for any use case.
+                </p>
+              </div>
+            </FadeIn>
+
             <FadeIn delay={200}>
               <div className="bg-white rounded-lg border border-slate-200 p-5">
                 <h3 className="font-medium text-slate-900 mb-2">Timezone Support</h3>
@@ -440,11 +564,11 @@ whenny(date).format('{time}')
               </div>
             </FadeIn>
 
-            <FadeIn delay={250}>
+            <FadeIn delay={225}>
               <div className="bg-white rounded-lg border border-slate-200 p-5">
-                <h3 className="font-medium text-slate-900 mb-2">TypeScript First</h3>
+                <h3 className="font-medium text-slate-900 mb-2">Business Days</h3>
                 <p className="text-sm text-slate-600">
-                  Full type safety with excellent autocomplete and inference.
+                  Add/subtract business days, count working days, configurable work week.
                 </p>
               </div>
             </FadeIn>
@@ -521,6 +645,15 @@ function LiveDemo({ label, code, result, live }: { label: string; code: string; 
       </div>
       <code className="text-blue-400 text-xs block mb-2 font-mono">{code}</code>
       <p className="text-white text-lg font-medium">{result}</p>
+    </div>
+  )
+}
+
+function StyleDemo({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="bg-white rounded-lg border border-slate-200 p-4 text-center">
+      <code className="text-blue-600 text-xs font-mono">{label}</code>
+      <p className="text-slate-900 font-medium mt-1">{value}</p>
     </div>
   )
 }

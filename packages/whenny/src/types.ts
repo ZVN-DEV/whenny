@@ -536,11 +536,20 @@ export interface WhennyDuration {
   /** Long format: "2 hours, 30 minutes" */
   long(): string
 
-  /** Compact format: "2h 30m" */
+  /** Compact format: "2h 30m 15s" */
   compact(): string
+
+  /** Brief format - no seconds unless < 1 min: "2h 30m" */
+  brief(): string
 
   /** Clock format: "2:30:00" */
   clock(): string
+
+  /** Timer format - always padded: "02:30:00" */
+  timer(): string
+
+  /** Minimal format - largest unit only: "2h" */
+  minimal(): string
 
   /** Human approximation: "about 2 hours" */
   human(): string
