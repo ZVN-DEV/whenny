@@ -101,6 +101,7 @@ export default function HomePage() {
           <div className="flex items-center gap-6">
             <Link href="/demo" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">Demo</Link>
             <Link href="/docs" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">Docs</Link>
+            <a href="/sanity-test.html" className="text-sm text-green-600 hover:text-green-700 transition-colors">Sanity Test ✓</a>
             <a href="https://github.com/ZVN-DEV/whenny" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">GitHub</a>
           </div>
         </div>
@@ -139,19 +140,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Datewind - The Hero Feature */}
+      {/* Shorthand Styles */}
       <section className="bg-gradient-to-b from-slate-50 to-white py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <FadeIn>
             <div className="text-center mb-12">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-blue-600 text-white mb-4">
-                Introducing Datewind
-              </span>
               <h2 className="text-3xl font-bold text-slate-900 mb-3">
-                Tailwind for dates.
+                Size up your dates.
               </h2>
               <p className="text-slate-600 max-w-lg mx-auto">
-                Configure your date styles once. Use them everywhere with simple properties. No format strings to remember.
+                Like Tailwind for dates — simple properties, consistent output. No format strings to remember.
               </p>
             </div>
           </FadeIn>
@@ -217,8 +215,8 @@ export default function HomePage() {
             </FadeIn>
             <FadeIn delay={175}>
               <FeatureCard
-                title="Datewind Styles"
-                description="Configure date formats once like Tailwind utilities. Use .xs .sm .md .lg everywhere."
+                title="Size-Based Styles"
+                description="Format dates like sizing — .xs .sm .md .lg .xl. Consistent output, zero thinking."
               />
             </FadeIn>
             <FadeIn delay={200}>

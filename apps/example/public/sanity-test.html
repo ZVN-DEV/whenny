@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Whenny Zone | Integration Test Results</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container { max-width: 900px; margin: 0 auto; }
+    header {
+      text-align: center;
+      padding: 2rem 0;
+      border-bottom: 1px solid #334155;
+      margin-bottom: 2rem;
+    }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    .subtitle { color: #94a3b8; font-size: 1rem; }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat {
+      background: #1e293b;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    .stat-label { color: #94a3b8; font-size: 0.875rem; }
+    .stat-passed .stat-value { color: #10b981; }
+    .stat-failed .stat-value { color: #ef4444; }
+
+    .progress-bar {
+      height: 8px;
+      background: #334155;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #34d399);
+      transition: width 0.3s ease;
+    }
+
+    .module {
+      background: #1e293b;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    .module h3 {
+      padding: 1rem 1.5rem;
+      background: #334155;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .module h3 .count { color: #94a3b8; font-weight: normal; margin-left: auto; }
+
+    .tests { padding: 0.5rem 0; }
+    .test {
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-bottom: 1px solid #334155;
+    }
+    .test:last-child { border-bottom: none; }
+    .test .status { width: 1.5rem; text-align: center; }
+    .test.passed .status { color: #10b981; }
+    .test.failed .status { color: #ef4444; }
+    .test .name { flex: 1; }
+    .test .duration { color: #64748b; font-size: 0.875rem; }
+    .test .error {
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.75rem;
+      background: #7f1d1d;
+      border-radius: 0.25rem;
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: #fecaca;
+      overflow-x: auto;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 0;
+      color: #64748b;
+      font-size: 0.875rem;
+    }
+    footer a { color: #818cf8; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: #10b981;
+      color: white;
+      border-radius: 2rem;
+      font-weight: bold;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>⏱️ Whenny Zone</h1>
+      <p class="subtitle">When are we? 2026-02-04 05:19:44 UTC</p>
+      <p class="subtitle" style="margin-top: 0.25rem; font-size: 0.875rem;">Integration test run: 2/4/2026, 5:19:44 AM</p>
+      <div class="badge">✅ All Tests Passed</div>
+    </header>
+
+    <div class="summary">
+      <div class="stat">
+        <div class="stat-value">75</div>
+        <div class="stat-label">Total Tests</div>
+      </div>
+      <div class="stat stat-passed">
+        <div class="stat-value">75</div>
+        <div class="stat-label">Passed</div>
+      </div>
+      <div class="stat stat-failed">
+        <div class="stat-value">0</div>
+        <div class="stat-label">Failed</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">100%</div>
+        <div class="stat-label">Pass Rate</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">5s</div>
+        <div class="stat-label">Duration</div>
+      </div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 100%"></div>
+    </div>
+
+    <div class="modules">
+      
+      <div class="module">
+        <h3>✅ i18n <span class="count">(10/10)</span></h3>
+        <div class="tests">
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">en locale exists</span>
+        <span class="duration">28ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">es locale exists</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">fr locale exists</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">de locale exists</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">ja locale exists</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">zh locale exists</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">retrieves English locale</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">retrieves Spanish locale</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">registers custom locale</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">locales object contains all built-ins</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    </div>
+      </div>
+    
+      <div class="module">
+        <h3>✅ compare <span class="count">(10/10)</span></h3>
+        <div class="tests">
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">smart() describes relationship</span>
+        <span class="duration">27ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">days() returns day difference</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">hours() returns hour difference</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">isBefore() returns true when earlier</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">isAfter() returns true when later</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">isSame() checks equality</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">isSame(&quot;day&quot;) checks same day</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">human() returns human-readable</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">exact() returns detailed breakdown</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">exposes component values</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    </div>
+      </div>
+    
+      <div class="module">
+        <h3>✅ duration <span class="count">(8/8)</span></h3>
+        <div class="tests">
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">long format</span>
+        <span class="duration">27ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">compact format</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">clock format</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">clock format without hours</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">human format for hours</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">human format for minutes</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">exposes component values</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">calculates duration between dates</span>
+        <span class="duration">2ms</span>
+        
+      </div>
+    </div>
+      </div>
+    
+      <div class="module">
+        <h3>✅ natural <span class="count">(13/13)</span></h3>
+        <div class="tests">
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">parses &quot;now&quot;</span>
+        <span class="duration">28ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">parses &quot;today&quot;</span>
+        <span class="duration">2ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">parses &quot;tomorrow&quot;</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">parses &quot;yesterday&quot;</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">parses &quot;in X days&quot;</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">parses &quot;X days ago&quot;</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">parses &quot;next friday&quot;</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">parses &quot;tomorrow at 3pm&quot;</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">returns null for unparseable</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">returns true for valid expressions</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">returns false for invalid expressions</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">natural.parse() works</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">natural.canParse() works</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    </div>
+      </div>
+    
+      <div class="module">
+        <h3>✅ mcp <span class="count">(9/9)</span></h3>
+        <div class="tests">
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">contains tool definitions</span>
+        <span class="duration">22ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">format_datewind tool exists</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">format_relative tool exists</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">compare_dates tool exists</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">returns array of tools</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">has server info</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">executes format_datewind</span>
+        <span class="duration">26ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">executes format_relative</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">executes calendar_check</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    </div>
+      </div>
+    
+      <div class="module">
+        <h3>✅ transfer <span class="count">(6/6)</span></h3>
+        <div class="tests">
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">creates transfer payload</span>
+        <span class="duration">37ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">includes timezone when specified</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">parses transfer payload</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">provides utility methods</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">transfer.create() works</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">transfer.from() works</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    </div>
+      </div>
+    
+      <div class="module">
+        <h3>✅ calendar <span class="count">(13/13)</span></h3>
+        <div class="tests">
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">isToday() returns true for today</span>
+        <span class="duration">18ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">isYesterday() works correctly</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">isTomorrow() works correctly</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">isWeekend() detects Saturday/Sunday</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">isWeekday() detects weekdays</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">isBusinessDay() uses config</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">isPast() detects past dates</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">isFuture() detects future dates</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">isBetween() checks range</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">startOf(&quot;day&quot;) returns midnight</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">endOf(&quot;day&quot;) returns end of day</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">add() adds time</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">daysUntil() counts days</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    </div>
+      </div>
+    
+      <div class="module">
+        <h3>✅ timezone <span class="count">(6/6)</span></h3>
+        <div class="tests">
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">returns a timezone string</span>
+        <span class="duration">33ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">returns UTC offset as 0</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">returns offset in minutes</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">returns start and end of day</span>
+        <span class="duration">2ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">tz.local() works</span>
+        <span class="duration">0ms</span>
+        
+      </div>
+    
+      <div class="test passed">
+        <span class="status">✓</span>
+        <span class="name">tz.offset() works</span>
+        <span class="duration">1ms</span>
+        
+      </div>
+    </div>
+      </div>
+    
+    </div>
+
+    <footer>
+      <p>Generated by <a href="https://whenny.dev">Whenny</a></p>
+      <p>Whenny knows when. Now you do too. ⏱️</p>
+    </footer>
+  </div>
+</body>
+</html>

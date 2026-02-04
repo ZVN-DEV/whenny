@@ -10,6 +10,7 @@ import fs from 'fs-extra'
 import path from 'path'
 import chalk from 'chalk'
 import ora from 'ora'
+import prompts from 'prompts'
 import { execSync, spawn } from 'child_process'
 import { MODULES } from '../templates/index.js'
 
@@ -19,6 +20,7 @@ interface TestResult {
   passed: boolean
   error?: string
   duration: number
+  code?: string
 }
 
 interface TestSuiteResult {
@@ -30,18 +32,27 @@ interface TestSuiteResult {
   timestamp: string
 }
 
+// Map of test name -> test source code
+type TestCodeMap = Record<string, string>
+
 export async function testInstall(options: {
   keep?: boolean
   verbose?: boolean
   output?: string
 }): Promise<void> {
+  const now = new Date()
+  const utcTime = now.toISOString().replace('T', ' ').slice(0, 19) + ' UTC'
+  const localTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+  const localZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
   console.log()
-  console.log(chalk.bold.magenta('  🎪 Whenny Test Fair'))
-  console.log(chalk.gray('  Testing your roads before we leave town...'))
+  console.log(chalk.bold.cyan('  ⏱️  Entering the Whenny Zone'))
+  console.log(chalk.gray(`  When are we? ${chalk.white(utcTime)} | ${chalk.yellow(localTime)} ${chalk.gray(localZone)}`))
   console.log()
 
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-  const testDir = path.join(process.cwd(), `.whenny-test-${timestamp}`)
+  // Use a valid npm package name format (no dots at start, lowercase, hyphens)
+  const timestamp = now.getTime().toString()
+  const testDir = path.join(process.cwd(), `whenny-test-${timestamp}`)
   const resultsFile = options.output ?? path.join(process.cwd(), `whenny-test-results-${timestamp}.html`)
 
   const spinner = ora('Setting up test environment...').start()
@@ -77,7 +88,7 @@ export async function testInstall(options: {
 
     // Step 5: Generate test files
     spinner.text = 'Generating test files...'
-    const testFiles = generateTestFiles()
+    const { files: testFiles, codeMap } = generateTestFiles()
 
     const testsDir = path.join(testDir, '__tests__')
     await fs.ensureDir(testsDir)
@@ -122,22 +133,16 @@ export default {
 
     try {
       const jsonResults = await fs.readJson(path.join(testDir, 'test-results.json'))
-      results = parseJestResults(jsonResults, duration)
+      results = parseJestResults(jsonResults, duration, codeMap)
     } catch {
       // Fallback: parse from output
-      results = parseTestOutput(testOutput, duration)
+      results = parseTestOutput(testOutput, duration, codeMap)
     }
 
     // Step 9: Generate HTML report
     spinner.text = 'Generating results page...'
     const html = generateResultsHtml(results)
     await fs.writeFile(resultsFile, html)
-
-    // Step 10: Cleanup (unless --keep)
-    if (!options.keep) {
-      spinner.text = 'Cleaning up...'
-      await fs.remove(testDir)
-    }
 
     spinner.stop()
 
@@ -163,14 +168,27 @@ export default {
     console.log()
     console.log(chalk.gray(`  Duration: ${results.duration}ms`))
     console.log(chalk.gray(`  Report: ${resultsFile}`))
+    console.log(chalk.gray(`  Test dir: ${testDir}`))
 
-    if (options.keep) {
-      console.log(chalk.gray(`  Test dir: ${testDir}`))
+    console.log()
+    console.log(chalk.cyan('  ⏱️  Whenny knows when. Now you do too.'))
+    console.log()
+
+    // Cleanup prompt (unless --keep flag explicitly set)
+    if (!options.keep) {
+      const { cleanup } = await prompts({
+        type: 'confirm',
+        name: 'cleanup',
+        message: 'Clean up test directory?',
+        initial: false
+      })
+
+      if (cleanup) {
+        await fs.remove(testDir)
+        console.log(chalk.gray('  Test directory removed.'))
+        console.log()
+      }
     }
-
-    console.log()
-    console.log(chalk.magenta('  🎪 The test fair has packed up and moved on.'))
-    console.log()
 
     // Exit with error code if tests failed
     if (results.failed > 0) {
@@ -568,20 +586,21 @@ describe('Calendar Module', () => {
   })
 
   test('isWeekend() detects Saturday/Sunday', () => {
-    const saturday = new Date('2024-01-13') // Saturday
-    const monday = new Date('2024-01-15') // Monday
+    // Use local dates (month is 0-indexed) to avoid UTC timezone shifts
+    const saturday = new Date(2024, 0, 13, 12, 0, 0) // Saturday Jan 13, 2024 at noon local
+    const monday = new Date(2024, 0, 15, 12, 0, 0) // Monday Jan 15, 2024 at noon local
     expect(calendar.isWeekend(saturday)).toBe(true)
     expect(calendar.isWeekend(monday)).toBe(false)
   })
 
   test('isWeekday() detects weekdays', () => {
-    const monday = new Date('2024-01-15')
+    const monday = new Date(2024, 0, 15, 12, 0, 0) // Monday at noon local
     expect(calendar.isWeekday(monday)).toBe(true)
   })
 
   test('isBusinessDay() uses config', () => {
-    const monday = new Date('2024-01-15')
-    const saturday = new Date('2024-01-13')
+    const monday = new Date(2024, 0, 15, 12, 0, 0) // Monday at noon local
+    const saturday = new Date(2024, 0, 13, 12, 0, 0) // Saturday at noon local
     expect(calendar.isBusinessDay(monday)).toBe(true)
     expect(calendar.isBusinessDay(saturday)).toBe(false)
   })
@@ -616,7 +635,7 @@ describe('Calendar Module', () => {
   })
 
   test('add() adds time', () => {
-    const date = new Date('2024-01-15')
+    const date = new Date(2024, 0, 15, 12, 0, 0) // Jan 15 at noon local
     const result = calendar.add(date, 5, 'days')
     expect(result.getDate()).toBe(20)
   })
@@ -1017,21 +1036,40 @@ describe('Configuration Module', () => {
 })
 `
 
-  return files
+  // Extract individual test code snippets for the code map
+  const codeMap: TestCodeMap = {}
+  for (const [filename, content] of Object.entries(files)) {
+    const module = filename.replace('.test.js', '')
+    // Extract each test() block
+    const testRegex = /test\(['"`]([^'"`]+)['"`],\s*(?:\(\)|async\s*\(\))\s*=>\s*\{([\s\S]*?)\n  \}\)/g
+    let match
+    while ((match = testRegex.exec(content)) !== null) {
+      const testName = match[1]
+      const testBody = match[2].trim()
+      const key = `${module}/${testName}`
+      codeMap[key] = `test('${testName}', () => {\n${testBody}\n})`
+    }
+  }
+
+  return { files, codeMap }
 }
 
-function parseJestResults(json: any, totalDuration: number): TestSuiteResult {
+function parseJestResults(json: any, totalDuration: number, codeMap: TestCodeMap): TestSuiteResult {
   const results: TestResult[] = []
   let passed = 0
   let failed = 0
 
   for (const testResult of json.testResults || []) {
     for (const assertion of testResult.assertionResults || []) {
+      const module = testResult.name.split('/').pop()?.replace('.test.js', '') || 'unknown'
+      const codeKey = `${module}/${assertion.title}`
+
       const result: TestResult = {
         name: assertion.title,
-        module: testResult.name.split('/').pop()?.replace('.test.js', '') || 'unknown',
+        module,
         passed: assertion.status === 'passed',
         duration: assertion.duration || 0,
+        code: codeMap[codeKey] || undefined,
       }
 
       if (!result.passed && assertion.failureMessages?.length) {
@@ -1053,7 +1091,7 @@ function parseJestResults(json: any, totalDuration: number): TestSuiteResult {
   }
 }
 
-function parseTestOutput(output: string, duration: number): TestSuiteResult {
+function parseTestOutput(output: string, duration: number, _codeMap: TestCodeMap): TestSuiteResult {
   // Fallback parser for when JSON output isn't available
   const passMatch = output.match(/(\d+) passed/)
   const failMatch = output.match(/(\d+) failed/)
@@ -1089,14 +1127,18 @@ function generateResultsHtml(results: TestSuiteResult): string {
     const modulePassCount = tests.filter(t => t.passed).length
     const moduleStatus = modulePassCount === tests.length ? '✅' : '⚠️'
 
-    const testsHtml = tests.map(test => `
+    const testsHtml = tests.map((test, i) => {
+      const testId = `test-${module}-${i}`
+      return `
       <div class="test ${test.passed ? 'passed' : 'failed'}">
         <span class="status">${test.passed ? '✓' : '✗'}</span>
         <span class="name">${escapeHtml(test.name)}</span>
+        ${test.code ? `<button class="code-btn" onclick="showCode('${testId}')">View Code</button>` : ''}
         <span class="duration">${test.duration}ms</span>
         ${test.error ? `<div class="error">${escapeHtml(test.error.split('\n')[0])}</div>` : ''}
+        ${test.code ? `<pre class="code-block" id="${testId}" style="display:none;">${escapeHtml(test.code)}</pre>` : ''}
       </div>
-    `).join('')
+    `}).join('')
 
     return `
       <div class="module">
@@ -1106,12 +1148,14 @@ function generateResultsHtml(results: TestSuiteResult): string {
     `
   }).join('')
 
+  const utcNow = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC'
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Whenny Integration Test Results</title>
+  <title>Whenny Zone | Integration Test Results</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -1205,6 +1249,34 @@ function generateResultsHtml(results: TestSuiteResult): string {
       color: #fecaca;
       overflow-x: auto;
     }
+    .test .code-btn {
+      background: #334155;
+      border: none;
+      color: #94a3b8;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .test .code-btn:hover {
+      background: #475569;
+      color: #e2e8f0;
+    }
+    .test .code-block {
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 1rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 0.25rem;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+      font-size: 0.8rem;
+      color: #a5f3fc;
+      overflow-x: auto;
+      white-space: pre;
+      line-height: 1.5;
+    }
 
     footer {
       text-align: center;
@@ -1230,8 +1302,9 @@ function generateResultsHtml(results: TestSuiteResult): string {
 <body>
   <div class="container">
     <header>
-      <h1>🎪 Whenny Test Fair Results</h1>
-      <p class="subtitle">Integration test run on ${new Date(results.timestamp).toLocaleString()}</p>
+      <h1>⏱️ Whenny Zone</h1>
+      <p class="subtitle">When are we? ${utcNow}</p>
+      <p class="subtitle" style="margin-top: 0.25rem; font-size: 0.875rem;">Integration test run: ${new Date(results.timestamp).toLocaleString()}</p>
       <div class="badge">${statusEmoji} ${results.failed === 0 ? 'All Tests Passed' : `${results.failed} Tests Failed`}</div>
     </header>
 
@@ -1267,10 +1340,18 @@ function generateResultsHtml(results: TestSuiteResult): string {
     </div>
 
     <footer>
-      <p>Generated by <a href="https://whenny.dev">Whenny</a> Test Fair</p>
-      <p>The circus has left town. Your roads are ${results.failed === 0 ? 'in great shape! 🎉' : 'in need of repair. 🔧'}</p>
+      <p>Generated by <a href="https://whenny.dev">Whenny</a></p>
+      <p>${results.failed === 0 ? 'Whenny knows when. Now you do too. ⏱️' : 'Some dates need attention. Fix and re-run. 🔧'}</p>
     </footer>
   </div>
+  <script>
+    function showCode(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.display = el.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+  </script>
 </body>
 </html>`
 }
