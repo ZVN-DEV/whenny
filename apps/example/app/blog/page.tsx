@@ -35,26 +35,28 @@ export default function BlogPage() {
             <p className="text-slate-500">No posts published yet. Check back soon!</p>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-12">
             {posts.map((post) => (
-              <article key={post.slug} className="group">
+              <article key={post.slug} className="group pb-10 border-b border-slate-100 last:border-0">
                 <Link href={`/blog/${post.slug}`} className="block">
-                  <div className="flex items-center gap-3 text-sm text-slate-500 mb-2">
+                  <div className="flex items-center gap-3 text-sm text-slate-500 mb-3">
+                    <span className="font-medium text-slate-700">{post.author}</span>
+                    <span>·</span>
                     <time dateTime={post.publishDate}>
                       {whenny(new Date(post.publishDate + 'T12:00:00')).lg}
                     </time>
                     <span>·</span>
                     <span>{post.readTime}</span>
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
+                  <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 group-hover:text-blue-600 transition-colors mb-3">
                     {post.title}
                   </h2>
-                  <p className="text-slate-600 mb-3">{post.subtitle}</p>
+                  <p className="text-slate-600 mb-4 leading-relaxed">{post.subtitle}</p>
                   <div className="flex gap-2">
                     {post.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-2 py-1 text-xs bg-slate-100 text-slate-600 rounded"
+                        className="px-2.5 py-1 text-xs bg-slate-100 text-slate-600 rounded-full"
                       >
                         #{tag}
                       </span>

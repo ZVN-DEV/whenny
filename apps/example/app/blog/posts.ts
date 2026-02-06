@@ -5,17 +5,22 @@ export interface BlogPost {
   slug: string
   title: string
   subtitle: string
+  author: string
   publishDate: string // ISO date string
   readTime: string
   tags: string[]
   content: string
 }
 
+// Default author for all posts
+const DEFAULT_AUTHOR = 'ZVN'
+
 export const posts: BlogPost[] = [
   {
     slug: 'introducing-whenny',
     title: 'Introducing Whenny',
     subtitle: 'The TypeScript Date Library That AI Actually Understands',
+    author: DEFAULT_AUTHOR,
     publishDate: '2026-02-06', // Thursday
     readTime: '5 min read',
     tags: ['typescript', 'javascript', 'ai'],
@@ -87,6 +92,7 @@ This creates a \`lib/whenny/\` folder in your project with the actual source cod
     slug: 'shadcn-style-dates',
     title: 'Why Your Date Library Should Live in Your Codebase',
     subtitle: 'The shadcn approach to date formatting',
+    author: DEFAULT_AUTHOR,
     publishDate: '2026-02-07', // Friday
     readTime: '6 min read',
     tags: ['typescript', 'shadcn', 'architecture'],
@@ -163,6 +169,7 @@ Now EVERYWHERE in your app, \`whenny(date).sm\` gives you consistent output.
     slug: 'ai-agents-dates-guide',
     title: 'The Markdown File That Teaches AI How to Handle Dates',
     subtitle: 'Stop getting inconsistent date formatting from Claude and GPT',
+    author: DEFAULT_AUTHOR,
     publishDate: '2026-02-10', // Monday
     readTime: '7 min read',
     tags: ['ai', 'typescript', 'developer-experience'],
@@ -227,6 +234,7 @@ Consistent with your existing codebase. Every time.
     slug: 'the-timestamp-trap',
     title: 'The Timestamp Trap: Why Your Calendar Shows the Wrong Date',
     subtitle: 'And why AI assistants keep generating code that makes it worse',
+    author: DEFAULT_AUTHOR,
     publishDate: '2026-02-11', // Tuesday
     readTime: '8 min read',
     tags: ['typescript', 'timezone', 'bugs'],
