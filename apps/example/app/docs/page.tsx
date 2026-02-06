@@ -78,7 +78,7 @@ export default function DocsPage() {
           </div>
           <div className="flex items-center gap-3 sm:gap-6">
             <Link href="/demo" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">Demo</Link>
-            <Link href="/server" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors hidden sm:inline">Server</Link>
+            <Link href="/blog" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">Blog</Link>
             <a href="https://github.com/ZVN-DEV/whenny" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">GitHub</a>
           </div>
         </div>
