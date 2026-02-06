@@ -4,108 +4,88 @@
 [![npm version](https://img.shields.io/npm/v/whenny.svg)](https://www.npmjs.com/package/whenny)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-**[Documentation](https://whenny.dev)** | **[Demo](https://whenny.dev/demo)** | **[Sanity Test](https://whenny.dev/sanity-test.html)**
+**[Documentation](https://whenny.dev)** | **[Demo](https://whenny.dev/demo)** | **[Blog](https://whenny.dev/blog)**
 
-A modern date library for the AI era.
+## Dates that just work.
 
-**Own your code. Configure your voice. Never think about timezones again.**
+**Built for AI. Built for humans. Own your code.**
+
+A date library for the AI era.
 
 ## Why Whenny?
 
-Whenny is different from other date libraries in three key ways:
+1. **AI-First Design** — Clean, predictable API optimized for AI code generation. Every function does one thing well. AI assistants write better code with Whenny.
 
-1. **Own Your Code** — Like [shadcn/ui](https://ui.shadcn.com), Whenny can copy code directly into your project. Your AI assistant can read and modify it. No dependency lock-in.
+2. **Own Your Code** — shadcn-style install. Pull functions directly into your codebase. Customize everything. No dependency lock-in. It's your code now.
 
-2. **Configure Your Voice** — One config file controls every string Whenny outputs. Want formal language? Casual? Emoji-heavy? Change it once, update everywhere.
+3. **Server/Client Sync** — The Transfer Protocol carries timezone context across the wire. Store UTC, display local. Server and client finally agree on what time it is.
 
-3. **Timezone Solved** — The Transfer Protocol carries timezone context across the wire. Server and browser always show the right time. Automatically.
-
-4. **AI-Friendly** — Built with MCP server support so AI assistants can understand and use date functions directly.
+4. **MCP Server** — Expose all functions to AI assistants through the Model Context Protocol. Let Claude pick the right date utilities for your task.
 
 ## Installation
 
-### NPM Package (Traditional)
+### shadcn-style (Recommended)
 
 ```bash
-npm install whenny whenny-react
-```
-
-### shadcn Style (Recommended)
-
-```bash
-npx create-whenny init
+npx create-whenny
 npx create-whenny add relative smart calendar
 ```
 
 This copies the code directly into your project at `src/lib/whenny/`.
 
+### NPM Package
+
+```bash
+npm install whenny whenny-react
+```
+
 ## Quick Start
 
 ### Size-Based Formatting
 
-Simple properties, consistent output — like Tailwind for dates:
+Like Tailwind for dates — simple properties, consistent output:
 
 ```typescript
 import { whenny } from 'whenny'
 
-whenny(date).xs        // "2/3"
-whenny(date).sm        // "Feb 3"
-whenny(date).md        // "Feb 3, 2026"
-whenny(date).lg        // "February 3rd, 2026"
-whenny(date).xl        // "Tuesday, February 3rd, 2026"
+whenny(date).xs        // "2/6"
+whenny(date).sm        // "Feb 6"
+whenny(date).md        // "Feb 6, 2026"
+whenny(date).lg        // "February 6th, 2026"
+whenny(date).xl        // "Thursday, February 6th, 2026"
 
 whenny(date).clock     // "3:45 PM"
-whenny(date).sortable  // "2026-02-03"
-whenny(date).log       // "2026-02-03 15:45:30"
+whenny(date).sortable  // "2026-02-06"
 ```
 
-### Smart & Relative Formatting
+### Smart Formatting
 
 ```typescript
-// Smart formatting - picks the best representation automatically
 whenny(date).smart()
 // → "just now"
 // → "5 minutes ago"
 // → "Yesterday at 3:45 PM"
 // → "Monday at 9:00 AM"
-// → "Jan 15"
-
-// Relative time
-whenny(date).relative()           // "5 minutes ago"
 ```
 
-### Duration Formatting
+### Duration
 
 ```typescript
 import { duration } from 'whenny'
 
-duration(3661).long()             // "1 hour, 1 minute, 1 second"
-duration(3661).compact()          // "1h 1m 1s"
-duration(3661).clock()            // "1:01:01"
-duration(3661).timer()            // "01:01:01"
-duration(7200).human()            // "2 hours"
+duration(3661).long()      // "1 hour, 1 minute, 1 second"
+duration(3661).compact()   // "1h 1m 1s"
+duration(3661).timer()     // "01:01:01"
 ```
 
-### Calendar Helpers
+### Calendar
 
 ```typescript
 import { calendar } from 'whenny'
 
 calendar.isToday(date)            // true
-calendar.isWeekend(date)          // false
 calendar.isBusinessDay(date)      // true
-calendar.daysUntil(futureDate)    // 7
 calendar.addBusinessDays(date, 5) // Date (skips weekends)
-```
-
-### Date Comparison
-
-```typescript
-import { compare } from 'whenny'
-
-compare(dateA, dateB).smart()     // "2 days before"
-compare(dateA, dateB).days()      // 2
-compare(dateA, dateB).hours()     // 48
 ```
 
 ## React Hooks
@@ -114,21 +94,37 @@ compare(dateA, dateB).hours()     // 48
 import { useRelativeTime, useCountdown } from 'whenny-react'
 
 function Comment({ createdAt }) {
-  // Auto-updates every minute
-  const time = useRelativeTime(createdAt)
+  const time = useRelativeTime(createdAt)  // Auto-updates
   return <span>{time}</span>
 }
 
 function Sale({ endsAt }) {
-  // Live countdown
   const { days, hours, minutes, seconds } = useCountdown(endsAt)
   return <span>{days}d {hours}h {minutes}m {seconds}s</span>
 }
 ```
 
-## MCP Server (AI Integration)
+## Transfer Protocol
 
-Whenny includes an MCP (Model Context Protocol) server so AI assistants like Claude can use date functions directly:
+Server and client, finally in sync:
+
+```typescript
+// Server: serialize with timezone context
+import { createTransfer } from 'whenny'
+
+const payload = createTransfer(date, {
+  timezone: 'America/New_York'
+})
+
+// Client: deserialize and format
+import { fromTransfer, whenny } from 'whenny'
+
+const { date, originZone } = fromTransfer(payload)
+whenny(date).inZone(originZone).clock
+// → "3:00 PM" (original timezone preserved!)
+```
+
+## MCP Server (AI Integration)
 
 ```json
 {
@@ -156,130 +152,11 @@ Whenny includes an MCP (Model Context Protocol) server so AI assistants like Cla
 | `parse_natural` | Parse natural language ("tomorrow at 3pm") |
 | `create_transfer` | Create timezone-aware transfer payload |
 
-```typescript
-// Access MCP tools programmatically
-import { mcpTools, executeMcpTool } from 'whenny'
-
-const result = executeMcpTool('format_datewind', {
-  date: '2024-01-15',
-  style: 'lg'
-})
-// → "January 15th, 2024"
-```
-
-## Internationalization
-
-Whenny supports multiple locales:
-
-```typescript
-import { getLocale, registerLocale, en, es, fr, de, ja, zh } from 'whenny'
-
-// Get locale strings
-const spanish = getLocale('es')
-
-// Register custom locale
-registerLocale('pt', {
-  justNow: 'agora mesmo',
-  minutesAgo: (n) => `${n} minutos atrás`,
-  // ...
-})
-```
-
-Built-in locales: `en`, `es`, `fr`, `de`, `ja`, `zh`
-
-## Configuration
-
-Create a `whenny.config.ts` in your project root:
-
-```typescript
-import { defineConfig } from 'whenny/config'
-
-export default defineConfig({
-  locale: 'en-US',
-
-  relative: {
-    justNow: 'moments ago',
-    minutesAgo: (n) => `${n}m ago`,
-    hoursAgo: (n) => `${n}h ago`,
-  },
-
-  styles: {
-    xs: 'D/M',
-    sm: 'D MMM',
-    md: 'D MMM YYYY',
-    lg: 'D MMMM YYYY',
-    xl: 'dddd, D MMMM YYYY',
-  },
-
-  calendar: {
-    weekStartsOn: 'monday',
-    businessDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-  },
-})
-```
-
-## Themes
-
-Start with a pre-built theme that matches your product:
-
-```typescript
-import { themes } from 'whenny/themes'
-import { configure } from 'whenny'
-
-// Available themes: casual, formal, slack, twitter, discord, github, minimal, technical
-configure(themes.slack)
-```
-
-| Theme | Example Output | Best For |
-|-------|---------------|----------|
-| `casual` | "5 minutes ago" | Consumer apps |
-| `formal` | "5 minutes ago" | Business apps |
-| `slack` | "5m" | Chat applications |
-| `twitter` | "5m" | Social media |
-| `discord` | "Today at 3:45 PM" | Gaming/community |
-| `github` | "5 minutes ago" | Developer tools |
-| `minimal` | "5 min" | Clean interfaces |
-| `technical` | "300s" | Precise data |
-
-## Transfer Protocol
-
-The Transfer Protocol solves the server/browser timezone problem:
-
-```typescript
-// Server: serialize with timezone context
-import { createTransfer } from 'whenny'
-
-const response = {
-  event: {
-    name: 'Meeting',
-    date: createTransfer(event.date, { timezone: 'America/New_York' })
-  }
-}
-
-// Client: deserialize and format
-import { fromTransfer, whenny } from 'whenny'
-
-const { date, originZone } = fromTransfer(response.event.date)
-whenny(date).inZone(originZone).clock
-// → "3:00 PM" (original timezone preserved!)
-```
-
-## Natural Language Parsing
-
-```typescript
-import { parse } from 'whenny/natural'
-
-parse('tomorrow at 3pm')        // Date object
-parse('next friday')            // Date object
-parse('in 2 hours')             // Date object
-parse('december 25th')          // Date object
-```
-
 ## CLI Commands
 
 ```bash
 # Initialize whenny in your project
-npx create-whenny init
+npx create-whenny
 
 # Add specific modules
 npx create-whenny add relative smart calendar duration timezone
@@ -291,29 +168,26 @@ npx create-whenny list
 npx create-whenny diff
 ```
 
+## Available Modules
+
+| Module | Description |
+|--------|-------------|
+| `core` | Base whenny function with size-based formatting |
+| `relative` | Relative time formatting |
+| `smart` | Context-aware smart formatting |
+| `duration` | Duration formatting |
+| `calendar` | Calendar helpers and business day calculations |
+| `timezone` | Timezone conversion utilities |
+| `transfer` | Transfer Protocol for server/client sync |
+| `react` | React hooks (useRelativeTime, useCountdown) |
+
 ## Tests
 
-All 374 tests passing. View tests:
-
-- [Core tests](packages/whenny/test/)
-- [React tests](packages/whenny-react/test/)
-- [Live Sanity Test](https://whenny.dev/sanity-test.html)
-
-Run tests locally:
+All 380 tests passing.
 
 ```bash
 npm test
 ```
-
-### Integration Test (Sanity Test)
-
-Run a full integration test that installs whenny from npm and runs 75+ tests:
-
-```bash
-npx create-whenny test-install
-```
-
-This creates a fresh project, installs whenny, generates test files for every module, runs them, and opens an HTML report with results.
 
 ## Packages
 
@@ -329,4 +203,4 @@ MIT
 
 ---
 
-Built with care. Own your code. Configure your voice.
+Built for the AI era. Own your code.

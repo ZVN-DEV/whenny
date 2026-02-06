@@ -95,14 +95,60 @@ export default function BlogPostPage() {
         </header>
 
         {/* Content */}
-        <div className="prose prose-lg prose-slate max-w-none prose-headings:font-semibold prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-5 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4 prose-p:text-slate-600 prose-p:leading-relaxed prose-p:mb-6 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 prose-code:text-sm prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:my-6 prose-li:mb-2">
+        <div className="blog-content">
           <ReactMarkdown
             components={{
+              h2: ({ children }) => (
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-16 mb-6 pb-3 border-b border-slate-100">
+                  {children}
+                </h2>
+              ),
+              h3: ({ children }) => (
+                <h3 className="text-xl sm:text-2xl font-semibold text-slate-900 mt-12 mb-5">
+                  {children}
+                </h3>
+              ),
+              p: ({ children }) => (
+                <p className="text-lg text-slate-600 leading-[1.8] mb-8">
+                  {children}
+                </p>
+              ),
+              ul: ({ children }) => (
+                <ul className="space-y-4 mb-10 ml-1">
+                  {children}
+                </ul>
+              ),
+              ol: ({ children }) => (
+                <ol className="space-y-4 mb-10 ml-1 list-decimal list-inside">
+                  {children}
+                </ol>
+              ),
+              li: ({ children }) => (
+                <li className="text-lg text-slate-600 leading-[1.8] pl-2 flex gap-3">
+                  <span className="text-slate-400 mt-1">•</span>
+                  <span>{children}</span>
+                </li>
+              ),
+              blockquote: ({ children }) => (
+                <blockquote className="border-l-4 border-blue-500 bg-blue-50/50 pl-6 pr-6 py-5 my-10 rounded-r-lg">
+                  <div className="text-lg text-slate-700 italic leading-relaxed">
+                    {children}
+                  </div>
+                </blockquote>
+              ),
+              a: ({ href, children }) => (
+                <a href={href} className="text-blue-600 hover:text-blue-800 underline underline-offset-2 decoration-blue-200 hover:decoration-blue-400 transition-colors">
+                  {children}
+                </a>
+              ),
+              strong: ({ children }) => (
+                <strong className="font-semibold text-slate-900">{children}</strong>
+              ),
               code: ({ className, children, ...props }) => {
                 const isInline = !className
                 if (isInline) {
                   return (
-                    <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded text-sm" {...props}>
+                    <code className="bg-slate-100 text-slate-800 px-2 py-1 rounded-md text-[0.9em] font-mono" {...props}>
                       {children}
                     </code>
                   )
@@ -114,9 +160,12 @@ export default function BlogPostPage() {
                 )
               },
               pre: ({ children }) => (
-                <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm">
+                <pre className="bg-slate-900 text-slate-100 p-6 rounded-xl overflow-x-auto text-sm leading-relaxed my-10 shadow-lg">
                   {children}
                 </pre>
+              ),
+              hr: () => (
+                <hr className="my-16 border-none h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
               ),
             }}
           >

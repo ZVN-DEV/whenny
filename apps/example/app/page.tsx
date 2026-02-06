@@ -6,7 +6,7 @@ import { whenny } from 'whenny'
 import { useRelativeTime } from 'whenny-react'
 
 // Fade-in animation wrapper
-function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+function FadeIn({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
@@ -15,42 +15,13 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   }, [delay])
 
   return (
-    <div className={`transition-all duration-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+    <div className={`transition-all duration-700 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'} ${className}`}>
       {children}
     </div>
   )
 }
 
-// Copy button component
-function CopyButton({ text, className = '' }: { text: string; className?: string }) {
-  const [copied, setCopied] = useState(false)
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(text)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
-  return (
-    <button
-      onClick={handleCopy}
-      className={`transition-all ${className}`}
-      title="Click to copy"
-    >
-      {copied ? (
-        <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
-      ) : (
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-        </svg>
-      )}
-    </button>
-  )
-}
-
-// Copyable command block
+// Copyable command
 function CommandBlock({ command, variant = 'dark' }: { command: string; variant?: 'dark' | 'light' }) {
   const [copied, setCopied] = useState(false)
 
@@ -65,20 +36,20 @@ function CommandBlock({ command, variant = 'dark' }: { command: string; variant?
   return (
     <button
       onClick={handleCopy}
-      className={`group relative px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-mono flex items-center gap-2 sm:gap-3 transition-all hover:scale-[1.02] active:scale-[0.98] ${
+      className={`group relative px-5 py-3 rounded-full text-sm font-mono flex items-center gap-3 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${
         isDark
-          ? 'bg-slate-900 text-slate-100 hover:bg-slate-800'
-          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+          ? 'bg-slate-900 text-slate-100 hover:bg-slate-800 shadow-lg shadow-slate-900/20'
+          : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
       }`}
     >
       <span>{command}</span>
       <span className={`transition-all ${copied ? 'text-green-400' : isDark ? 'text-slate-500 group-hover:text-slate-300' : 'text-slate-400 group-hover:text-slate-600'}`}>
         {copied ? (
-          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         ) : (
-          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
           </svg>
         )}
@@ -95,200 +66,214 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white/90 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-          <Link href="/" className="font-semibold text-slate-900">Whenny</Link>
-          <div className="flex items-center gap-3 sm:gap-6">
-            <Link href="/demo" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">Demo</Link>
-            <Link href="/docs" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">Docs</Link>
-            <Link href="/blog" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">Blog</Link>
-            <a href="https://github.com/ZVN-DEV/whenny" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">GitHub</a>
-          </div>
+      <header className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md z-50">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="text-lg font-semibold text-slate-900 tracking-tight">whenny</Link>
+          <nav className="flex items-center gap-8">
+            <Link href="/demo" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">Demo</Link>
+            <Link href="/docs" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">Docs</Link>
+            <Link href="/blog" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">Blog</Link>
+            <a href="https://github.com/ZVN-DEV/whenny" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">GitHub</a>
+          </nav>
         </div>
       </header>
 
-      {/* Hero - Why Whenny */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto text-center">
+      {/* Hero */}
+      <section className="min-h-screen flex items-center justify-center px-6 pt-16">
+        <div className="max-w-4xl mx-auto text-center">
           <FadeIn>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-4 sm:mb-6">
-              Dates that just work.
-            </h1>
-            <p className="text-lg sm:text-xl text-slate-600 mb-3 sm:mb-4">
-              Built for AI. Built for humans. Own your code.
-            </p>
-            <p className="text-sm sm:text-base text-slate-500 mb-6 sm:mb-8 max-w-xl mx-auto">
-              Stop fighting timezones. Stop memorizing format tokens. Pull only the functions you need directly into your codebase.
+            <p className="text-sm font-medium text-slate-400 tracking-widest uppercase mb-8">
+              A date library for the AI era
             </p>
           </FadeIn>
 
           <FadeIn delay={100}>
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12">
-              <span className="px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs bg-blue-50 text-blue-700 border border-blue-200">AI-Optimized</span>
-              <span className="px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs bg-green-50 text-green-700 border border-green-200">Server/Client Sync</span>
-              <span className="px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs bg-purple-50 text-purple-700 border border-purple-200">Zero Deps</span>
-              <span className="px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs bg-amber-50 text-amber-700 border border-amber-200">Own Your Code</span>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-slate-900 tracking-tight leading-[0.9] mb-8">
+              Dates that
+              <br />
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">
+                just work.
+              </span>
+            </h1>
+          </FadeIn>
+
+          <FadeIn delay={200}>
+            <p className="text-xl sm:text-2xl text-slate-500 max-w-2xl mx-auto leading-relaxed mb-12">
+              Built for AI. Built for humans.
+              <br className="hidden sm:block" />
+              Own your code.
+            </p>
+          </FadeIn>
+
+          <FadeIn delay={300}>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+              <CommandBlock command="npx create-whenny" variant="dark" />
+              <CommandBlock command="npm install whenny" variant="light" />
             </div>
           </FadeIn>
 
-          <FadeIn delay={150}>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <CommandBlock command="npx create-whenny" variant="dark" />
-              <CommandBlock command="npm install whenny" variant="light" />
+          <FadeIn delay={400}>
+            <div className="flex flex-wrap justify-center gap-3">
+              <span className="px-4 py-2 rounded-full text-xs font-medium bg-slate-50 text-slate-600 border border-slate-100">AI-Optimized</span>
+              <span className="px-4 py-2 rounded-full text-xs font-medium bg-slate-50 text-slate-600 border border-slate-100">Zero Dependencies</span>
+              <span className="px-4 py-2 rounded-full text-xs font-medium bg-slate-50 text-slate-600 border border-slate-100">Own Your Code</span>
+              <span className="px-4 py-2 rounded-full text-xs font-medium bg-slate-50 text-slate-600 border border-slate-100">Server/Client Sync</span>
             </div>
           </FadeIn>
         </div>
       </section>
 
-      {/* Shorthand Styles */}
-      <section className="bg-gradient-to-b from-slate-50 to-white py-12 sm:py-20 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
+      {/* Size-based styles */}
+      <section className="py-32 px-6 bg-slate-50">
+        <div className="max-w-5xl mx-auto">
           <FadeIn>
-            <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2 sm:mb-3">
-                Size up your dates.
-              </h2>
-              <p className="text-sm sm:text-base text-slate-600 max-w-lg mx-auto">
-                Like Tailwind for dates — simple properties, consistent output. No format strings to remember.
-              </p>
-            </div>
+            <p className="text-sm font-medium text-slate-400 tracking-widest uppercase text-center mb-4">
+              Intuitive API
+            </p>
+            <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 text-center mb-6 tracking-tight">
+              Size up your dates.
+            </h2>
+            <p className="text-lg text-slate-500 text-center max-w-xl mx-auto mb-16">
+              Like Tailwind for dates — simple properties, consistent output.
+              No format strings to remember.
+            </p>
           </FadeIn>
 
           <FadeIn delay={100}>
-            <div className="bg-slate-900 rounded-xl p-4 sm:p-6 shadow-2xl">
-              <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500"></div>
-                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500"></div>
-                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500"></div>
+            <div className="bg-slate-900 rounded-2xl p-8 shadow-2xl shadow-slate-900/30 mb-8">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
               </div>
-              <pre className="text-xs sm:text-sm leading-relaxed overflow-x-auto">
+              <pre className="text-sm sm:text-base leading-loose overflow-x-auto">
                 <code className="text-slate-300">
-                  <span className="text-blue-400">whenny</span>(date).<span className="text-green-400">xs</span>       <span className="text-slate-500">// "{whenny(now).xs}"</span>{'\n'}
-                  <span className="text-blue-400">whenny</span>(date).<span className="text-green-400">sm</span>       <span className="text-slate-500">// "{whenny(now).sm}"</span>{'\n'}
-                  <span className="text-blue-400">whenny</span>(date).<span className="text-green-400">md</span>       <span className="text-slate-500">// "{whenny(now).md}"</span>{'\n'}
-                  <span className="text-blue-400">whenny</span>(date).<span className="text-green-400">lg</span>       <span className="text-slate-500">// "{whenny(now).lg}"</span>{'\n'}
-                  <span className="text-blue-400">whenny</span>(date).<span className="text-green-400">xl</span>       <span className="text-slate-500">// "{whenny(now).xl}"</span>{'\n'}
+                  <span className="text-blue-400">whenny</span>(date).<span className="text-emerald-400">xs</span>       <span className="text-slate-500">// "{whenny(now).xs}"</span>{'\n'}
+                  <span className="text-blue-400">whenny</span>(date).<span className="text-emerald-400">sm</span>       <span className="text-slate-500">// "{whenny(now).sm}"</span>{'\n'}
+                  <span className="text-blue-400">whenny</span>(date).<span className="text-emerald-400">md</span>       <span className="text-slate-500">// "{whenny(now).md}"</span>{'\n'}
+                  <span className="text-blue-400">whenny</span>(date).<span className="text-emerald-400">lg</span>       <span className="text-slate-500">// "{whenny(now).lg}"</span>{'\n'}
+                  <span className="text-blue-400">whenny</span>(date).<span className="text-emerald-400">xl</span>       <span className="text-slate-500">// "{whenny(now).xl}"</span>{'\n'}
                   {'\n'}
-                  <span className="text-blue-400">whenny</span>(date).<span className="text-yellow-400">clock</span>    <span className="text-slate-500">// "{whenny(now).clock}"</span>{'\n'}
-                  <span className="text-blue-400">whenny</span>(date).<span className="text-yellow-400">sortable</span> <span className="text-slate-500">// "{whenny(now).sortable}"</span>
+                  <span className="text-blue-400">whenny</span>(date).<span className="text-amber-400">clock</span>    <span className="text-slate-500">// "{whenny(now).clock}"</span>{'\n'}
+                  <span className="text-blue-400">whenny</span>(date).<span className="text-amber-400">sortable</span> <span className="text-slate-500">// "{whenny(now).sortable}"</span>
                 </code>
               </pre>
             </div>
           </FadeIn>
 
           <FadeIn delay={150}>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-4 sm:mt-6">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
               <StyleDemo label=".xs" value={whenny(now).xs} />
               <StyleDemo label=".sm" value={whenny(now).sm} />
               <StyleDemo label=".md" value={whenny(now).md} />
               <StyleDemo label=".lg" value={whenny(now).lg} />
+              <StyleDemo label=".xl" value={whenny(now).xl} className="col-span-2 sm:col-span-1" />
             </div>
           </FadeIn>
         </div>
       </section>
 
-      {/* Why Whenny Grid */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
+      {/* Why Whenny */}
+      <section className="py-32 px-6">
+        <div className="max-w-5xl mx-auto">
           <FadeIn>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-8 sm:mb-12">Why Whenny?</h2>
+            <p className="text-sm font-medium text-slate-400 tracking-widest uppercase text-center mb-4">
+              Why Whenny?
+            </p>
+            <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 text-center mb-20 tracking-tight">
+              Built different.
+            </h2>
           </FadeIn>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-16">
             <FadeIn delay={100}>
-              <FeatureCard
+              <Feature
+                number="01"
                 title="AI-First Design"
-                description="Clean, predictable API optimized for AI code generation. Every function does one thing well."
-              />
-            </FadeIn>
-            <FadeIn delay={125}>
-              <FeatureCard
-                title="Own Your Code"
-                description="shadcn-style install. Pull functions directly into your codebase. No dependency lock-in."
+                description="Clean, predictable API optimized for AI code generation. Every function does one thing well. AI assistants write better code with Whenny."
               />
             </FadeIn>
             <FadeIn delay={150}>
-              <FeatureCard
-                title="Server/Client Sync"
-                description="Transfer Protocol preserves timezone context. One point in time, displayed correctly everywhere."
-              />
-            </FadeIn>
-            <FadeIn delay={175}>
-              <FeatureCard
-                title="Size-Based Styles"
-                description="Format dates like sizing — .xs .sm .md .lg .xl. Consistent output, zero thinking."
+              <Feature
+                number="02"
+                title="Own Your Code"
+                description="shadcn-style install. Pull functions directly into your codebase. Customize everything. No dependency lock-in. It's your code now."
               />
             </FadeIn>
             <FadeIn delay={200}>
-              <FeatureCard
-                title="Smart Defaults"
-                description="Context-aware formatting. 'just now', '5 min ago', 'Yesterday at 3pm' - automatic."
+              <Feature
+                number="03"
+                title="Server/Client Sync"
+                description="The Transfer Protocol carries timezone context across the wire. Store UTC, display local. Server and client finally agree on what time it is."
               />
             </FadeIn>
-            <FadeIn delay={225}>
-              <FeatureCard
+            <FadeIn delay={250}>
+              <Feature
+                number="04"
                 title="MCP Server"
-                description="Expose all functions to AI assistants. Let AI pick the right date utilities for you."
+                description="Expose all functions to AI assistants through the Model Context Protocol. Let Claude pick the right date utilities for your task."
               />
             </FadeIn>
           </div>
         </div>
       </section>
 
-      {/* Quick Examples */}
-      <section className="bg-slate-50 py-12 sm:py-20 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
+      {/* API Examples */}
+      <section className="py-32 px-6 bg-gradient-to-b from-white via-blue-50/30 to-white">
+        <div className="max-w-5xl mx-auto">
           <FadeIn>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-2 sm:mb-3">Dead Simple API</h2>
-            <p className="text-sm sm:text-base text-slate-600 text-center mb-8 sm:mb-12 max-w-lg mx-auto">
+            <p className="text-sm font-medium text-slate-400 tracking-widest uppercase text-center mb-4">
+              Simple API
+            </p>
+            <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 text-center mb-6 tracking-tight">
+              Dead simple.
+            </h2>
+            <p className="text-lg text-slate-500 text-center max-w-xl mx-auto mb-20">
               Every function is predictable. Every output is useful.
             </p>
           </FadeIn>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FadeIn delay={100}>
-              <QuickExample
+              <APICard
                 title="Smart Formatting"
-                code={`whenny(date).smart()`}
-                outputs={[
-                  { input: 'now', output: 'just now' },
-                  { input: '5m ago', output: '5 minutes ago' },
-                  { input: 'yesterday', output: 'Yesterday at 3:45 PM' },
+                code="whenny(date).smart()"
+                examples={[
+                  { label: 'now', value: 'just now' },
+                  { label: '5m ago', value: '5 minutes ago' },
+                  { label: 'yesterday', value: 'Yesterday at 3:45 PM' },
                 ]}
               />
             </FadeIn>
-
             <FadeIn delay={150}>
-              <QuickExample
+              <APICard
                 title="Duration"
-                code={`duration(seconds)`}
-                outputs={[
-                  { input: '3661', output: '1h 1m 1s' },
-                  { input: '.timer()', output: '01:01:01' },
-                  { input: '.human()', output: 'about 1 hour' },
+                code="duration(3661)"
+                examples={[
+                  { label: '.long()', value: '1 hour, 1 minute, 1 second' },
+                  { label: '.compact()', value: '1h 1m 1s' },
+                  { label: '.timer()', value: '01:01:01' },
                 ]}
               />
             </FadeIn>
-
             <FadeIn delay={200}>
-              <QuickExample
-                title="Business Days"
-                code={`calendar.addBusinessDays(date, 5)`}
-                outputs={[
-                  { input: 'Mon + 5', output: 'Next Monday' },
-                  { input: 'isBusinessDay', output: 'true/false' },
-                  { input: 'nextBusinessDay', output: 'Next working day' },
+              <APICard
+                title="Calendar"
+                code="calendar"
+                examples={[
+                  { label: '.isToday(date)', value: 'true / false' },
+                  { label: '.isBusinessDay(date)', value: 'true / false' },
+                  { label: '.addBusinessDays(date, 5)', value: 'Next Monday' },
                 ]}
               />
             </FadeIn>
-
             <FadeIn delay={250}>
-              <QuickExample
+              <APICard
                 title="React Hooks"
-                code={`useRelativeTime(date)`}
-                outputs={[
-                  { input: 'auto-updates', output: liveTime },
-                  { input: 'useCountdown', output: '3d 5h 30m 15s' },
+                code="useRelativeTime(date)"
+                examples={[
+                  { label: 'Live update', value: liveTime },
+                  { label: 'useCountdown()', value: '3d 5h 30m 15s' },
                 ]}
                 live
               />
@@ -297,89 +282,89 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* shadcn-style Install */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto">
+      {/* shadcn Install */}
+      <section className="py-32 px-6">
+        <div className="max-w-4xl mx-auto">
           <FadeIn>
-            <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 sm:mb-3">
-                Pull only what you need.
-              </h2>
-              <p className="text-sm sm:text-base text-slate-600">
-                Like shadcn/ui - copy code directly into your project. Full ownership, full control.
-              </p>
-            </div>
+            <p className="text-sm font-medium text-slate-400 tracking-widest uppercase text-center mb-4">
+              shadcn-style
+            </p>
+            <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 text-center mb-6 tracking-tight">
+              Pull only what you need.
+            </h2>
+            <p className="text-lg text-slate-500 text-center max-w-xl mx-auto mb-16">
+              Like shadcn/ui — copy code directly into your project.
+              Full ownership, full control.
+            </p>
           </FadeIn>
 
           <FadeIn delay={100}>
-            <div className="bg-slate-900 rounded-xl p-4 sm:p-6 shadow-xl">
-              <div className="space-y-2">
-                <p className="text-slate-500 text-xs sm:text-sm mb-2 sm:mb-3"># Initialize whenny in your project</p>
-                <CopyableLine command="npx create-whenny" />
-
-                <p className="text-slate-500 text-xs sm:text-sm mt-3 sm:mt-4 mb-2 sm:mb-3"># Add only the modules you need</p>
-                <CopyableLine command="npx create-whenny add relative" />
-                <CopyableLine command="npx create-whenny add smart calendar" />
-                <CopyableLine command="npx create-whenny add duration" />
-
-                <p className="text-slate-500 text-xs sm:text-sm mt-3 sm:mt-4 mb-2 sm:mb-3"># Or grab everything</p>
-                <CopyableLine command="npx create-whenny add all" />
+            <div className="bg-slate-900 rounded-2xl p-8 shadow-2xl mb-8">
+              <div className="space-y-4">
+                <CLILine comment="Initialize whenny in your project" command="npx create-whenny" />
+                <div className="h-4"></div>
+                <CLILine comment="Add only the modules you need" command="npx create-whenny add relative" />
+                <CLILine command="npx create-whenny add smart calendar" />
+                <CLILine command="npx create-whenny add duration" />
+                <div className="h-4"></div>
+                <CLILine comment="Or grab everything" command="npx create-whenny add all" />
               </div>
             </div>
           </FadeIn>
 
           <FadeIn delay={150}>
-            <p className="text-center text-xs sm:text-sm text-slate-500 mt-4 sm:mt-6 mb-3">Click any module to copy its install command:</p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-              <ModuleChip name="core" />
-              <ModuleChip name="relative" />
-              <ModuleChip name="smart" />
-              <ModuleChip name="duration" />
-              <ModuleChip name="calendar" />
-              <ModuleChip name="timezone" />
-              <ModuleChip name="transfer" />
-              <ModuleChip name="react" />
+            <p className="text-center text-sm text-slate-400 mb-6">Available modules:</p>
+            <div className="flex flex-wrap justify-center gap-3">
+              {['core', 'relative', 'smart', 'duration', 'calendar', 'timezone', 'transfer', 'react'].map((mod) => (
+                <ModuleChip key={mod} name={mod} />
+              ))}
             </div>
           </FadeIn>
         </div>
       </section>
 
-      {/* Server/Client Sync */}
-      <section className="bg-gradient-to-b from-blue-50 to-white py-12 sm:py-20 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
+      {/* Transfer Protocol */}
+      <section className="py-32 px-6 bg-slate-900 text-white">
+        <div className="max-w-5xl mx-auto">
           <FadeIn>
-            <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 sm:mb-3">
-                Server and client, finally in sync.
-              </h2>
-              <p className="text-sm sm:text-base text-slate-600 max-w-lg mx-auto">
-                The Transfer Protocol carries timezone context across the wire. Store UTC, display local. Automatically.
-              </p>
-            </div>
+            <p className="text-sm font-medium text-slate-500 tracking-widest uppercase text-center mb-4">
+              Transfer Protocol
+            </p>
+            <h2 className="text-4xl sm:text-5xl font-bold text-white text-center mb-6 tracking-tight">
+              Server and client,
+              <br />
+              finally in sync.
+            </h2>
+            <p className="text-lg text-slate-400 text-center max-w-xl mx-auto mb-20">
+              The Transfer Protocol carries timezone context across the wire.
+              Store UTC, display local. Automatically.
+            </p>
           </FadeIn>
 
           <FadeIn delay={100}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
-                <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                  <span className="px-2 py-1 rounded text-[10px] sm:text-xs bg-slate-100 text-slate-700 font-medium">Server</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-slate-800 rounded-xl p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-700 text-slate-300">Server</span>
                 </div>
-                <pre className="text-[10px] sm:text-xs text-slate-700 overflow-x-auto">
+                <pre className="text-sm text-slate-300 leading-relaxed">
 {`// Store UTC, preserve origin
 const payload = createTransfer(date, {
   timezone: 'America/New_York'
 })
+
 // { iso, originZone, originOffset }`}
                 </pre>
               </div>
 
-              <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
-                <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                  <span className="px-2 py-1 rounded text-[10px] sm:text-xs bg-blue-100 text-blue-700 font-medium">Client</span>
+              <div className="bg-slate-800 rounded-xl p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-600 text-white">Client</span>
                 </div>
-                <pre className="text-[10px] sm:text-xs text-slate-700 overflow-x-auto">
+                <pre className="text-sm text-slate-300 leading-relaxed">
 {`// Display in user's local time
 const event = fromTransfer(payload)
+
 whenny(event.date).smart()
 // "3:00 PM" (auto-converted)`}
                 </pre>
@@ -390,16 +375,26 @@ whenny(event.date).smart()
       </section>
 
       {/* CTA */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6">
+      <section className="py-32 px-6">
         <div className="max-w-2xl mx-auto text-center">
           <FadeIn>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3 sm:mb-4">Ready to simplify dates?</h2>
-            <p className="text-sm sm:text-base text-slate-600 mb-6 sm:mb-8">Start with the CLI or install the package. Your choice.</p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/docs" className="px-5 sm:px-6 py-2.5 sm:py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors text-sm sm:text-base">
+            <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
+              Ready to simplify dates?
+            </h2>
+            <p className="text-lg text-slate-500 mb-12">
+              Start with the CLI or install the package. Your choice.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/docs"
+                className="px-8 py-4 bg-slate-900 text-white rounded-full font-medium hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20 hover:shadow-xl hover:shadow-slate-900/30"
+              >
                 Read the Docs
               </Link>
-              <Link href="/demo" className="px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-slate-900 border border-slate-200 rounded-lg font-medium hover:bg-slate-50 transition-colors text-sm sm:text-base">
+              <Link
+                href="/demo"
+                className="px-8 py-4 bg-white text-slate-900 border border-slate-200 rounded-full font-medium hover:bg-slate-50 transition-all"
+              >
                 Try the Demo
               </Link>
             </div>
@@ -408,56 +403,58 @@ whenny(event.date).smart()
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 py-6 sm:py-8 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-          <p className="text-xs sm:text-sm text-slate-500">Built for the AI era. Own your code.</p>
-          <div className="flex items-center gap-4 sm:gap-6">
-            <Link href="/docs" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900">Docs</Link>
-            <Link href="/demo" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900">Demo</Link>
-            <a href="https://github.com/ZVN-DEV/whenny" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900">GitHub</a>
-          </div>
+      <footer className="border-t border-slate-100 py-12 px-6">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+          <p className="text-sm text-slate-400">Built for the AI era. Own your code.</p>
+          <nav className="flex items-center gap-8">
+            <Link href="/docs" className="text-sm text-slate-400 hover:text-slate-900 transition-colors">Docs</Link>
+            <Link href="/demo" className="text-sm text-slate-400 hover:text-slate-900 transition-colors">Demo</Link>
+            <Link href="/blog" className="text-sm text-slate-400 hover:text-slate-900 transition-colors">Blog</Link>
+            <a href="https://github.com/ZVN-DEV/whenny" className="text-sm text-slate-400 hover:text-slate-900 transition-colors">GitHub</a>
+          </nav>
         </div>
       </footer>
     </main>
   )
 }
 
-function StyleDemo({ label, value }: { label: string; value: string }) {
+function StyleDemo({ label, value, className = '' }: { label: string; value: string; className?: string }) {
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-2 sm:p-3 text-center">
-      <code className="text-blue-600 text-[10px] sm:text-xs font-mono">{label}</code>
-      <p className="text-slate-900 font-medium mt-1 text-xs sm:text-sm truncate">{value}</p>
+    <div className={`bg-white rounded-xl border border-slate-200 p-4 text-center ${className}`}>
+      <code className="text-blue-600 text-sm font-mono font-medium">{label}</code>
+      <p className="text-slate-900 font-medium mt-2 text-sm truncate">{value}</p>
     </div>
   )
 }
 
-function FeatureCard({ title, description }: { title: string; description: string }) {
+function Feature({ number, title, description }: { number: string; title: string; description: string }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 hover:shadow-md transition-shadow">
-      <h3 className="font-semibold text-slate-900 mb-1 sm:mb-2 text-sm sm:text-base">{title}</h3>
-      <p className="text-xs sm:text-sm text-slate-600">{description}</p>
+    <div>
+      <span className="text-sm font-mono text-slate-300 mb-3 block">{number}</span>
+      <h3 className="text-xl font-semibold text-slate-900 mb-3">{title}</h3>
+      <p className="text-slate-500 leading-relaxed">{description}</p>
     </div>
   )
 }
 
-function QuickExample({ title, code, outputs, live }: {
+function APICard({ title, code, examples, live }: {
   title: string
   code: string
-  outputs: { input: string; output: string }[]
+  examples: { label: string; value: string }[]
   live?: boolean
 }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
-      <div className="flex items-center gap-2 mb-2 sm:mb-3">
-        <h3 className="font-semibold text-slate-900 text-sm sm:text-base">{title}</h3>
-        {live && <span className="px-1.5 py-0.5 rounded text-[10px] bg-green-500 text-white">LIVE</span>}
+    <div className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg hover:shadow-slate-100 transition-shadow">
+      <div className="flex items-center gap-3 mb-4">
+        <h3 className="font-semibold text-slate-900">{title}</h3>
+        {live && <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500 text-white uppercase tracking-wide">Live</span>}
       </div>
-      <code className="text-[10px] sm:text-xs text-blue-600 font-mono block mb-2 sm:mb-3">{code}</code>
-      <div className="space-y-1">
-        {outputs.map((o, i) => (
-          <div key={i} className="flex justify-between text-xs sm:text-sm">
-            <span className="text-slate-500">{o.input}</span>
-            <span className="text-slate-900 font-medium">{o.output}</span>
+      <code className="text-sm text-blue-600 font-mono block mb-5">{code}</code>
+      <div className="space-y-3">
+        {examples.map((ex, i) => (
+          <div key={i} className="flex justify-between text-sm">
+            <span className="text-slate-400 font-mono">{ex.label}</span>
+            <span className="text-slate-900 font-medium">{ex.value}</span>
           </div>
         ))}
       </div>
@@ -465,9 +462,8 @@ function QuickExample({ title, code, outputs, live }: {
   )
 }
 
-function ModuleChip({ name }: { name: string }) {
+function CLILine({ comment, command }: { comment?: string; command: string }) {
   const [copied, setCopied] = useState(false)
-  const command = `npx whenny add ${name}`
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(command)
@@ -476,24 +472,32 @@ function ModuleChip({ name }: { name: string }) {
   }
 
   return (
-    <button
-      onClick={handleCopy}
-      className={`group px-3 py-2 rounded-lg border text-center transition-all hover:scale-[1.02] active:scale-[0.98] ${
-        copied
-          ? 'bg-green-50 border-green-300 text-green-700'
-          : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-      }`}
-      title={`Copy: ${command}`}
-    >
-      <code className={`text-xs font-mono ${copied ? 'text-green-700' : 'text-slate-700'}`}>
-        {copied ? '✓ copied!' : name}
-      </code>
-    </button>
+    <>
+      {comment && <p className="text-slate-500 text-sm"># {comment}</p>}
+      <button
+        onClick={handleCopy}
+        className="group w-full flex items-center justify-between px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors text-left"
+      >
+        <code className="text-emerald-400 text-sm">{command}</code>
+        <span className={`flex-shrink-0 transition-all ${copied ? 'text-emerald-400' : 'text-slate-600 group-hover:text-slate-400'}`}>
+          {copied ? (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          )}
+        </span>
+      </button>
+    </>
   )
 }
 
-function CopyableLine({ command }: { command: string }) {
+function ModuleChip({ name }: { name: string }) {
   const [copied, setCopied] = useState(false)
+  const command = `npx create-whenny add ${name}`
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(command)
@@ -504,20 +508,14 @@ function CopyableLine({ command }: { command: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="group w-full flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg hover:bg-slate-800 transition-colors text-left"
+      className={`px-4 py-2 rounded-full text-sm font-mono transition-all hover:scale-105 active:scale-95 ${
+        copied
+          ? 'bg-emerald-500 text-white'
+          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+      }`}
+      title={`Copy: ${command}`}
     >
-      <code className="text-xs sm:text-sm text-green-400 truncate mr-2">{command}</code>
-      <span className={`flex-shrink-0 transition-all ${copied ? 'text-green-400' : 'text-slate-600 group-hover:text-slate-400'}`}>
-        {copied ? (
-          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-        ) : (
-          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-          </svg>
-        )}
-      </span>
+      {copied ? 'copied!' : name}
     </button>
   )
 }
