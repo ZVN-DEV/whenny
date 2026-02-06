@@ -58,23 +58,35 @@ export default function BlogPostPage() {
         </Link>
 
         {/* Header */}
-        <header className="mb-8">
-          <div className="flex items-center gap-3 text-sm text-slate-500 mb-4">
-            <time dateTime={post.publishDate}>
-              {whenny(new Date(post.publishDate + 'T12:00:00')).lg}
-            </time>
-            <span>·</span>
-            <span>{post.readTime}</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">
+        <header className="mb-10">
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
             {post.title}
           </h1>
-          <p className="text-xl text-slate-600">{post.subtitle}</p>
-          <div className="flex gap-2 mt-4">
+          <p className="text-xl text-slate-600 mb-6">{post.subtitle}</p>
+
+          {/* Author and meta */}
+          <div className="flex items-center gap-4 pb-6 border-b border-slate-200">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-sm">
+              {post.author.charAt(0)}
+            </div>
+            <div>
+              <p className="font-medium text-slate-900">{post.author}</p>
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <time dateTime={post.publishDate}>
+                  {whenny(new Date(post.publishDate + 'T12:00:00')).lg}
+                </time>
+                <span>·</span>
+                <span>{post.readTime}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Tags */}
+          <div className="flex gap-2 mt-6">
             {post.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-2 py-1 text-xs bg-slate-100 text-slate-600 rounded"
+                className="px-2.5 py-1 text-xs bg-slate-100 text-slate-600 rounded-full"
               >
                 #{tag}
               </span>
@@ -83,7 +95,7 @@ export default function BlogPostPage() {
         </header>
 
         {/* Content */}
-        <div className="prose prose-slate max-w-none prose-headings:font-semibold prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3 prose-p:text-slate-600 prose-p:leading-relaxed prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 prose-code:text-sm prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none prose-pre:bg-slate-900 prose-pre:text-slate-100">
+        <div className="prose prose-lg prose-slate max-w-none prose-headings:font-semibold prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-5 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4 prose-p:text-slate-600 prose-p:leading-relaxed prose-p:mb-6 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 prose-code:text-sm prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:my-6 prose-li:mb-2">
           <ReactMarkdown
             components={{
               code: ({ className, children, ...props }) => {
