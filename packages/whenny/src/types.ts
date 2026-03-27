@@ -9,7 +9,14 @@
 // ============================================================================
 
 /**
- * Any valid input that can be converted to a date
+ * Any valid input that can be converted to a date.
+ *
+ * Forward-compatible with the TC39 Temporal API (Stage 3, shipping in
+ * Chrome 144 / Firefox 139). When Temporal is available at runtime,
+ * `Temporal.Instant` and `Temporal.ZonedDateTime` are also accepted.
+ * Because Temporal types may not exist at compile time in all environments
+ * we keep the union as `Date | string | number | Whenny` and handle
+ * Temporal objects via duck-typing in `parseDate`.
  */
 export type DateInput = Date | string | number | Whenny
 

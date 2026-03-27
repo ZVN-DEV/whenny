@@ -276,6 +276,158 @@ export const zh: LocaleStrings = {
   at: '',
 }
 
+// Portuguese
+export const pt: LocaleStrings = {
+  justNow: 'agora mesmo',
+  secondsAgo: (n) => `${n} segundo${n === 1 ? '' : 's'} atr\u00e1s`,
+  minutesAgo: (n) => `${n} minuto${n === 1 ? '' : 's'} atr\u00e1s`,
+  hoursAgo: (n) => `${n} hora${n === 1 ? '' : 's'} atr\u00e1s`,
+  yesterday: 'ontem',
+  daysAgo: (n) => `${n} dia${n === 1 ? '' : 's'} atr\u00e1s`,
+  weeksAgo: (n) => `${n} semana${n === 1 ? '' : 's'} atr\u00e1s`,
+  monthsAgo: (n) => `${n} m\u00eas${n === 1 ? '' : 'es'} atr\u00e1s`,
+  yearsAgo: (n) => `${n} ano${n === 1 ? '' : 's'} atr\u00e1s`,
+
+  inSeconds: (n) => `em ${n} segundo${n === 1 ? '' : 's'}`,
+  inMinutes: (n) => `em ${n} minuto${n === 1 ? '' : 's'}`,
+  inHours: (n) => `em ${n} hora${n === 1 ? '' : 's'}`,
+  tomorrow: 'amanh\u00e3',
+  inDays: (n) => `em ${n} dia${n === 1 ? '' : 's'}`,
+  inWeeks: (n) => `em ${n} semana${n === 1 ? '' : 's'}`,
+  inMonths: (n) => `em ${n} m\u00eas${n === 1 ? '' : 'es'}`,
+  inYears: (n) => `em ${n} ano${n === 1 ? '' : 's'}`,
+
+  durationHours: (n) => `${n} hora${n === 1 ? '' : 's'}`,
+  durationMinutes: (n) => `${n} minuto${n === 1 ? '' : 's'}`,
+  durationSeconds: (n) => `${n} segundo${n === 1 ? '' : 's'}`,
+  durationAbout: (time) => `aproximadamente ${time}`,
+
+  monthsShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+  monthsFull: ['Janeiro', 'Fevereiro', 'Mar\u00e7o', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+
+  weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'S\u00e1b'],
+  weekdaysFull: ['Domingo', 'Segunda-feira', 'Ter\u00e7a-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'S\u00e1bado'],
+
+  yesterdayAt: (time) => `Ontem \u00e0s ${time}`,
+  tomorrowAt: (time) => `Amanh\u00e3 \u00e0s ${time}`,
+  todayAt: (time) => `hoje \u00e0s ${time}`,
+  at: '\u00e0s',
+}
+
+// Italian
+export const it: LocaleStrings = {
+  justNow: 'proprio ora',
+  secondsAgo: (n) => `${n} secondo${n === 1 ? '' : 'i'} fa`,
+  minutesAgo: (n) => `${n} minut${n === 1 ? 'o' : 'i'} fa`,
+  hoursAgo: (n) => `${n} or${n === 1 ? 'a' : 'e'} fa`,
+  yesterday: 'ieri',
+  daysAgo: (n) => `${n} giorn${n === 1 ? 'o' : 'i'} fa`,
+  weeksAgo: (n) => `${n} settiman${n === 1 ? 'a' : 'e'} fa`,
+  monthsAgo: (n) => `${n} mes${n === 1 ? 'e' : 'i'} fa`,
+  yearsAgo: (n) => `${n} ann${n === 1 ? 'o' : 'i'} fa`,
+
+  inSeconds: (n) => `tra ${n} second${n === 1 ? 'o' : 'i'}`,
+  inMinutes: (n) => `tra ${n} minut${n === 1 ? 'o' : 'i'}`,
+  inHours: (n) => `tra ${n} or${n === 1 ? 'a' : 'e'}`,
+  tomorrow: 'domani',
+  inDays: (n) => `tra ${n} giorn${n === 1 ? 'o' : 'i'}`,
+  inWeeks: (n) => `tra ${n} settiman${n === 1 ? 'a' : 'e'}`,
+  inMonths: (n) => `tra ${n} mes${n === 1 ? 'e' : 'i'}`,
+  inYears: (n) => `tra ${n} ann${n === 1 ? 'o' : 'i'}`,
+
+  durationHours: (n) => `${n} or${n === 1 ? 'a' : 'e'}`,
+  durationMinutes: (n) => `${n} minut${n === 1 ? 'o' : 'i'}`,
+  durationSeconds: (n) => `${n} second${n === 1 ? 'o' : 'i'}`,
+  durationAbout: (time) => `circa ${time}`,
+
+  monthsShort: ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'],
+  monthsFull: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'],
+
+  weekdaysShort: ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'],
+  weekdaysFull: ['Domenica', 'Luned\u00ec', 'Marted\u00ec', 'Mercoled\u00ec', 'Gioved\u00ec', 'Venerd\u00ec', 'Sabato'],
+
+  yesterdayAt: (time) => `Ieri alle ${time}`,
+  tomorrowAt: (time) => `Domani alle ${time}`,
+  todayAt: (time) => `oggi alle ${time}`,
+  at: 'alle',
+}
+
+// Korean
+export const ko: LocaleStrings = {
+  justNow: '\uBC29\uAE08',
+  secondsAgo: (n) => `${n}\uCD08 \uC804`,
+  minutesAgo: (n) => `${n}\uBD84 \uC804`,
+  hoursAgo: (n) => `${n}\uC2DC\uAC04 \uC804`,
+  yesterday: '\uC5B4\uC81C',
+  daysAgo: (n) => `${n}\uC77C \uC804`,
+  weeksAgo: (n) => `${n}\uC8FC \uC804`,
+  monthsAgo: (n) => `${n}\uAC1C\uC6D4 \uC804`,
+  yearsAgo: (n) => `${n}\uB144 \uC804`,
+
+  inSeconds: (n) => `${n}\uCD08 \uD6C4`,
+  inMinutes: (n) => `${n}\uBD84 \uD6C4`,
+  inHours: (n) => `${n}\uC2DC\uAC04 \uD6C4`,
+  tomorrow: '\uB0B4\uC77C',
+  inDays: (n) => `${n}\uC77C \uD6C4`,
+  inWeeks: (n) => `${n}\uC8FC \uD6C4`,
+  inMonths: (n) => `${n}\uAC1C\uC6D4 \uD6C4`,
+  inYears: (n) => `${n}\uB144 \uD6C4`,
+
+  durationHours: (n) => `${n}\uC2DC\uAC04`,
+  durationMinutes: (n) => `${n}\uBD84`,
+  durationSeconds: (n) => `${n}\uCD08`,
+  durationAbout: (time) => `\uC57D ${time}`,
+
+  monthsShort: ['1\uC6D4', '2\uC6D4', '3\uC6D4', '4\uC6D4', '5\uC6D4', '6\uC6D4', '7\uC6D4', '8\uC6D4', '9\uC6D4', '10\uC6D4', '11\uC6D4', '12\uC6D4'],
+  monthsFull: ['1\uC6D4', '2\uC6D4', '3\uC6D4', '4\uC6D4', '5\uC6D4', '6\uC6D4', '7\uC6D4', '8\uC6D4', '9\uC6D4', '10\uC6D4', '11\uC6D4', '12\uC6D4'],
+
+  weekdaysShort: ['\uC77C', '\uC6D4', '\uD654', '\uC218', '\uBAA9', '\uAE08', '\uD1A0'],
+  weekdaysFull: ['\uC77C\uC694\uC77C', '\uC6D4\uC694\uC77C', '\uD654\uC694\uC77C', '\uC218\uC694\uC77C', '\uBAA9\uC694\uC77C', '\uAE08\uC694\uC77C', '\uD1A0\uC694\uC77C'],
+
+  yesterdayAt: (time) => `\uC5B4\uC81C ${time}`,
+  tomorrowAt: (time) => `\uB0B4\uC77C ${time}`,
+  todayAt: (time) => `\uC624\uB298 ${time}`,
+  at: '',
+}
+
+// Arabic
+export const ar: LocaleStrings = {
+  justNow: '\u0627\u0644\u0622\u0646',
+  secondsAgo: (n) => `\u0645\u0646\u0630 ${n} ${n === 1 ? '\u062B\u0627\u0646\u064A\u0629' : n === 2 ? '\u062B\u0627\u0646\u064A\u062A\u064A\u0646' : n <= 10 ? '\u062B\u0648\u0627\u0646\u064D' : '\u062B\u0627\u0646\u064A\u0629'}`,
+  minutesAgo: (n) => `\u0645\u0646\u0630 ${n} ${n === 1 ? '\u062F\u0642\u064A\u0642\u0629' : n === 2 ? '\u062F\u0642\u064A\u0642\u062A\u064A\u0646' : n <= 10 ? '\u062F\u0642\u0627\u0626\u0642' : '\u062F\u0642\u064A\u0642\u0629'}`,
+  hoursAgo: (n) => `\u0645\u0646\u0630 ${n} ${n === 1 ? '\u0633\u0627\u0639\u0629' : n === 2 ? '\u0633\u0627\u0639\u062A\u064A\u0646' : n <= 10 ? '\u0633\u0627\u0639\u0627\u062A' : '\u0633\u0627\u0639\u0629'}`,
+  yesterday: '\u0623\u0645\u0633',
+  daysAgo: (n) => `\u0645\u0646\u0630 ${n} ${n === 1 ? '\u064A\u0648\u0645' : n === 2 ? '\u064A\u0648\u0645\u064A\u0646' : n <= 10 ? '\u0623\u064A\u0627\u0645' : '\u064A\u0648\u0645'}`,
+  weeksAgo: (n) => `\u0645\u0646\u0630 ${n} ${n === 1 ? '\u0623\u0633\u0628\u0648\u0639' : n === 2 ? '\u0623\u0633\u0628\u0648\u0639\u064A\u0646' : n <= 10 ? '\u0623\u0633\u0627\u0628\u064A\u0639' : '\u0623\u0633\u0628\u0648\u0639'}`,
+  monthsAgo: (n) => `\u0645\u0646\u0630 ${n} ${n === 1 ? '\u0634\u0647\u0631' : n === 2 ? '\u0634\u0647\u0631\u064A\u0646' : n <= 10 ? '\u0623\u0634\u0647\u0631' : '\u0634\u0647\u0631'}`,
+  yearsAgo: (n) => `\u0645\u0646\u0630 ${n} ${n === 1 ? '\u0633\u0646\u0629' : n === 2 ? '\u0633\u0646\u062A\u064A\u0646' : n <= 10 ? '\u0633\u0646\u0648\u0627\u062A' : '\u0633\u0646\u0629'}`,
+
+  inSeconds: (n) => `\u062E\u0644\u0627\u0644 ${n} ${n === 1 ? '\u062B\u0627\u0646\u064A\u0629' : n === 2 ? '\u062B\u0627\u0646\u064A\u062A\u064A\u0646' : n <= 10 ? '\u062B\u0648\u0627\u0646\u064D' : '\u062B\u0627\u0646\u064A\u0629'}`,
+  inMinutes: (n) => `\u062E\u0644\u0627\u0644 ${n} ${n === 1 ? '\u062F\u0642\u064A\u0642\u0629' : n === 2 ? '\u062F\u0642\u064A\u0642\u062A\u064A\u0646' : n <= 10 ? '\u062F\u0642\u0627\u0626\u0642' : '\u062F\u0642\u064A\u0642\u0629'}`,
+  inHours: (n) => `\u062E\u0644\u0627\u0644 ${n} ${n === 1 ? '\u0633\u0627\u0639\u0629' : n === 2 ? '\u0633\u0627\u0639\u062A\u064A\u0646' : n <= 10 ? '\u0633\u0627\u0639\u0627\u062A' : '\u0633\u0627\u0639\u0629'}`,
+  tomorrow: '\u063A\u062F\u0627\u064B',
+  inDays: (n) => `\u062E\u0644\u0627\u0644 ${n} ${n === 1 ? '\u064A\u0648\u0645' : n === 2 ? '\u064A\u0648\u0645\u064A\u0646' : n <= 10 ? '\u0623\u064A\u0627\u0645' : '\u064A\u0648\u0645'}`,
+  inWeeks: (n) => `\u062E\u0644\u0627\u0644 ${n} ${n === 1 ? '\u0623\u0633\u0628\u0648\u0639' : n === 2 ? '\u0623\u0633\u0628\u0648\u0639\u064A\u0646' : n <= 10 ? '\u0623\u0633\u0627\u0628\u064A\u0639' : '\u0623\u0633\u0628\u0648\u0639'}`,
+  inMonths: (n) => `\u062E\u0644\u0627\u0644 ${n} ${n === 1 ? '\u0634\u0647\u0631' : n === 2 ? '\u0634\u0647\u0631\u064A\u0646' : n <= 10 ? '\u0623\u0634\u0647\u0631' : '\u0634\u0647\u0631'}`,
+  inYears: (n) => `\u062E\u0644\u0627\u0644 ${n} ${n === 1 ? '\u0633\u0646\u0629' : n === 2 ? '\u0633\u0646\u062A\u064A\u0646' : n <= 10 ? '\u0633\u0646\u0648\u0627\u062A' : '\u0633\u0646\u0629'}`,
+
+  durationHours: (n) => `${n} ${n === 1 ? '\u0633\u0627\u0639\u0629' : n === 2 ? '\u0633\u0627\u0639\u062A\u064A\u0646' : n <= 10 ? '\u0633\u0627\u0639\u0627\u062A' : '\u0633\u0627\u0639\u0629'}`,
+  durationMinutes: (n) => `${n} ${n === 1 ? '\u062F\u0642\u064A\u0642\u0629' : n === 2 ? '\u062F\u0642\u064A\u0642\u062A\u064A\u0646' : n <= 10 ? '\u062F\u0642\u0627\u0626\u0642' : '\u062F\u0642\u064A\u0642\u0629'}`,
+  durationSeconds: (n) => `${n} ${n === 1 ? '\u062B\u0627\u0646\u064A\u0629' : n === 2 ? '\u062B\u0627\u0646\u064A\u062A\u064A\u0646' : n <= 10 ? '\u062B\u0648\u0627\u0646\u064D' : '\u062B\u0627\u0646\u064A\u0629'}`,
+  durationAbout: (time) => `\u062D\u0648\u0627\u0644\u064A ${time}`,
+
+  monthsShort: ['\u064A\u0646\u0627', '\u0641\u0628\u0631', '\u0645\u0627\u0631', '\u0623\u0628\u0631', '\u0645\u0627\u064A', '\u064A\u0648\u0646', '\u064A\u0648\u0644', '\u0623\u063A\u0633', '\u0633\u0628\u062A', '\u0623\u0643\u062A', '\u0646\u0648\u0641', '\u062F\u064A\u0633'],
+  monthsFull: ['\u064A\u0646\u0627\u064A\u0631', '\u0641\u0628\u0631\u0627\u064A\u0631', '\u0645\u0627\u0631\u0633', '\u0623\u0628\u0631\u064A\u0644', '\u0645\u0627\u064A\u0648', '\u064A\u0648\u0646\u064A\u0648', '\u064A\u0648\u0644\u064A\u0648', '\u0623\u063A\u0633\u0637\u0633', '\u0633\u0628\u062A\u0645\u0628\u0631', '\u0623\u0643\u062A\u0648\u0628\u0631', '\u0646\u0648\u0641\u0645\u0628\u0631', '\u062F\u064A\u0633\u0645\u0628\u0631'],
+
+  weekdaysShort: ['\u0623\u062D\u062F', '\u0627\u062B\u0646', '\u062B\u0644\u0627\u062B', '\u0623\u0631\u0628\u0639', '\u062E\u0645\u064A\u0633', '\u062C\u0645\u0639\u0629', '\u0633\u0628\u062A'],
+  weekdaysFull: ['\u0627\u0644\u0623\u062D\u062F', '\u0627\u0644\u0627\u062B\u0646\u064A\u0646', '\u0627\u0644\u062B\u0644\u0627\u062B\u0627\u0621', '\u0627\u0644\u0623\u0631\u0628\u0639\u0627\u0621', '\u0627\u0644\u062E\u0645\u064A\u0633', '\u0627\u0644\u062C\u0645\u0639\u0629', '\u0627\u0644\u0633\u0628\u062A'],
+
+  yesterdayAt: (time) => `\u0623\u0645\u0633 \u0641\u064A ${time}`,
+  tomorrowAt: (time) => `\u063A\u062F\u0627\u064B \u0641\u064A ${time}`,
+  todayAt: (time) => `\u0627\u0644\u064A\u0648\u0645 \u0641\u064A ${time}`,
+  at: '\u0641\u064A',
+}
+
 // Locale registry
 export const locales: Record<string, LocaleStrings> = {
   en,
@@ -292,6 +444,16 @@ export const locales: Record<string, LocaleStrings> = {
   'ja-JP': ja,
   zh,
   'zh-CN': zh,
+  pt,
+  'pt-BR': pt,
+  'pt-PT': pt,
+  it,
+  'it-IT': it,
+  ko,
+  'ko-KR': ko,
+  ar,
+  'ar-SA': ar,
+  'ar-EG': ar,
 }
 
 /**
