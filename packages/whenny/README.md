@@ -1,64 +1,47 @@
 # whenny
 
-The core Whenny date library. A modern, configurable date formatting library for the AI era.
+Modern TypeScript date formatting library. Zero dependencies. Own your code.
 
-## Installation
+**[Full Documentation](https://whenny.dev)** | **[GitHub](https://github.com/ZVN-DEV/whenny)** | **[Demo](https://whenny.dev/demo)**
 
-```bash
-npm install whenny
-```
+## What Makes Whenny Different
 
-Or use the shadcn-style CLI:
+- **shadcn-style install** — `npx create-whenny add smart relative` copies code into your project. You own it.
+- **Size-based formatting** — `whenny(date).lg` instead of `format(date, "MMMM Do, YYYY")`
+- **8 pre-built themes** — Slack, GitHub, Discord, Twitter, and more. One line to match your product.
+- **Configurable voice** — One `whenny.config.ts` controls every output string in your app.
+- **React hooks** — `useRelativeTime` and `useCountdown` with auto-updating, SSR-safe.
+- **MCP server** — AI assistants (Claude, ChatGPT) can use date functions directly.
+- **Transfer Protocol** — Solves server/client timezone sync in SSR apps.
+- **Zero dependencies** — Pure TypeScript, tree-shakeable, 374 tests.
 
-```bash
-npx create-whenny init
-npx create-whenny add relative smart calendar
-```
-
-## Usage
-
-```typescript
-import { whenny, duration, calendar, compare, relative, smart } from 'whenny'
-
-// Main Whenny class - chainable API
-const w = whenny(new Date())
-
-w.smart()                    // Context-aware formatting
-w.relative()                 // "5 minutes ago"
-w.short()                    // "Jan 15"
-w.long()                     // "January 15, 2024"
-w.time()                     // "3:45 PM"
-w.datetime()                 // "Jan 15, 3:45 PM"
-w.iso()                      // ISO 8601 string
-w.format('{monthFull} {day}, {year}')  // Custom format
-
-// Standalone functions
-relative(date)               // "5 minutes ago"
-smart(date)                  // Context-aware
-duration(seconds)            // Duration formatting
-compare(dateA, dateB)        // Date comparison
-```
-
-## Configuration
+## Quick Start
 
 ```typescript
-import { defineConfig, configure } from 'whenny/config'
+import { whenny, compare, duration, calendar } from 'whenny'
 
-const config = defineConfig({
-  locale: 'en-US',
-  relative: {
-    justNow: 'just now',
-    minutesAgo: (n) => `${n} minute${n === 1 ? '' : 's'} ago`,
-  },
-  formats: {
-    presets: {
-      short: '{monthShort} {day}',
-    },
-    hour12: true,
-  },
-})
+// Size-based formatting (like Tailwind for dates)
+whenny(date).xs        // "2/3"
+whenny(date).sm        // "Feb 3"
+whenny(date).md        // "Feb 3, 2026"
+whenny(date).lg        // "February 3rd, 2026"
+whenny(date).xl        // "Tuesday, February 3rd, 2026"
 
-configure(config)
+// Smart formatting — auto-picks the best representation
+whenny(date).smart()   // "just now" / "5 min ago" / "Yesterday" / "Jan 15"
+
+// Relative time
+whenny(date).relative() // "5 minutes ago"
+
+// Duration
+duration(3661).compact() // "1h 1m 1s"
+
+// Calendar
+calendar.isBusinessDay(date)     // true
+calendar.addBusinessDays(date, 5) // skips weekends
+
+// Comparison
+compare(dateA, dateB).smart()    // "2 days before"
 ```
 
 ## Themes
@@ -67,118 +50,46 @@ configure(config)
 import { themes } from 'whenny/themes'
 import { configure } from 'whenny'
 
-// casual, formal, slack, twitter, discord, github, minimal, technical
-configure(themes.slack)
+configure(themes.slack)   // "5m", "Yesterday 3:45 PM"
+configure(themes.github)  // "5 minutes ago", "yesterday"
+configure(themes.discord) // "Today at 3:45 PM"
 ```
 
-## Modules
+## vs date-fns / Day.js / Luxon
 
-The library is organized into modules that can be imported individually:
+| Feature | whenny | date-fns | Day.js | Luxon |
+|---------|--------|----------|--------|-------|
+| Own your code (shadcn-style) | Yes | No | No | No |
+| Size-based formatting | Yes | No | No | No |
+| Configurable voice | Yes | No | No | No |
+| Pre-built themes | 8 | No | No | No |
+| React hooks | Yes | No | No | No |
+| MCP server (AI) | Yes | No | No | No |
+| Smart formatting | Yes | No | No | No |
+| Transfer Protocol | Yes | No | No | No |
+| Zero deps | Yes | Yes | Yes | Yes |
+| Locales | 10 | 60+ | 100+ | Intl |
 
-- **core** - Parsing, arithmetic, comparisons, formatting
-- **relative** - Relative time formatting ("5 minutes ago")
-- **smart** - Context-aware smart formatting
-- **compare** - Date comparison utilities
-- **duration** - Duration formatting
-- **calendar** - Calendar helpers (isWeekend, isBusinessDay, etc.)
-- **transfer** - Server/browser timezone transfer protocol
-- **natural** - Natural language parsing
+Whenny is the **display layer** — how dates appear to users. Use it alongside date-fns for manipulation if you need both.
 
-## API Reference
+## Install
 
-### whenny(date)
-
-Creates a new Whenny instance.
-
-```typescript
-const w = whenny(new Date())
-const w = whenny('2024-01-15')
-const w = whenny(1705334400000)
+```bash
+npm install whenny
 ```
 
-### relative(date)
+Or shadcn-style:
 
-Format a date relative to now.
-
-```typescript
-relative(new Date(Date.now() - 5 * 60 * 1000))  // "5 minutes ago"
-relative(new Date(Date.now() + 60 * 60 * 1000)) // "in 1 hour"
+```bash
+npx create-whenny init
+npx create-whenny add relative smart calendar
 ```
 
-### smart(date)
+## Related Packages
 
-Format with context-aware buckets.
-
-```typescript
-smart(date)  // "just now" | "5 minutes ago" | "Yesterday at 3:45 PM" | "Monday at 9:00 AM" | "Jan 15"
-```
-
-### duration(seconds)
-
-Format a duration in seconds.
-
-```typescript
-duration(3661).long()     // "1 hour, 1 minute, 1 second"
-duration(3661).compact()  // "1h 1m 1s"
-duration(3661).clock()    // "1:01:01"
-duration(3661).human()    // "about 1 hour"
-```
-
-### compare(dateA, dateB)
-
-Compare two dates.
-
-```typescript
-compare(earlier, later).smart()   // "2 days before"
-compare(earlier, later).days()    // 2
-compare(earlier, later).hours()   // 48
-compare(earlier, later).seconds() // 172800
-```
-
-### calendar
-
-Calendar utility functions.
-
-```typescript
-calendar.isToday(date)
-calendar.isYesterday(date)
-calendar.isTomorrow(date)
-calendar.isWeekend(date)
-calendar.isWeekday(date)
-calendar.isBusinessDay(date)
-calendar.isPast(date)
-calendar.isFuture(date)
-calendar.daysUntil(date)
-calendar.daysSince(date)
-calendar.startOf(date, 'month')
-calendar.endOf(date, 'month')
-calendar.add(date, 5, 'days')
-calendar.subtract(date, 1, 'week')
-```
-
-### transfer
-
-Transfer protocol for server/browser date serialization.
-
-```typescript
-// Server
-const json = transfer.toJSON(date, 'America/New_York')
-
-// Client
-const { date, originZone, originOffset } = transfer.fromJSON(json)
-```
-
-### natural
-
-Natural language date parsing.
-
-```typescript
-natural.parse('tomorrow')
-natural.parse('next friday')
-natural.parse('in 2 hours')
-natural.parse('december 25th')
-```
+- [`whenny-react`](https://www.npmjs.com/package/whenny-react) — React hooks (useRelativeTime, useCountdown)
+- [`create-whenny`](https://www.npmjs.com/package/create-whenny) — CLI for shadcn-style installation + MCP server
 
 ## License
 
-MIT
+MIT — [GitHub](https://github.com/ZVN-DEV/whenny)
