@@ -116,7 +116,15 @@ export async function add(
     return
   }
 
-  const fullPath = path.join(cwd, targetPath)
+  const fullPath = path.resolve(cwd, targetPath)
+
+  // Validate that the resolved path is within the current working directory
+  const relativePath = path.relative(cwd, fullPath)
+  if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+    console.log(chalk.red('  Target path must be within the current directory'))
+    return
+  }
+
   const spinner = ora('Adding modules...').start()
 
   try {

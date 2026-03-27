@@ -228,95 +228,150 @@ export const mcpTools = {
 }
 
 /**
+ * Assert that a value is a string, throwing a descriptive error if not.
+ */
+function assertString(value: unknown, paramName: string): string {
+  if (typeof value !== 'string') {
+    throw new Error(`Invalid parameter "${paramName}": expected a string, got ${typeof value}`)
+  }
+  return value
+}
+
+/**
+ * Assert that a value is a number, throwing a descriptive error if not.
+ */
+function assertNumber(value: unknown, paramName: string): number {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    throw new Error(`Invalid parameter "${paramName}": expected a number, got ${typeof value}`)
+  }
+  return value
+}
+
+/**
  * Execute an MCP tool
  */
 export function executeMcpTool(toolName: string, params: Record<string, unknown>): unknown {
-  switch (toolName) {
-    case 'whenny': {
-      const w = createWhenny(params.date as string)
-      if (params.timezone) {
-        return w.inZone(params.timezone as string)
+  try {
+    switch (toolName) {
+      case 'whenny': {
+        const date = assertString(params.date, 'date')
+        const w = createWhenny(date)
+        if (params.timezone !== undefined) {
+          const timezone = assertString(params.timezone, 'timezone')
+          return w.inZone(timezone)
+        }
+        return w
       }
-      return w
-    }
 
-    case 'format_datewind': {
-      const w = createWhenny(params.date as string)
-      const style = params.style as string
-      switch (style) {
-        case 'xs': return w.xs
-        case 'sm': return w.sm
-        case 'md': return w.md
-        case 'lg': return w.lg
-        case 'xl': return w.xl
-        case 'clock': return w.clock
-        case 'sortable': return w.sortable
-        case 'log': return w.log
-        default: return w.md
+      case 'format_datewind': {
+        const date = assertString(params.date, 'date')
+        const style = assertString(params.style, 'style')
+        const w = createWhenny(date)
+        switch (style) {
+          case 'xs': return w.xs
+          case 'sm': return w.sm
+          case 'md': return w.md
+          case 'lg': return w.lg
+          case 'xl': return w.xl
+          case 'clock': return w.clock
+          case 'sortable': return w.sortable
+          case 'log': return w.log
+          default: return w.md
+        }
       }
-    }
 
-    case 'format_smart':
-      return smart(params.date as string, params.timezone ? { for: params.timezone as string } : undefined)
-
-    case 'format_relative':
-      return relative(params.date as string, params.from ? { from: params.from as string } : undefined)
-
-    case 'format_duration': {
-      const d = duration(params.seconds as number)
-      const style = (params.style as string) || 'compact'
-      switch (style) {
-        case 'long': return d.long()
-        case 'compact': return d.compact()
-        case 'brief': return d.brief()
-        case 'timer': return d.timer()
-        case 'clock': return d.clock()
-        case 'minimal': return d.minimal()
-        case 'human': return d.human()
-        default: return d.compact()
+      case 'format_smart': {
+        const date = assertString(params.date, 'date')
+        if (params.timezone !== undefined) {
+          const timezone = assertString(params.timezone, 'timezone')
+          return smart(date, { for: timezone })
+        }
+        return smart(date)
       }
-    }
 
-    case 'compare_dates': {
-      const result = compare(params.dateA as string, params.dateB as string)
-      const unit = (params.unit as string) || 'smart'
-      switch (unit) {
-        case 'smart': return result.smart()
-        case 'days': return result.days()
-        case 'hours': return result.hours()
-        case 'minutes': return result.minutes()
-        case 'seconds': return result.seconds()
-        default: return result.smart()
+      case 'format_relative': {
+        const date = assertString(params.date, 'date')
+        if (params.from !== undefined) {
+          const from = assertString(params.from, 'from')
+          return relative(date, { from })
+        }
+        return relative(date)
       }
-    }
 
-    case 'calendar_check': {
-      const check = params.check as string
-      const date = params.date as string
-      switch (check) {
-        case 'isToday': return calendar.isToday(date)
-        case 'isYesterday': return calendar.isYesterday(date)
-        case 'isTomorrow': return calendar.isTomorrow(date)
-        case 'isWeekend': return calendar.isWeekend(date)
-        case 'isWeekday': return calendar.isWeekday(date)
-        case 'isBusinessDay': return calendar.isBusinessDay(date)
-        case 'isPast': return calendar.isPast(date)
-        case 'isFuture': return calendar.isFuture(date)
-        default: return false
+      case 'format_duration': {
+        const seconds = assertNumber(params.seconds, 'seconds')
+        const d = duration(seconds)
+        const style = params.style !== undefined ? assertString(params.style, 'style') : 'compact'
+        switch (style) {
+          case 'long': return d.long()
+          case 'compact': return d.compact()
+          case 'brief': return d.brief()
+          case 'timer': return d.timer()
+          case 'clock': return d.clock()
+          case 'minimal': return d.minimal()
+          case 'human': return d.human()
+          default: return d.compact()
+        }
       }
+
+      case 'compare_dates': {
+        const dateA = assertString(params.dateA, 'dateA')
+        const dateB = assertString(params.dateB, 'dateB')
+        const result = compare(dateA, dateB)
+        const unit = params.unit !== undefined ? assertString(params.unit, 'unit') : 'smart'
+        switch (unit) {
+          case 'smart': return result.smart()
+          case 'days': return result.days()
+          case 'hours': return result.hours()
+          case 'minutes': return result.minutes()
+          case 'seconds': return result.seconds()
+          default: return result.smart()
+        }
+      }
+
+      case 'calendar_check': {
+        const check = assertString(params.check, 'check')
+        const date = assertString(params.date, 'date')
+        switch (check) {
+          case 'isToday': return calendar.isToday(date)
+          case 'isYesterday': return calendar.isYesterday(date)
+          case 'isTomorrow': return calendar.isTomorrow(date)
+          case 'isWeekend': return calendar.isWeekend(date)
+          case 'isWeekday': return calendar.isWeekday(date)
+          case 'isBusinessDay': return calendar.isBusinessDay(date)
+          case 'isPast': return calendar.isPast(date)
+          case 'isFuture': return calendar.isFuture(date)
+          default: return false
+        }
+      }
+
+      case 'add_business_days': {
+        const date = assertString(params.date, 'date')
+        const days = assertNumber(params.days, 'days')
+        return calendar.addBusinessDays(date, days).toISOString()
+      }
+
+      case 'parse_natural': {
+        const expression = assertString(params.expression, 'expression')
+        if (params.from !== undefined) {
+          const from = assertString(params.from, 'from')
+          return parseNatural(expression, { from: new Date(from) })?.toISOString()
+        }
+        return parseNatural(expression)?.toISOString()
+      }
+
+      case 'create_transfer': {
+        const date = assertString(params.date, 'date')
+        const timezone = assertString(params.timezone, 'timezone')
+        return createTransfer(date, { timezone })
+      }
+
+      default:
+        return { error: `Unknown tool: ${toolName}` }
     }
-
-    case 'add_business_days':
-      return calendar.addBusinessDays(params.date as string, params.days as number).toISOString()
-
-    case 'parse_natural':
-      return parseNatural(params.expression as string, params.from ? { from: new Date(params.from as string) } : undefined)?.toISOString()
-
-    case 'create_transfer':
-      return createTransfer(params.date as string, { timezone: params.timezone as string })
-
-    default:
-      throw new Error(`Unknown tool: ${toolName}`)
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
+    return { error: message }
   }
 }
 

@@ -11,6 +11,9 @@ import path from 'path'
 import chalk from 'chalk'
 import ora from 'ora'
 import prompts from 'prompts'
+// Security note: All execSync calls in this file use static command strings only.
+// No user input is interpolated into shell commands. The test directory path is only
+// used via the `cwd` option, which does not go through shell interpolation.
 import { execSync, spawn } from 'child_process'
 import { MODULES } from '../templates/index.js'
 
