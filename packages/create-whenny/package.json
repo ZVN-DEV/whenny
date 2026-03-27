@@ -1,6 +1,6 @@
 {
   "name": "create-whenny",
-  "version": "1.0.8",
+  "version": "1.1.0",
   "description": "CLI for adding Whenny date utilities to your project",
   "keywords": [
     "whenny",
