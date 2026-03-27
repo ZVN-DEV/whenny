@@ -20,7 +20,8 @@
     },
     "lint": {
       "dependsOn": ["^build"],
-      "outputs": []
+      "outputs": [],
+      "passThroughEnv": ["ESLINT_USE_FLAT_CONFIG"]
     },
     "typecheck": {
       "dependsOn": ["^build"],

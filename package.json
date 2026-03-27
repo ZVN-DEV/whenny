@@ -13,7 +13,7 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
     "typecheck": "turbo run typecheck",
-    "lint": "turbo run lint",
+    "lint": "ESLINT_USE_FLAT_CONFIG=true turbo run lint",
     "clean": "turbo run clean && rm -rf node_modules",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "changeset": "changeset",
@@ -23,6 +23,8 @@
   "devDependencies": {
     "@changesets/cli": "^2.27.0",
     "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
     "prettier": "^3.2.0",
     "turbo": "^2.0.0",
     "typescript": "^5.3.0",
