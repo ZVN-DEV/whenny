@@ -37,3 +37,17 @@ jobs:
 
       - name: Type check
         run: npm run typecheck
+
+      - name: Report bundle sizes
+        if: matrix.node-version == '20.x'
+        run: |
+          echo "## Bundle Sizes" >> $GITHUB_STEP_SUMMARY
+          echo "| Package | File | Size |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|------|------|" >> $GITHUB_STEP_SUMMARY
+          for f in packages/whenny/dist/*.js packages/whenny/dist/*.cjs; do
+            if [ -f "$f" ]; then
+              size=$(wc -c < "$f" | tr -d ' ')
+              gzip_size=$(gzip -c "$f" | wc -c | tr -d ' ')
+              echo "| whenny | $(basename $f) | ${size}B (${gzip_size}B gzip) |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done

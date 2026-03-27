@@ -1,0 +1,61 @@
+name: Bundle Size Check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  size-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Report bundle sizes
+        run: |
+          echo "## Bundle Size Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Package | File | Raw | Gzip |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|------|-----|------|" >> $GITHUB_STEP_SUMMARY
+          total_raw=0
+          total_gzip=0
+          for pkg in whenny whenny-react create-whenny; do
+            for f in packages/$pkg/dist/*.js packages/$pkg/dist/*.cjs; do
+              if [ -f "$f" ]; then
+                size=$(wc -c < "$f" | tr -d ' ')
+                gzip_size=$(gzip -c "$f" | wc -c | tr -d ' ')
+                total_raw=$((total_raw + size))
+                total_gzip=$((total_gzip + gzip_size))
+                echo "| $pkg | $(basename $f) | ${size}B | ${gzip_size}B |" >> $GITHUB_STEP_SUMMARY
+              fi
+            done
+          done
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Total: ${total_raw}B raw / ${total_gzip}B gzip**" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check size limits
+        run: |
+          # Fail if core whenny package exceeds 50KB gzip
+          for f in packages/whenny/dist/index.js; do
+            if [ -f "$f" ]; then
+              gzip_size=$(gzip -c "$f" | wc -c | tr -d ' ')
+              if [ "$gzip_size" -gt 51200 ]; then
+                echo "::error::Bundle size for $f exceeds 50KB gzip limit (${gzip_size}B)"
+                exit 1
+              fi
+              echo "OK: $(basename $f) is ${gzip_size}B gzip (limit: 51200B)"
+            fi
+          done
