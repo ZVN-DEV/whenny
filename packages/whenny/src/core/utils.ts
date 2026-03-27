@@ -139,22 +139,55 @@ export function parseDate(input: DateInput): Date {
     )
   }
 
-  // Handle Whenny instances (duck typing)
-  if (input && typeof input === 'object' && 'toDate' in input) {
-    const date = (input as { toDate(): Date }).toDate()
-    if (isNaN(date.getTime())) {
-      throw new WhennyError('INVALID_DATE', 'Object.toDate() returned Invalid Date', {
-        input: 'Whenny-like object',
-        operation: 'parseDate',
-      })
+  // ─────────────────────────────────────────────────────────
+  // Temporal API support (Stage 3 — forward-compatible)
+  //
+  // The TC39 Temporal proposal is shipping in Chrome 144 and Firefox 139.
+  // When the Temporal global is available at runtime we accept
+  // Temporal.Instant and Temporal.ZonedDateTime as DateInput values.
+  // If Temporal is not present, we fall through to the next check.
+  // ─────────────────────────────────────────────────────────
+  if (input && typeof input === 'object') {
+    // Temporal.Instant — has epochMilliseconds property
+    const inputRecord = input as unknown as Record<string, unknown>
+    if (
+      typeof inputRecord.epochMilliseconds === 'number' ||
+      typeof inputRecord.epochMilliseconds === 'bigint'
+    ) {
+      const ms = Number(inputRecord.epochMilliseconds)
+      if (!Number.isFinite(ms)) {
+        throw new WhennyError('INVALID_TIMESTAMP', 'Temporal epochMilliseconds is not finite', {
+          input: 'Temporal.Instant or Temporal.ZonedDateTime',
+          operation: 'parseDate',
+        })
+      }
+      const date = new Date(ms)
+      if (isNaN(date.getTime())) {
+        throw new WhennyError('INVALID_DATE', 'Temporal object resulted in Invalid Date', {
+          input: 'Temporal.Instant or Temporal.ZonedDateTime',
+          operation: 'parseDate',
+        })
+      }
+      return date
     }
-    return date
+
+    // Handle Whenny instances (duck typing)
+    if ('toDate' in input) {
+      const date = (input as { toDate(): Date }).toDate()
+      if (isNaN(date.getTime())) {
+        throw new WhennyError('INVALID_DATE', 'Object.toDate() returned Invalid Date', {
+          input: 'Whenny-like object',
+          operation: 'parseDate',
+        })
+      }
+      return date
+    }
   }
 
   throw new WhennyError('INVALID_DATE', 'Unsupported date input type', {
     input,
     received: typeof input,
-    expected: 'Date | number | string',
+    expected: 'Date | number | string | Temporal.Instant | Temporal.ZonedDateTime',
     operation: 'parseDate',
   })
 }

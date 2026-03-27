@@ -206,7 +206,7 @@ export {
 
 // Core utilities
 export { parseDate, isValidDate, getLocalTimezone }
-export { format, formatPreset, formatISO, formatInTimezone } from './core/formatter'
+export { format, formatPreset, formatISO, formatInTimezone, clearFormatterCache } from './core/formatter'
 export {
   MONTHS_SHORT,
   MONTHS_FULL,
@@ -255,6 +255,10 @@ export {
   de,
   ja,
   zh,
+  pt,
+  it,
+  ko,
+  ar,
   type LocaleStrings,
 } from './i18n'
 
