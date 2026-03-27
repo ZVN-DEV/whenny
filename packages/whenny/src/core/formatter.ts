@@ -71,6 +71,7 @@ interface DateParts {
  * Creating Intl.DateTimeFormat is expensive; caching by
  * timezone + options key gives ~5-10% speedup on heavy formatting workloads.
  */
+const MAX_FORMATTER_CACHE_SIZE = 100
 const formatterCache = new Map<string, Intl.DateTimeFormat>()
 
 /**
@@ -88,6 +89,11 @@ function getOrCreateFormatter(
   let fmt = formatterCache.get(key)
   if (!fmt) {
     fmt = new Intl.DateTimeFormat('en-US', { ...options, timeZone: timezone })
+    if (formatterCache.size >= MAX_FORMATTER_CACHE_SIZE) {
+      // Evict oldest entry (first inserted)
+      const firstKey = formatterCache.keys().next().value
+      if (firstKey !== undefined) formatterCache.delete(firstKey)
+    }
     formatterCache.set(key, fmt)
   }
   return fmt

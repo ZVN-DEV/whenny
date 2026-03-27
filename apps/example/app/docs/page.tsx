@@ -175,6 +175,7 @@ function NavItem({ section, active, onClick, children }: { section: Section; act
   return (
     <button
       onClick={() => onClick(section)}
+      aria-current={isActive ? 'page' : undefined}
       className={`block w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors ${
         isActive ? 'bg-slate-100 text-slate-900 font-medium' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
       }`}

@@ -1,12 +1,12 @@
 import { MetadataRoute } from 'next'
-import { getAllPosts } from './blog/posts'
+import { getPublishedPosts } from './blog/posts'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://whenny.dev'
   const now = new Date()
 
-  // Blog post entries
-  const blogPosts = getAllPosts().map((post) => ({
+  // Only include published blog posts in sitemap
+  const blogPosts = getPublishedPosts().map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: new Date(post.publishDate),
     changeFrequency: 'monthly' as const,
