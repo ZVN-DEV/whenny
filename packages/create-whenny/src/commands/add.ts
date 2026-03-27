@@ -8,10 +8,12 @@ import fs from 'fs-extra'
 import path from 'path'
 import chalk from 'chalk'
 import ora from 'ora'
+import crypto from 'crypto'
 import prompts from 'prompts'
 import { MODULES, getModuleTemplate } from '../templates/index.js'
 import { detectWhennyPath } from '../utils/detect.js'
 import { writeDocsFile, getInstalledModules } from '../utils/docs-generator.js'
+import { writeChecksums } from './update.js'
 
 /**
  * Resolve all dependencies for the given modules
@@ -157,7 +159,20 @@ export async function add(
       spinner.start()
     }
 
-    // Write modules
+    // Write modules and compute checksums
+    const checksums: Record<string, string> = {}
+
+    // Read existing checksums if any
+    const checksumPath = path.join(fullPath, '.whenny-checksums.json')
+    if (await fs.pathExists(checksumPath)) {
+      try {
+        const existing = await fs.readJSON(checksumPath)
+        Object.assign(checksums, existing)
+      } catch {
+        // Ignore malformed checksum file
+      }
+    }
+
     for (const moduleName of modules) {
       spinner.text = `Adding ${moduleName}...`
       const template = getModuleTemplate(moduleName)
@@ -167,7 +182,14 @@ export async function add(
       }
 
       await fs.writeFile(path.join(fullPath, `${moduleName}.ts`), template)
+
+      // Store checksum of the original template content
+      checksums[moduleName] = crypto.createHash('sha256').update(template).digest('hex')
     }
+
+    // Write checksums file
+    spinner.text = 'Writing checksums...'
+    await writeChecksums(fullPath, checksums)
 
     // Update index file
     spinner.text = 'Updating index.ts...'
