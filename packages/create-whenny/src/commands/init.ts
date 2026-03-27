@@ -122,7 +122,14 @@ export async function init(options: InitOptions): Promise<void> {
 
   try {
     // Create directory
-    const fullPath = path.join(cwd, targetPath)
+    const fullPath = path.resolve(cwd, targetPath)
+
+    // Validate that the resolved path is within the current working directory
+    const relativePath = path.relative(cwd, fullPath)
+    if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+      throw new Error('Target path must be within the current directory')
+    }
+
     await fs.ensureDir(fullPath)
 
     // Write config file
