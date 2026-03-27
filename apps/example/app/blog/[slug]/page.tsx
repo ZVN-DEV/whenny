@@ -2,14 +2,21 @@
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { getPostBySlug, getAllPosts } from '../posts'
+import { getPostBySlug, getPublishedPosts } from '../posts'
 import { whenny } from 'whenny'
 import ReactMarkdown from 'react-markdown'
+import rehypeSanitize from 'rehype-sanitize'
 
 export default function BlogPostPage() {
   const params = useParams()
   const slug = params.slug as string
   const post = getPostBySlug(slug)
+
+  // Determine previous/next posts for navigation
+  const publishedPosts = getPublishedPosts()
+  const currentIndex = publishedPosts.findIndex(p => p.slug === slug)
+  const prevPost = currentIndex > 0 ? publishedPosts[currentIndex - 1] : null
+  const nextPost = currentIndex < publishedPosts.length - 1 ? publishedPosts[currentIndex + 1] : null
 
   if (!post) {
     return (
@@ -97,6 +104,7 @@ export default function BlogPostPage() {
         {/* Content */}
         <div className="prose prose-lg prose-slate max-w-none prose-headings:font-semibold prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-5 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4 prose-p:text-slate-600 prose-p:leading-relaxed prose-p:mb-6 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 prose-code:text-sm prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:my-6 prose-li:mb-2">
           <ReactMarkdown
+            rehypePlugins={[rehypeSanitize]}
             components={{
               code: ({ className, children, ...props }) => {
                 const isInline = !className
@@ -126,7 +134,7 @@ export default function BlogPostPage() {
 
         {/* Footer */}
         <footer className="mt-12 pt-8 border-t border-slate-200">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
             <div>
               <p className="text-sm text-slate-500">Share this post</p>
               <div className="flex gap-3 mt-2">
@@ -152,6 +160,48 @@ export default function BlogPostPage() {
               ← More posts
             </Link>
           </div>
+
+          {/* Previous / Next Post Navigation */}
+          {(prevPost || nextPost) && (
+            <nav aria-label="Blog post navigation" className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-slate-100">
+              {prevPost ? (
+                <Link
+                  href={`/blog/${prevPost.slug}`}
+                  className="group flex flex-col p-4 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all"
+                >
+                  <span className="text-xs text-slate-400 mb-1 flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Previous
+                  </span>
+                  <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900 transition-colors line-clamp-1">
+                    {prevPost.title}
+                  </span>
+                </Link>
+              ) : (
+                <div />
+              )}
+              {nextPost ? (
+                <Link
+                  href={`/blog/${nextPost.slug}`}
+                  className="group flex flex-col items-end p-4 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all text-right"
+                >
+                  <span className="text-xs text-slate-400 mb-1 flex items-center gap-1">
+                    Next
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                  <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900 transition-colors line-clamp-1">
+                    {nextPost.title}
+                  </span>
+                </Link>
+              ) : (
+                <div />
+              )}
+            </nav>
+          )}
         </footer>
       </article>
     </main>
