@@ -13,6 +13,7 @@ import { init } from './commands/init.js'
 import { add } from './commands/add.js'
 import { list } from './commands/list.js'
 import { diff } from './commands/diff.js'
+import { update } from './commands/update.js'
 import { testInstall } from './commands/test-install.js'
 import { mcp } from './commands/mcp.js'
 
@@ -58,9 +59,7 @@ program
   .description('Update installed modules')
   .argument('[modules...]', 'Modules to update (or "all")')
   .option('--force', 'Overwrite without prompting')
-  .action(async (modules, options) => {
-    console.log(chalk.yellow('Update command coming soon'))
-  })
+  .action(update)
 
 program
   .command('remove')

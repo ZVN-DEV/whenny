@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
-type Section = 'installation' | 'quickstart' | 'core' | 'formatting' | 'relative' | 'smart' | 'compare' | 'duration' | 'timezone' | 'calendar' | 'natural' | 'react' | 'config' | 'cli'
+type Section = 'installation' | 'upgrading' | 'quickstart' | 'core' | 'formatting' | 'relative' | 'smart' | 'compare' | 'duration' | 'timezone' | 'calendar' | 'natural' | 'react' | 'config' | 'cli'
 
 // Simple copyable code block - no syntax highlighting
 function CodeBlock({ children, title }: { children: string; title?: string }) {
@@ -49,6 +49,7 @@ function CodeBlock({ children, title }: { children: string; title?: string }) {
 // Navigation items for mobile chips
 const navItems: { section: Section; label: string }[] = [
   { section: 'installation', label: 'Install' },
+  { section: 'upgrading', label: 'Upgrading' },
   { section: 'quickstart', label: 'Quick Start' },
   { section: 'core', label: 'whenny()' },
   { section: 'formatting', label: 'Formatting' },
@@ -113,6 +114,7 @@ export default function DocsPage() {
             <div className="sticky top-24 space-y-1">
               <NavSection title="Getting Started">
                 <NavItem section="installation" active={activeSection} onClick={setActiveSection}>Installation</NavItem>
+                <NavItem section="upgrading" active={activeSection} onClick={setActiveSection}>Upgrading</NavItem>
                 <NavItem section="quickstart" active={activeSection} onClick={setActiveSection}>Quick Start</NavItem>
               </NavSection>
               <NavSection title="Core API">
@@ -141,6 +143,7 @@ export default function DocsPage() {
           {/* Content */}
           <div className="flex-1 min-w-0 max-w-2xl">
             {activeSection === 'installation' && <InstallationSection />}
+            {activeSection === 'upgrading' && <UpgradingSection />}
             {activeSection === 'quickstart' && <QuickStartSection />}
             {activeSection === 'core' && <CoreSection />}
             {activeSection === 'formatting' && <FormattingSection />}
@@ -349,6 +352,65 @@ function InstallationSection() {
       <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">Import</h2>
       <CodeBlock>{`import { whenny, compare, duration, calendar } from 'whenny'
 import { useRelativeTime, useCountdown } from 'whenny-react'`}</CodeBlock>
+    </DocSection>
+  )
+}
+
+function UpgradingSection() {
+  return (
+    <DocSection title="Upgrading">
+      <p className="text-slate-600 mb-6">How to upgrade Whenny to the latest version.</p>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">npm package users</h2>
+      <CodeBlock>{`npm install whenny@latest whenny-react@latest`}</CodeBlock>
+      <p className="text-slate-600 mb-6">That&apos;s it. No breaking changes in 1.1.0.</p>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">shadcn-style users</h2>
+      <p className="text-slate-600 mb-4">Since you own the code, updating is a bit more involved. The CLI helps you manage it.</p>
+
+      <h3 className="text-base font-medium text-slate-800 mt-6 mb-2">See what changed</h3>
+      <CodeBlock>{`# Diff individual modules against the latest version
+npx create-whenny diff smart
+npx create-whenny diff relative`}</CodeBlock>
+
+      <h3 className="text-base font-medium text-slate-800 mt-6 mb-2">Update modules</h3>
+      <CodeBlock>{`# Update all modules (auto-updates unchanged, prompts for customized)
+npx create-whenny update all
+
+# Update specific modules
+npx create-whenny update smart relative
+
+# Force update (overwrites customizations)
+npx create-whenny update all --force`}</CodeBlock>
+
+      <p className="text-slate-600 mt-4 mb-6">
+        The update command tracks which modules you&apos;ve customized. If a module is unchanged from the original,
+        it updates automatically. If you&apos;ve made changes, it shows a diff and asks before overwriting.
+      </p>
+
+      <h2 className="text-lg font-medium text-slate-900 mt-8 mb-3">What&apos;s new in 1.1.0</h2>
+      <ul className="space-y-2 text-slate-600 mb-6">
+        <li className="flex items-start gap-2">
+          <span className="text-green-600 mt-0.5">+</span>
+          <span>4 new locales (pt, it, ko, ar)</span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span className="text-green-600 mt-0.5">+</span>
+          <span>Temporal API support</span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span className="text-green-600 mt-0.5">+</span>
+          <span>Faster formatting (Intl.DateTimeFormat caching)</span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span className="text-green-600 mt-0.5">+</span>
+          <span>Minified builds (37% smaller)</span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span className="text-green-600 mt-0.5">+</span>
+          <span>MCP tool parameter validation</span>
+        </li>
+      </ul>
     </DocSection>
   )
 }
