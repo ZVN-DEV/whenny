@@ -81,7 +81,16 @@ export const metadata: Metadata = {
   classification: 'Software Development',
 }
 
-// JSON-LD Structured Data for rich search results
+/*
+ * JSON-LD Structured Data for rich search results.
+ *
+ * This object is fully static (no user input, no dynamic interpolation) and is
+ * serialized into a <script type="application/ld+json"> tag via
+ * dangerouslySetInnerHTML. This is the standard pattern recommended by Next.js
+ * for JSON-LD (see https://nextjs.org/docs/app/building-your-application/optimizing/metadata#json-ld).
+ * Because the data is a compile-time constant with no external or user-supplied
+ * values, there is no XSS risk from using dangerouslySetInnerHTML here.
+ */
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
@@ -101,7 +110,7 @@ const jsonLd = {
   },
   programmingLanguage: ['TypeScript', 'JavaScript'],
   keywords: 'date library, typescript, timezone, moment.js alternative, AI-friendly',
-}
+} as const
 
 export default function RootLayout({
   children,
@@ -116,7 +125,17 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-slate-900 focus:text-white focus:rounded-lg focus:text-sm focus:font-medium focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+        >
+          Skip to main content
+        </a>
+        <div id="main-content">
+          {children}
+        </div>
+      </body>
     </html>
   )
 }
