@@ -1,0 +1,6 @@
+This project uses Whenny, a TypeScript date library.
+
+See CLAUDE.md for architecture and conventions.
+See AGENTS.md for development commands and coding rules.
+
+Key rule: Use whenny(date).lg instead of format strings. Use smart() for relative timestamps. Use useRelativeTime() in React.
