@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { LITTLE_FRIEND_ENABLED, LITTLE_FRIEND_SITE_KEY } from '@/lib/little-friend'
+import LittleFriendEvents from './little-friend'
 import './globals.css'
 
 const title = 'Whenny - The Modern TypeScript Date Library for the AI Era'
@@ -124,8 +126,24 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {LITTLE_FRIEND_ENABLED && (
+          <>
+            <script
+              defer
+              src="https://cdn.littlefriend.io/lf.js"
+              data-site={LITTLE_FRIEND_SITE_KEY}
+              data-mode="journey"
+            />
+            <script
+              defer
+              src="https://cdn.littlefriend.io/lf-replay.js"
+              data-site={LITTLE_FRIEND_SITE_KEY}
+            />
+          </>
+        )}
       </head>
       <body className="font-sans">
+        {LITTLE_FRIEND_ENABLED && <LittleFriendEvents />}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-slate-900 focus:text-white focus:rounded-lg focus:text-sm focus:font-medium focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"

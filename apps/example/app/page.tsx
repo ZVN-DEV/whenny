@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { whenny } from 'whenny'
 import { useRelativeTime } from 'whenny-react'
+import { trackCopy } from '@/lib/little-friend'
 
 // Fade-in animation wrapper
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
@@ -56,6 +57,7 @@ function CommandBlock({ command, variant = 'dark' }: { command: string; variant?
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(command)
+    trackCopy(command)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -99,10 +101,10 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           <Link href="/" className="font-semibold text-slate-900">Whenny</Link>
           <div className="flex items-center gap-3 sm:gap-6">
-            <Link href="/demo" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">Demo</Link>
-            <Link href="/docs" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">Docs</Link>
+            <Link href="/demo" data-lf="nav.demo" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">Demo</Link>
+            <Link href="/docs" data-lf="nav.docs" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">Docs</Link>
             <Link href="/blog" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">Blog</Link>
-            <a href="https://github.com/ZVN-DEV/whenny" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">GitHub</a>
+            <a href="https://github.com/ZVN-DEV/whenny" data-lf="nav.github" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-colors">GitHub</a>
           </div>
         </div>
       </header>
@@ -396,10 +398,10 @@ whenny(event.date).smart()
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3 sm:mb-4">Ready to simplify dates?</h2>
             <p className="text-sm sm:text-base text-slate-600 mb-6 sm:mb-8">Start with the CLI or install the package. Your choice.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/docs" className="px-5 sm:px-6 py-2.5 sm:py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors text-sm sm:text-base">
+              <Link href="/docs" data-lf="cta.docs" className="px-5 sm:px-6 py-2.5 sm:py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors text-sm sm:text-base">
                 Read the Docs
               </Link>
-              <Link href="/demo" className="px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-slate-900 border border-slate-200 rounded-lg font-medium hover:bg-slate-50 transition-colors text-sm sm:text-base">
+              <Link href="/demo" data-lf="cta.demo" className="px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-slate-900 border border-slate-200 rounded-lg font-medium hover:bg-slate-50 transition-colors text-sm sm:text-base">
                 Try the Demo
               </Link>
             </div>
@@ -414,7 +416,7 @@ whenny(event.date).smart()
           <div className="flex items-center gap-4 sm:gap-6">
             <Link href="/docs" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900">Docs</Link>
             <Link href="/demo" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900">Demo</Link>
-            <a href="https://github.com/ZVN-DEV/whenny" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900">GitHub</a>
+            <a href="https://github.com/ZVN-DEV/whenny" data-lf="footer.github" className="text-xs sm:text-sm text-slate-600 hover:text-slate-900">GitHub</a>
           </div>
         </div>
       </footer>
@@ -471,6 +473,7 @@ function ModuleChip({ name }: { name: string }) {
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(command)
+    trackCopy(command)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -497,6 +500,7 @@ function CopyableLine({ command }: { command: string }) {
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(command)
+    trackCopy(command)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
