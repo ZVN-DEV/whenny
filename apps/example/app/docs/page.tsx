@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { trackCopy } from '@/lib/little-friend'
 
 type Section = 'installation' | 'upgrading' | 'quickstart' | 'core' | 'formatting' | 'relative' | 'smart' | 'compare' | 'duration' | 'timezone' | 'calendar' | 'natural' | 'react' | 'config' | 'cli'
 
@@ -11,6 +12,7 @@ function CodeBlock({ children, title }: { children: string; title?: string }) {
 
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText(children)
+    trackCopy(children)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -246,6 +248,7 @@ function InstallationSection() {
 
   const copyCommand = async () => {
     await navigator.clipboard.writeText(addCommand)
+    trackCopy(addCommand)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -264,6 +267,7 @@ function InstallationSection() {
           <button
             onClick={async () => {
               await navigator.clipboard.writeText('npx whenny init')
+              trackCopy('npx whenny init')
               setCopied(true)
               setTimeout(() => setCopied(false), 2000)
             }}
